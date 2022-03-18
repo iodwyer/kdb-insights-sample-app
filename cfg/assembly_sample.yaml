@@ -1,0 +1,9 @@
+name: integration-env
+description: Test GW assembly.
+labels:
+  region: canada,usa
+elements:
+  rc:
+    host: sgrc
+    port: 5060
+  timeout: 30000

@@ -1,0 +1,87 @@
+#
+# Optional: Create volumes to include licence/configuration in the containers.
+#
+x-vols: &vols
+  volumes:
+  - ${kx_licence_dir}:/opt/kx/lic
+  - ./cfg:/opt/kx/cfg
+#  - ${custom_dir}:/opt/kx/custom # Optional mount for loading custom code
+
+#
+# Optional: Create a network for processes to communicate.
+#
+x-kxnet: &kxnet
+  networks:
+  - kx
+
+networks:
+  kx:
+    name: kx
+    driver: bridge
+
+#
+# Services.
+#
+services:
+  #
+  # Resource Coordinator -- 1 per assembly.
+  #
+  sgrc:
+    image: ${registry}/kxi-sg-rc:${sg_version}
+    environment:
+      - KXI_NAME=sg_rc
+      - KXI_PORT=5060
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+   #   - KDB_LICENSE_B64=${kdb-licence}
+    ports:
+      - 127.0.0.1::5060
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
+
+
+  #
+  # Aggregator. Note we only have one here, but multiple can be configured.
+  #
+  sgagg:
+    image: ${registry}/kxi-sg-agg:${sg_version}
+    environment:
+      - KXI_NAME=sg_agg
+      - KXI_PORT=5050
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+#      - KXI_CUSTOM_FILE=/opt/kx/custom/${custom_agg_code}.q # Optional
+#     - KDB_LICENSE_B64=${kdb-licence}
+      - KXI_SG_RC_ADDR=sgrc:5060
+    ports:
+      - 127.0.0.1::5050
+    # Optional: deploy multiple replicas.
+    deploy:
+      mode: replicated
+      replicas: 3
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
+  #
+  # Gateway.
+  #
+  sggw:
+    image: ${registry}/kxi-sg-gw:${sg_version}
+    environment:
+    #  - DISCOVERY_PROXY=http://proxy:4000 # Optional, only if using discovery
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - GATEWAY_QIPC_PORT=5040
+      - GATEWAY_HTTP_PORT=8080
+    ports:
+      - 127.0.0.1::5040
+      - 127.0.0.1::8080
+    # Optional: deploy multiple replicas.
+    deploy:
+      mode: replicated
+      replicas: 5
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
