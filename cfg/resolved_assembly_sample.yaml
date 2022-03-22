@@ -70,7 +70,7 @@ tables:
 bus:
   messages:
     protocol: custom
-    nodes: ${host_ip}:5010
+    nodes: 127.0.1.1:5010
     topic: dataStream
 
 # Database mount configuration
@@ -81,11 +81,11 @@ mounts:
     partition: none
   idb:
     type: local
-    baseURI: file://${mnt_dir}/idb
+    baseURI: file:///home/ianodwyer/git/kxi-microservices-data-services/db/idb
     partition: ordinal
   hdb:
     type: local
-    baseURI: file://${mnt_dir}/hdb
+    baseURI: file:///home/ianodwyer/git/kxi-microservices-data-services/db/hdb
     partition: date
 
 # Service configuration
@@ -117,14 +117,14 @@ elements:
           rows: 200000
       - name: hdb2
         mount: hdb
-        store: file://${mnt_dir}/hdbtier2
+        store: file:///home/ianodwyer/git/kxi-microservices-data-services/db/hdbtier2
         retain:
           time: 5 weeks
           size: 2 TB
           rows: 10000000
       - name: hdb3
         mount: hdb
-        store: file://${mnt_dir}/hdbtier3
+        store: file:///home/ianodwyer/git/kxi-microservices-data-services/db/hdbtier3
         retain:
           time: 3 months
           size: 1 PB

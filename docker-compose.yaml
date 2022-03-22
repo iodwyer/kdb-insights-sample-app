@@ -1,3 +1,4 @@
+version: "3.0"
 #
 # Optional: Create volumes to include licence/configuration in the containers.
 #
@@ -5,6 +6,7 @@ x-vols: &vols
   volumes:
   - ${kx_licence_dir}:/opt/kx/lic
   - ./cfg:/opt/kx/cfg
+  - ${mnt_dir}:${mnt_dir}
 #  - ${custom_dir}:/opt/kx/custom # Optional mount for loading custom code
 
 #
@@ -76,7 +78,86 @@ services:
     # Optional: deploy multiple replicas.
     deploy:
       mode: replicated
-      replicas: 5
+      replicas: 3
     <<: *vols # Optional
     <<: *kxnet # Optional
 
+  sm:
+  #
+  # Storage Manager.
+  #
+    image: ${registry}/kxi-sm:${sm_version}
+    environment:
+      - KXI_NAME=sm
+      - KXI_SC=SM
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_PORT=10001
+      - KXI_LOG_FORMAT=text
+    ports:
+      - 10001:10001
+    stdin_open: true
+    tty: true
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+  
+  eoi:
+  #
+  # End of Interval
+  #
+    image: ${registry}/kxi-sm-eoi:${sm_version}
+    environment:
+      - KXI_NAME=eoi
+      - KXI_SC=EOI
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_PORT=10002
+      - KXI_LOG_FORMAT=text
+      - KXI_SM_SMADDR=sm:10001
+    ports:
+      - 10002:10002
+    stdin_open: true
+    tty: true
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+  
+  eod:
+  #
+  # End of Day
+  #
+    image: ${registry}/kxi-sm-eod:${sm_version}
+    environment:
+      - KXI_NAME=eod
+      - KXI_SC=EOD
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_PORT=10003
+      - KXI_LOG_FORMAT=text
+      - KXI_SM_SMADDR=sm:10001
+      - KXI_SM_EOIADDR=eoi:10002
+    ports:
+      - 10003:10003
+    stdin_open: true
+    tty: true
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
+  dbm:
+  #
+  # DBM
+  #
+    image: ${registry}/kxi-sm-dbm:${sm_version}
+    environment:
+      - KXI_NAME=dbm
+      - KXI_SC=DBM
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_PORT=10004
+      - KXI_LOG_FORMAT=text
+      - KXI_SM_SMADDR=sm:10001
+    ports:
+      - 10004:10004
+    stdin_open: true
+    tty: true
+    <<: *vols # Optional
+    <<: *kxnet # Optional
