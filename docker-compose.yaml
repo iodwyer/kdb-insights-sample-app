@@ -34,12 +34,10 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
-   #   - KDB_LICENSE_B64=${kdb-licence}
     ports:
       - 127.0.0.1::5060
     <<: *vols # Optional
     <<: *kxnet # Optional
-
 
 
   #
@@ -53,8 +51,6 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
-#      - KXI_CUSTOM_FILE=/opt/kx/custom/${custom_agg_code}.q # Optional
-#     - KDB_LICENSE_B64=${kdb-licence}
       - KXI_SG_RC_ADDR=sgrc:5060
     ports:
       - 127.0.0.1::5050
@@ -71,7 +67,6 @@ services:
   sggw:
     image: ${registry}/kxi-sg-gw:${sg_version}
     environment:
-    #  - DISCOVERY_PROXY=http://proxy:4000 # Optional, only if using discovery
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - GATEWAY_QIPC_PORT=5040
       - GATEWAY_HTTP_PORT=8080
