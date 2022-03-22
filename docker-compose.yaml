@@ -6,7 +6,8 @@ x-vols: &vols
   volumes:
   - ${kx_licence_dir}:/opt/kx/lic
   - ./cfg:/opt/kx/cfg
-  - ${mnt_dir}:${mnt_dir}
+  - ${db_mnt_dir}:/data/db
+  - ${tp_mnt_dir}:/tplog
 #  - ${custom_dir}:/opt/kx/custom # Optional mount for loading custom code
 
 #
@@ -26,6 +27,21 @@ networks:
 #
 services:
   #
+  # Tickerplant
+  #
+  tp:
+    image: ${registry}/${qce}
+    environment:
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1
+    ports:
+      - 127.0.0.1::5010
+    command: -p 5010 -s 4 cfg/kdb-tick/tick.q
+    tty: true
+    stdin_open: true      
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+  #
   # Resource Coordinator -- 1 per assembly.
   #
   sgrc:
@@ -36,6 +52,7 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_AUTH_DISABLED=1
     ports:
       - 127.0.0.1::5060
     <<: *vols # Optional
@@ -51,15 +68,16 @@ services:
       - KXI_NAME=sg_agg
       - KXI_PORT=5050
       - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_LOG_LEVELS=DEFAULT:INFO # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - KXI_SG_RC_ADDR=sgrc:5060
+      - KXI_AUTH_DISABLED=1
     ports:
       - 127.0.0.1::5050
     # Optional: deploy multiple replicas.
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -72,13 +90,14 @@ services:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - GATEWAY_QIPC_PORT=5040
       - GATEWAY_HTTP_PORT=8080
+      - KXI_AUTH_DISABLED=1
     ports:
       - 127.0.0.1::5040
       - 127.0.0.1::8080
     # Optional: deploy multiple replicas.
     deploy:
       mode: replicated
-      replicas: 3
+      replicas: 2
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -94,6 +113,7 @@ services:
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_PORT=10001
       - KXI_LOG_FORMAT=text
+      - KXI_AUTH_DISABLED=1
     ports:
       - 10001:10001
     stdin_open: true
@@ -114,6 +134,7 @@ services:
       - KXI_PORT=10002
       - KXI_LOG_FORMAT=text
       - KXI_SM_SMADDR=sm:10001
+      - KXI_AUTH_DISABLED=1      
     ports:
       - 10002:10002
     stdin_open: true
@@ -135,6 +156,7 @@ services:
       - KXI_LOG_FORMAT=text
       - KXI_SM_SMADDR=sm:10001
       - KXI_SM_EOIADDR=eoi:10002
+      - KXI_AUTH_DISABLED=1      
     ports:
       - 10003:10003
     stdin_open: true
@@ -155,9 +177,82 @@ services:
       - KXI_PORT=10004
       - KXI_LOG_FORMAT=text
       - KXI_SM_SMADDR=sm:10001
+      - KXI_AUTH_DISABLED=1   
+            
     ports:
       - 10004:10004
     stdin_open: true
     tty: true
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
+
+  rdb:
+  #
+  # Realtime Database
+  #
+    image: ${registry}/kxi-da:${da_version}
+    command: -p 5080
+    environment:
+      - KXI_NAME=rdb
+      - KXI_SC=RDB
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      ## - KXI_CUSTOM_FILE=/opt/kx/custom/custom_rdb_code.q # Optional
+      - KXI_SG_RC_ADDR=sgrc:5060
+    ports:
+      - 127.0.0.1::5080
+    deploy:
+      mode: replicated
+      replicas: 2
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
+
+
+  idb:
+  #
+  # Intraday Database
+  #
+    image: ${registry}/kxi-da:${da_version}
+    command: -p 5090
+    environment:
+      - KXI_NAME=idb
+      - KXI_SC=IDB
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_SG_RC_ADDR=sgrc:5060
+      ## - KXI_CUSTOM_FILE=/opt/kx/custom/${custom_idb_code}.q # Optional
+    ports:
+      - 127.0.0.1::5090
+    deploy:
+      mode: replicated
+      replicas: 2
+    <<: *vols # Optional
+    <<: *kxnet # Optional
+
+
+  hdb:
+  #
+  # Historical Database
+  #
+    image: ${registry}/kxi-da:${da_version}
+    command: -p 5100
+    environment:
+      - KXI_NAME=hdb
+      - KXI_SC=HDB
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KXI_SG_RC_ADDR=sgrc:5060
+      #- KXI_CUSTOM_FILE=/opt/kx/custom/${custom_hdb_code}.q # Optional
+    ports:
+      - 127.0.0.1::5090
+    deploy:
+      mode: replicated
+      replicas: 2
     <<: *vols # Optional
     <<: *kxnet # Optional

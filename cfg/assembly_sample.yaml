@@ -70,7 +70,13 @@ tables:
 bus:
   messages:
     protocol: custom
-    nodes: ${host_ip}:5010
+    # nodes: ${host_ip}:5010
+    nodes: tp:5010
+    topic: dataStream
+  stream:    ## DUPE FIX THIS
+    protocol: custom
+    # nodes: ${host_ip}:5010
+    nodes: tp:5010
     topic: dataStream
 
 # Database mount configuration
@@ -81,11 +87,11 @@ mounts:
     partition: none
   idb:
     type: local
-    baseURI: file://${mnt_dir}/idb
+    baseURI: file:///data/db/idb
     partition: ordinal
   hdb:
     type: local
-    baseURI: file://${mnt_dir}/hdb
+    baseURI: file:///data/db/hdb
     partition: date
 
 # Service configuration
@@ -93,7 +99,7 @@ elements:
   rc:
     host: sgrc
     port: 5060
-  timeout: 30000
+    timeout: 30000
   
   # SM configuration (also used by EOI, EOD, and DBM)
   sm:
@@ -117,16 +123,26 @@ elements:
           rows: 200000
       - name: hdb2
         mount: hdb
-        store: file://${mnt_dir}/hdbtier2
+        store: file:///data/db/hdbtier2
         retain:
           time: 5 weeks
           size: 2 TB
           rows: 10000000
       - name: hdb3
         mount: hdb
-        store: file://${mnt_dir}/hdbtier3
+        store: file:///data/db/hdbtier3
         retain:
           time: 3 months
           size: 1 PB
           rows: 20000000
     disableDiscovery: true  # Disables registering with discovery
+  dap:
+    gwAssembly: gw-assembly
+    smEndpoints: sm:10001
+    instances:
+      RDB:
+        mountName: rdb
+      IDB:
+        mountName: idb
+      HDB:
+        mountName: hdb
