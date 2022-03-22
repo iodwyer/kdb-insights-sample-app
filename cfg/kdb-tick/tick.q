@@ -44,7 +44,7 @@ if[not system"t";system"t 1000";
  f:key flip value t;pub[t;$[0>type first x;enlist f!x;flip f!x]];if[l;l enlist (`upd;t;x);i+:1];}];
 
 \d .
-.u.tick["tp_";"/tplog"];
+.u.tick["tp_";"/opt/kx/tplog"];
 
 \
  globals used

@@ -7,7 +7,7 @@ x-vols: &vols
   - ${kx_licence_dir}:/opt/kx/lic
   - ./cfg:/opt/kx/cfg
   - ${db_mnt_dir}:/data/db
-  - ${tp_mnt_dir}:/tplog
+  - ${tp_mnt_dir}:/opt/kx/tplog
 #  - ${custom_dir}:/opt/kx/custom # Optional mount for loading custom code
 
 #
