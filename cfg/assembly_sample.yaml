@@ -66,6 +66,28 @@ tables:
         description: Ask size
         type: long
 
+  xref:
+    description: TAQ reference data
+    type: splayed
+    primaryKeys: serial
+    prtnCol: bornTS
+    columns:
+      - name: serial
+        type: int
+        attrMem: unique
+      - name: nft
+        description: They say these are all the rage lately!
+        type: guid
+      - name: factory
+        type: short
+      - name: batch
+        type: int
+      - name: machine
+        type: int
+      - name: bornTS
+        type: timestamp
+
+
 # Message bus configuration
 bus:
   messages:
@@ -131,8 +153,15 @@ elements:
         store: file:///data/db/hdbtier3
         retain:
           time: 3 months
-          size: 1 PB
+          size: 10 TB
           rows: 20000000
+##      - name: hist4
+ ##       mount: hdb
+ ##       store: s3://hdbtier3/
+   ##     retain:
+   ##       time: 1 year
+  ##        size: 1 PB
+##          rows: 20000000          
     disableDiscovery: true  # Disables registering with discovery
   dap:
     gwAssembly: gw-assembly
