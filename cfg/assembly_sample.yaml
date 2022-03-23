@@ -70,12 +70,10 @@ tables:
 bus:
   messages:
     protocol: custom
-    # nodes: ${host_ip}:5010
     nodes: tp:5010
     topic: dataStream
-  stream:    ## DUPE FIX THIS
+  stream:   
     protocol: custom
-    # nodes: ${host_ip}:5010
     nodes: tp:5010
     topic: dataStream
 
@@ -83,15 +81,15 @@ bus:
 mounts:
   rdb:
     type: stream
-    baseURI: file:///mnt/foo/i/
+    uri: file:///mnt/foo/i/
     partition: none
   idb:
     type: local
-    baseURI: file:///data/db/idb
+    uri: file:///data/db/idb
     partition: ordinal
   hdb:
     type: local
-    baseURI: file:///data/db/hdb
+    uri: file:///data/db/hdb
     partition: date
 
 # Service configuration
@@ -104,7 +102,7 @@ elements:
   # SM configuration (also used by EOI, EOD, and DBM)
   sm:
     description: Storage manager
-    source: messages
+    source: stream
     # Tier configuration
     tiers:
       - name: stream

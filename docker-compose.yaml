@@ -55,6 +55,8 @@ services:
       - KXI_AUTH_DISABLED=1
     ports:
       - 127.0.0.1::5060
+    stdin_open: true
+    tty: true           
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -78,6 +80,8 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    stdin_open: true
+    tty: true           
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -98,6 +102,8 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    stdin_open: true
+    tty: true     
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -207,6 +213,8 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    stdin_open: true
+    tty: true      
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -231,6 +239,8 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    stdin_open: true
+    tty: true      
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -254,5 +264,7 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    stdin_open: true
+    tty: true      
     <<: *vols # Optional
     <<: *kxnet # Optional
