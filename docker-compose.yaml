@@ -122,8 +122,8 @@ services:
       - KXI_AUTH_DISABLED=1
     ports:
       - 10001:10001
-    stdin_open: true
-    tty: true
+##     stdin_open: true
+##     tty: true
     <<: *vols # Optional
     <<: *kxnet # Optional
   
@@ -143,8 +143,8 @@ services:
       - KXI_AUTH_DISABLED=1      
     ports:
       - 10002:10002
-    stdin_open: true
-    tty: true
+##    stdin_open: true
+##    tty: true
     <<: *vols # Optional
     <<: *kxnet # Optional
   
@@ -165,8 +165,8 @@ services:
       - KXI_AUTH_DISABLED=1      
     ports:
       - 10003:10003
-    stdin_open: true
-    tty: true
+##     stdin_open: true
+##     tty: true
     <<: *vols # Optional
     <<: *kxnet # Optional
 
@@ -187,8 +187,8 @@ services:
             
     ports:
       - 10004:10004
-    stdin_open: true
-    tty: true
+##     stdin_open: true
+##     tty: true
     <<: *vols # Optional
     <<: *kxnet # Optional
 

@@ -81,15 +81,15 @@ bus:
 mounts:
   rdb:
     type: stream
-    uri: file:///mnt/foo/i/
+    baseURI: file:///mnt/foo/i/
     partition: none
   idb:
     type: local
-    uri: file:///data/db/idb
+    baseURI: file:///data/db/idb
     partition: ordinal
   hdb:
     type: local
-    uri: file:///data/db/hdb
+    baseURI: file:///data/db/hdb
     partition: date
 
 # Service configuration
