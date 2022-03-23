@@ -67,25 +67,40 @@ tables:
         type: long
 
   xref:
-    description: TAQ reference data
-    type: splayed
-    primaryKeys: serial
-    prtnCol: bornTS
+    description: ref data
+    type: partitioned
+    blockSize: 10000
+    prtnCol: realTime
+    sortColsOrd: sym
+    sortColsDisk: sym
     columns:
-      - name: serial
-        type: int
-        attrMem: unique
-      - name: nft
-        description: They say these are all the rage lately!
-        type: guid
-      - name: factory
-        type: short
-      - name: batch
-        type: int
-      - name: machine
-        type: int
-      - name: bornTS
+      - name: time
+        description: Time
+        type: timespan
+      - name: sym
+        description: Symbol name
+        type: symbol
+        attrMem: grouped
+        attrDisk: parted
+        attrOrd: parted       
+      - name: realTime
+        description: Time
         type: timestamp
+      - name: serial
+        description: Time
+        type: long
+      - name: nft
+        description: Time      
+        type: long
+      - name: factory
+        description: Time      
+        type: long
+      - name: batch
+        description: Time
+        type: long
+      - name: machine
+        description: Time
+        type: long        
 
 
 # Message bus configuration
@@ -154,14 +169,7 @@ elements:
         retain:
           time: 3 months
           size: 10 TB
-          rows: 20000000
-##      - name: hist4
- ##       mount: hdb
- ##       store: s3://hdbtier3/
-   ##     retain:
-   ##       time: 1 year
-  ##        size: 1 PB
-##          rows: 20000000          
+          rows: 20000000  
     disableDiscovery: true  # Disables registering with discovery
   dap:
     gwAssembly: gw-assembly
