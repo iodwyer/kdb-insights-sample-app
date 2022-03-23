@@ -3,6 +3,7 @@
 
 ## Create data folders 
 ```bash
+$ cd kxi-microservices-data-services
 $ mkdir db tplog
 $ chmod o+rw db tplog 
 ```
@@ -10,8 +11,7 @@ $ chmod o+rw db tplog
 
 ## Docker start
 ```bash
-$ cd kxi-microservices-data-services
-$ ./prepEnv
+$ ./prepEnv.sh
 $ source .env
 $ docker-compose up
 ```
