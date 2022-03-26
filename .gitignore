@@ -2,4 +2,5 @@ cfg/resolved_assembly_sample.yaml
 db/
 tplog/
 restart.sh
+reset.sh
 test.q

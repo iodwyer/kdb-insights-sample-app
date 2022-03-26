@@ -5,4 +5,10 @@
 
 trade:([] time:"n"$(); sym:`$(); realTime:"p"$(); price:"f"$(); size:"j"$())
 quote:([] time:"n"$(); sym:`$(); realTime:"p"$(); bid:"f"$(); ask:"f"$(); bidSize:"j"$(); askSize:"j"$())
-xref:flip `time`sym`realTime`serial`nft`factory`batch`machine!"NSPJJJJJ"$\:()
+// xref:flip `time`sym`realTime`serial`nft`factory`batch`machine!"NSPJJJJJ"$\:()
+
+
+// bitmex
+
+trade:flip `symbol`timestamp`side`size`price`tickDirection`trdMatchID`grossValue`homeNotional`foreignNotional!"SPSJFSGJFF"$\:()
+quote:flip `symbol`timestamp`bidSize`bidPrice`askPrice`askSize!"SPFFFF"$\:()

@@ -4,111 +4,94 @@ description: Sample assembly file
 labels:
   region: canada,usa
 
+spec:
+  env:
+    - name: AWS_REGION
+      value: ${AWS_REGION}
+    - name: AWS_ACCESS_KEY_ID
+      value: ${AWS_ACCESS_KEY_ID}
+    - name: AWS_SECRET_ACCESS_KEY
+      value: ${AWS_SECRET_ACCESS_KEY}
+    - name: KX_TRACE_S3
+      value: "1"         
+
 # Database schema
 tables:
   trade:
     description: Trade data
     type: partitioned
     blockSize: 10000
-    prtnCol: realTime
-    sortColsOrd: sym
-    sortColsDisk: sym
+    prtnCol: timestamp
+    sortColsOrd: symbol
+    sortColsDisk: symbol
     columns:
-      - name: time
-        description: Time
-        type: timespan
-      - name: sym
+      - name: symbol
         description: Symbol name
         type: symbol
         attrMem: grouped
         attrDisk: parted
         attrOrd: parted
-      - name: realTime
-        description: Partitioning timestamp column
+      - name: timestamp
+        description: Time
         type: timestamp
-      - name: price
-        description: Trade price
-        type: float
+      - name: side
+        description: side
+        type: symbol
       - name: size
-        description: Trade size
+        description: bid price
         type: long
+      - name: price
+        description: bid price
+        type: float        
+      - name: tickDirection
+        description: Big size
+        type: symbol
+      - name: trdMatchID
+        description: Ask size
+        type: guid
+      - name: grossValue
+        description: Ask size
+        type: long
+      - name: homeNotional
+        description: Ask size
+        type: float
+      - name: foreignNotional
+        description: Ask size
+        type: float                        
 
   quote:
     description: Quote data
     type: partitioned
     blockSize: 10000
-    prtnCol: realTime
-    sortColsOrd: sym
-    sortColsDisk: sym
+    prtnCol: timestamp
+    sortColsOrd: symbol
+    sortColsDisk: symbol
     columns:
-      - name: time
-        description: Time
-        type: timespan
-      - name: sym
+      - name: symbol
         description: Symbol name
         type: symbol
         attrMem: grouped
         attrDisk: parted
         attrOrd: parted
-      - name: realTime
-        description: Partitioning timestamp column
+      - name: timestamp
+        description: Time
         type: timestamp
-      - name: bid
+      - name: bidSize
         description: Bid price
         type: float
-      - name: ask
-        description: Ask price
+      - name: bidPrice
+        description: bid price
         type: float
-      - name: bidSize
+      - name: askPrice
         description: Big size
-        type: long
+        type: float
       - name: askSize
         description: Ask size
-        type: long
-
-  xref:
-    description: ref data
-    type: partitioned
-    blockSize: 10000
-    prtnCol: realTime
-    sortColsOrd: sym
-    sortColsDisk: sym
-    columns:
-      - name: time
-        description: Time
-        type: timespan
-      - name: sym
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted       
-      - name: realTime
-        description: Time
-        type: timestamp
-      - name: serial
-        description: Time
-        type: long
-      - name: nft
-        description: Time      
-        type: long
-      - name: factory
-        description: Time      
-        type: long
-      - name: batch
-        description: Time
-        type: long
-      - name: machine
-        description: Time
-        type: long        
+        type: float
 
 
 # Message bus configuration
 bus:
-  messages:
-    protocol: custom
-    nodes: tp:5010
-    topic: dataStream
   stream:   
     protocol: custom
     nodes: tp:5010
@@ -127,7 +110,8 @@ mounts:
   hdb:
     type: local
     baseURI: file:///data/db/hdb
-    partition: date
+    partition: date      
+
 
 # Service configuration
 elements:
@@ -148,36 +132,26 @@ elements:
         mount: idb
         schedule:
           freq: 0D00:10:00 # every 10 minutes
-      - name: hdb1
+      - name: ondisk
         mount: hdb
         schedule:
           freq: 1D00:00:00 # every day
           snap:   01:35:00 # at 1:35 AM
         retain:
           time: 2 days
-          rows: 200000
-      - name: hdb2
-        mount: hdb
-        store: file:///data/db/hdbtier2
-        retain:
-          time: 5 weeks
-          size: 2 TB
-          rows: 10000000
-      - name: hdb3
-        mount: hdb
-        store: file:///data/db/hdbtier3
-        retain:
-          time: 3 months
-          size: 10 TB
-          rows: 20000000  
+          rows: 200000       
     disableDiscovery: true  # Disables registering with discovery
   dap:
+    # These configs apply to all DA below
     gwAssembly: gw-assembly
     smEndpoints: sm:10001
     instances:
       RDB:
-        mountName: rdb
+        # Config specific to DAPs with a KXI_SC of RDB
+        mountName: rdb # Must match name of mount in "mounts" section
       IDB:
+        # Config specific to DAPs with a KXI_SC of IDB
         mountName: idb
       HDB:
-        mountName: hdb
+        # Config specific to DAPs with a KXI_SC of HDB
+        mountName: hdb   
