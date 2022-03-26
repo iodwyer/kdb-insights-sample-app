@@ -139,7 +139,11 @@ elements:
           snap:   01:35:00 # at 1:35 AM
         retain:
           time: 2 days
-          rows: 200000       
+          rows: 200000 
+      - name: s3
+        mount: hdb
+        store: s3://bitmex-hdb/db
+        sym: s3://bitmex-hdb/sym            
     disableDiscovery: true  # Disables registering with discovery
   dap:
     # These configs apply to all DA below
@@ -154,4 +158,6 @@ elements:
         mountName: idb
       HDB:
         # Config specific to DAPs with a KXI_SC of HDB
-        mountName: hdb   
+        mountName: hdb
+        sym: s3://bitmex-hdb/sym
+        storageURI: s3://bitmex-hdb/db 
