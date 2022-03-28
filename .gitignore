@@ -3,3 +3,4 @@ db/
 tplog/
 restart.sh
 test.q
+.aws_env
