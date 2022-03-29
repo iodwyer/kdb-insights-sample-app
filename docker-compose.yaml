@@ -125,6 +125,8 @@ services:
       - KXI_LOG_FORMAT=text
       - KXI_LOG_LEVELS=default:trace 
       - KXI_AUTH_DISABLED=1
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
     env_file:
       - .env
       - .aws_env  
@@ -149,7 +151,9 @@ services:
       - KXI_LOG_FORMAT=text
       - KXI_LOG_LEVELS=default:trace      
       - KXI_SM_SMADDR=sm:10001
-      - KXI_AUTH_DISABLED=1      
+      - KXI_AUTH_DISABLED=1  
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1          
     ports:
       - 10002:10002
     env_file:
@@ -176,6 +180,8 @@ services:
       - KXI_SM_SMADDR=sm:10001
       - KXI_SM_EOIADDR=eoi:10002
       - KXI_AUTH_DISABLED=1      
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
     ports:
       - 10003:10003
     env_file:
@@ -200,7 +206,9 @@ services:
       - KXI_LOG_FORMAT=text
       - KXI_LOG_LEVELS=default:trace
       - KXI_SM_SMADDR=sm:10001
-      - KXI_AUTH_DISABLED=1          
+      - KXI_AUTH_DISABLED=1   
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1             
     ports:
       - 10004:10004
     env_file:
@@ -226,6 +234,8 @@ services:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       ## - KXI_CUSTOM_FILE=/opt/kx/custom/custom_rdb_code.q # Optional
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
     ports:
       - 127.0.0.1::5080
@@ -254,6 +264,8 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:trace # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
       ## - KXI_CUSTOM_FILE=/opt/kx/custom/${custom_idb_code}.q # Optional
     ports:
@@ -282,6 +294,8 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:trace # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
       #- KXI_CUSTOM_FILE=/opt/kx/custom/${custom_hdb_code}.q # Optional
     ports:
