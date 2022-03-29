@@ -142,8 +142,7 @@ elements:
           rows: 200000 
       - name: s3
         mount: hdb
-        store: s3://bitmex-hdb/db
-        sym: s3://bitmex-hdb/sym            
+        store: s3://bitmex-hdb/db          
     disableDiscovery: true  # Disables registering with discovery
   dap:
     # These configs apply to all DA below
@@ -159,5 +158,3 @@ elements:
       HDB:
         # Config specific to DAPs with a KXI_SC of HDB
         mountName: hdb
-        sym: s3://bitmex-hdb/sym
-        storageURI: s3://bitmex-hdb/db 

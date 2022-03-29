@@ -126,7 +126,8 @@ services:
       - KXI_LOG_LEVELS=default:trace 
       - KXI_AUTH_DISABLED=1
     env_file:
-      - .env  
+      - .env
+      - .aws_env  
     ports:
       - 10001:10001
 ##    stdin_open: false
@@ -153,6 +154,7 @@ services:
       - 10002:10002
     env_file:
       - .env 
+      - .aws_env      
 ##    stdin_open: false
 ##    tty: false
     <<: *vols # Optional
@@ -177,7 +179,8 @@ services:
     ports:
       - 10003:10003
     env_file:
-      - .env       
+      - .env   
+      - .aws_env          
 ##    stdin_open: false
 ##    tty: false
     <<: *vols # Optional
@@ -201,7 +204,8 @@ services:
     ports:
       - 10004:10004
     env_file:
-      - .env       
+      - .env   
+      - .aws_env          
 ##    stdin_open: false
 ##    tty: false
     <<: *vols # Optional
@@ -229,7 +233,8 @@ services:
       mode: replicated
       replicas: 1
     env_file:
-      - .env       
+      - .env    
+      - .aws_env         
 ##    stdin_open: false
 ##    tty: false   
     <<: *vols # Optional
@@ -257,7 +262,8 @@ services:
       mode: replicated
       replicas: 1
     env_file:
-      - .env       
+      - .env  
+      - .aws_env           
 ##    stdin_open: false
 ##    tty: false 
     <<: *vols # Optional
@@ -284,7 +290,8 @@ services:
       mode: replicated
       replicas: 1
     env_file:
-      - .env       
+      - .env 
+      - .aws_env            
 ##    stdin_open: false
 ##    tty: false    
     <<: *vols # Optional
