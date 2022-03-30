@@ -8,6 +8,7 @@ x-vols: &vols
   - ./cfg:/opt/kx/cfg
   - ${db_mnt_dir}:/data/db
   - ${tp_mnt_dir}:/opt/kx/tplog
+  - ./cache:/opt/kx/cache
 #  - ${custom_dir}:/opt/kx/custom # Optional mount for loading custom code
 
 #
@@ -296,10 +297,12 @@ services:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - KX_TRACE_OBJSTR=1
       - KX_KURL_DEBUG_LOG=1      
+      - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
+      - KX_S3_CACHE_SIZE=10000
       - KXI_SG_RC_ADDR=sgrc:5060
       #- KXI_CUSTOM_FILE=/opt/kx/custom/${custom_hdb_code}.q # Optional
     ports:
-      - 5100:5100
+      - 127.0.0.1::5100
     deploy:
       mode: replicated
       replicas: 2
