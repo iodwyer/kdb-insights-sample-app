@@ -3,8 +3,8 @@
 ## Create data folders 
 ```bash
 $ cd kxi-microservices-data-services
-$ mkdir db tplog
-$ chmod o+rw db tplog 
+$ mkdir db tplog cache
+$ chmod o+rw db tplog cache
 ```
 
 
