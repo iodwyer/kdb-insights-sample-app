@@ -287,7 +287,7 @@ services:
   # Historical Database
   #
     image: ${registry}/kxi-da:${da_version}
-    command: -p 5100
+    command: -p 5100 -s 8
     environment:
       - KXI_NAME=hdb
       - KXI_SC=HDB
@@ -302,7 +302,7 @@ services:
       - 5100:5100
     deploy:
       mode: replicated
-      replicas: 1
+      replicas: 2
     env_file:
       - .env 
       - .aws_env            

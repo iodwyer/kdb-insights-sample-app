@@ -1,6 +1,5 @@
 # kxi-microservices-data-services
 
-
 ## Create data folders 
 ```bash
 $ cd kxi-microservices-data-services
@@ -13,24 +12,36 @@ $ chmod o+rw db tplog
 ```bash
 $ ./prepEnv.sh
 $ source .env
-$ docker-compose up
+$ docker-compose up -d
+$ docker-compose logs -f 
 ```
 
 
 ## Publish data
 ```q
-tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-tp-1"
-tp(`.u.upd;`quote;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000;10?1000))
-tp(`.u.upd;`trade;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000))
-tp(`.u.upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
+q)tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-tp-1"
+q)tp(`.u.upd;`quote;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000;10?1000))
+q)tp(`.u.upd;`trade;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000))
+q)tp(`.u.upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
+```
+
+
+## Fix Purview 
+```q
+q)sgrc:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sgrc-1"
+q)sgrc"update startTS:-0Wp from `.sgrc.i.daps where instance = `HDB"
+`.sgrc.i.daps
+q)sgrc"update startTS:(exec max endTS from .sgrc.i.daps where not endTS=0Wp) from `.sgrc.i.daps where instance = `RDB"
+`.sgrc.i.daps
 ```
 
 
 ## Query Data
 ```q
-gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sggw-1"
-gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
-gw(`.kxi.getData;(`table`startTS`endTS)!(`xref;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
+q)gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sggw-1"
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$2014.11.22-1;"p"$2014.11.22+1);`f;(0#`)!())
 ```
 
 ```bash
