@@ -1,3 +1,9 @@
+
+.rdb.subToTable:{[tpHandle;table;syms]
+    tpHandle(`.tp.sub;table;syms);
+    show"Subscribed to ",string[table];
+    }
+    
 // === internal tables without time/sym columns ===
 .rt.NO_TIME_SYM:`$("_prtnEnd";"_reload")
 
@@ -38,9 +44,13 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
   
   //subscribe
   res:h "(.u.sub[`;`]; .u `i`L; .u.d)";
+
+  // sub to all tables in root
+  // .rdb.subToTable[h;;`] each tables[];
+  // hclose h;
   
   //if start index is less than current index, then recover
-  if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0]; .rt.recoverMultiDay[res[1];startIdx]];
+  // if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0]; .rt.recoverMultiDay[res[1];startIdx]];
   };
 
 //100 billion records per day
