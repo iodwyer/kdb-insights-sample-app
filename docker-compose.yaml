@@ -299,7 +299,7 @@ services:
       - KXI_SG_RC_ADDR=sgrc:5060
       #- KXI_CUSTOM_FILE=/opt/kx/custom/${custom_hdb_code}.q # Optional
     ports:
-      - 127.0.0.1::5090
+      - 5100:5100
     deploy:
       mode: replicated
       replicas: 1
