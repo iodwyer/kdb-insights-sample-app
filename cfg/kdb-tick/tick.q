@@ -19,6 +19,8 @@
 /2005.10.10 zero latency
 "kdb+tick 2.8 2014.03.12"
 
+// .z.pi:{0N!value x}
+
 system"cd cfg/kdb-tick"
 if[not system"p";system"p 5010"]
 
