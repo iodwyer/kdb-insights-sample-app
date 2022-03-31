@@ -19,10 +19,13 @@ $ docker-compose logs -f
 
 ## Publish data
 ```q
+// open handle 
 q)tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-tp-1"
-q)tp(`.u.upd;`quote;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000;10?1000))
-q)tp(`.u.upd;`trade;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000))
-q)tp(`.u.upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
+
+// publish data
+q)tp(`upd;`quote;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000;10?1000))
+q)tp(`upd;`trade;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000))
+q)tp(`upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
 ```
 
 
