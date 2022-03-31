@@ -16,6 +16,15 @@ $ docker-compose up -d
 $ docker-compose logs -f 
 ```
 
+## Authentication
+```bash
+## create file and populate appropriately
+tee .aws_env << EOF
+export AWS_REGION=
+export AWS_ACCESS_KEY_ID=
+export AWS_SECRET_ACCESS_KEY=
+EOF
+```
 
 ## Publish data
 ```q
@@ -33,7 +42,7 @@ q)tp(`upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000))
 ## Fix Purview 
 ```q
 q)sgrc:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sgrc-1"
-q)sgrc"update startTS:-0Wp from `.sgrc.i.daps where instance = `HDB"
+q)sgrc"update startTS:-0Wp, endTS:first `timestamp$(exec max prtns[;`max_date] from .sgrc.i.daps where instance = `HDB) from `.sgrc.i.daps where instance = `HDB"
 `.sgrc.i.daps
 q)sgrc"update startTS:(exec max endTS from .sgrc.i.daps where not endTS=0Wp) from `.sgrc.i.daps where instance = `RDB"
 `.sgrc.i.daps

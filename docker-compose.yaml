@@ -31,7 +31,7 @@ services:
   # Tickerplant
   #
   tp:
-    image: ${registry}/${qce}
+    image: ${KX_DOCKER_REG}/${qce}
     environment:
       - KX_TRACE_OBJSTR=1
       - KX_KURL_DEBUG_LOG=1
@@ -48,7 +48,7 @@ services:
   # Resource Coordinator -- 1 per assembly.
   #
   sgrc:
-    image: ${registry}/kxi-sg-rc:${sg_version}
+    image: ${KX_DOCKER_REG}/kxi-sg-rc:${sg_version}
     environment:
       - KXI_NAME=sg_rc
       - KXI_PORT=5060
@@ -68,7 +68,7 @@ services:
   # Aggregator. Note we only have one here, but multiple can be configured.
   #
   sgagg:
-    image: ${registry}/kxi-sg-agg:${sg_version}
+    image: ${KX_DOCKER_REG}/kxi-sg-agg:${sg_version}
     environment:
       - KXI_NAME=sg_agg
       - KXI_PORT=5050
@@ -92,7 +92,7 @@ services:
   # Gateway.
   #
   sggw:
-    image: ${registry}/kxi-sg-gw:${sg_version}
+    image: ${KX_DOCKER_REG}/kxi-sg-gw:${sg_version}
     environment:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - GATEWAY_QIPC_PORT=5040
@@ -116,7 +116,7 @@ services:
   #
   # Storage Manager.
   #
-    image: ${registry}/kxi-sm:${sm_version}
+    image: ${KX_DOCKER_REG}/kxi-sm:${sm_version}
     environment:
       - KXI_NAME=sm
       - KXI_SC=SM
@@ -142,7 +142,7 @@ services:
   #
   # End of Interval
   #
-    image: ${registry}/kxi-sm-eoi:${sm_version}
+    image: ${KX_DOCKER_REG}/kxi-sm-eoi:${sm_version}
     environment:
       - KXI_NAME=eoi
       - KXI_SC=EOI
@@ -169,7 +169,7 @@ services:
   #
   # End of Day
   #
-    image: ${registry}/kxi-sm-eod:${sm_version}
+    image: ${KX_DOCKER_REG}/kxi-sm-eod:${sm_version}
     environment:
       - KXI_NAME=eod
       - KXI_SC=EOD
@@ -197,7 +197,7 @@ services:
   #
   # DBM
   #
-    image: ${registry}/kxi-sm-dbm:${sm_version}
+    image: ${KX_DOCKER_REG}/kxi-sm-dbm:${sm_version}
     environment:
       - KXI_NAME=dbm
       - KXI_SC=DBM
@@ -225,7 +225,7 @@ services:
   #
   # Realtime Database
   #
-    image: ${registry}/kxi-da:${da_version}
+    image: ${KX_DOCKER_REG}/kxi-da:${da_version}
     command: -p 5080
     environment:
       - KXI_NAME=rdb
@@ -257,7 +257,7 @@ services:
   #
   # Intraday Database
   #
-    image: ${registry}/kxi-da:${da_version}
+    image: ${KX_DOCKER_REG}/kxi-da:${da_version}
     command: -p 5090
     environment:
       - KXI_NAME=idb
@@ -287,7 +287,7 @@ services:
   #
   # Historical Database
   #
-    image: ${registry}/kxi-da:${da_version}
+    image: ${KX_DOCKER_REG}/kxi-da:${da_version}
     command: -p 5100 -s 8
     environment:
       - KXI_NAME=hdb
