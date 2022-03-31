@@ -4,7 +4,7 @@
 ```bash
 $ cd kxi-microservices-data-services
 $ mkdir db tplog cache
-$ chmod o+rw db tplog cache
+$ chmod 777 db tplog cache
 ```
 
 
@@ -25,6 +25,7 @@ q)tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-servi
 // publish data
 q)tp(`upd;`quote;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000;10?1000))
 q)tp(`upd;`trade;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000))
+q)tp(`upd;`quote;flip (10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000f;10?1000f))
 q)tp(`upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
 ```
 
