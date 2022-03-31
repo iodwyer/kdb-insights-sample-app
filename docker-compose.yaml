@@ -39,7 +39,7 @@ services:
       - KXI_LOG_LEVELS=default:debug # Optional
     ports:
       - 127.0.0.1::5010
-    command: -p 5010 -s 4 cfg/kdb-tick/tick.q
+    command: -p 5010 -s 4 cfg/process/tp.q
     tty: true
     stdin_open: true      
     <<: *vols # Optional

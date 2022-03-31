@@ -42,12 +42,12 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
   //replay log file and continue the live subscription
   if[null startIdx;startIdx:0W]; // null means follow only, not start from beginning
   
-  //subscribe
-  res:h "(.u.sub[`;`]; .u `i`L; .u.d)";
 
-  // sub to all tables in root
-  // .rdb.subToTable[h;;`] each tables[];
-  // hclose h;
+  {[h;t] h(`.tp.sub;t;`)}[h;] each tables[];
+  //subscribe
+  // res:h "(.u.sub[`;`]; .u `i`L; .u.d)";
+
+   hclose h;
   
   //if start index is less than current index, then recover
   // if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0]; .rt.recoverMultiDay[res[1];startIdx]];
