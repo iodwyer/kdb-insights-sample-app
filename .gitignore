@@ -5,4 +5,4 @@ cache/
 restart.sh
 reset.sh
 test.q
-.aws_env
+.cloud_auth_env

@@ -130,7 +130,7 @@ services:
       - KX_KURL_DEBUG_LOG=1      
     env_file:
       - .env
-      - .aws_env  
+      - .cloud_auth_env  
     ports:
       - 10001:10001
 ##    stdin_open: false
@@ -159,7 +159,7 @@ services:
       - 10002:10002
     env_file:
       - .env 
-      - .aws_env      
+      - .cloud_auth_env      
 ##    stdin_open: false
 ##    tty: false
     <<: *vols # Optional
@@ -187,7 +187,7 @@ services:
       - 10003:10003
     env_file:
       - .env   
-      - .aws_env          
+      - .cloud_auth_env          
 ##    stdin_open: false
 ##    tty: false
     <<: *vols # Optional
@@ -214,7 +214,7 @@ services:
       - 10004:10004
     env_file:
       - .env   
-      - .aws_env          
+      - .cloud_auth_env          
 ##    stdin_open: false
 ##    tty: false
     <<: *vols # Optional
@@ -245,7 +245,7 @@ services:
       replicas: 1
     env_file:
       - .env    
-      - .aws_env         
+      - .cloud_auth_env         
 ##    stdin_open: false
 ##    tty: false   
     <<: *vols # Optional
@@ -276,7 +276,7 @@ services:
       replicas: 1
     env_file:
       - .env  
-      - .aws_env           
+      - .cloud_auth_env           
 ##    stdin_open: false
 ##    tty: false 
     <<: *vols # Optional
@@ -308,7 +308,7 @@ services:
       replicas: 2
     env_file:
       - .env 
-      - .aws_env            
+      - .cloud_auth_env            
 ##    stdin_open: false
 ##    tty: false    
     <<: *vols # Optional

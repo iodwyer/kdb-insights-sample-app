@@ -19,10 +19,14 @@ $ docker-compose logs -f
 ## Authentication
 ```bash
 ## create file and populate appropriately
-tee .aws_env << EOF
+$ tee .cloud_auth_env << EOF
 export AWS_REGION=
 export AWS_ACCESS_KEY_ID=
 export AWS_SECRET_ACCESS_KEY=
+export AZURE_STORAGE_ACCOUNT=
+export AZURE_STORAGE_SHARED_KEY=
+export GOOGLE_TOKEN=
+export GCLOUD_PROJECT_ID=
 EOF
 ```
 
