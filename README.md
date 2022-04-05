@@ -61,6 +61,12 @@ q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$2014.11.22-1;"p"$2014.11.22+1);`f;(0#`)!())
 ```
+```bash
+curl -X POST --header "Content-Type: application/json"\
+ --header "Accepted: application/json"    \
+ --data '{ "table":  "quote", "startTS":"2022.02.10D00:00:00.000", "endTS":"2023.02.12D00:00:00.000"}'\
+  `docker port kxi-microservices-data-services-sggw-1 | grep 8080 | cut -f3 -d " "`"/kxi/getData"
+```
 
 ## Custom API
 ```q
@@ -68,9 +74,4 @@ q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`quote;"p"$.z.d-1;"p"$.z.d+
 ```
 
 
-```bash
-curl -X POST --header "Content-Type: application/json"\
- --header "Accepted: application/json"    \
- --data '{ "table":  "quote", "startTS":"2022.02.10D00:00:00.000", "endTS":"2023.02.12D00:00:00.000"}'\
-  `docker port kxi-microservices-data-services-sggw-1 | grep 8080 | cut -f3 -d " "`"/kxi/getData"
-```
+
