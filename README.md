@@ -1,5 +1,24 @@
 # kxi-microservices-data-services
 
+## Quick Links
+
+<https://code.kx.com/insights/microservices/intro.html>
+
+### Storage Manager
+
+* <https://code.kx.com/insights/microservices/storage-manager/introduction.html>
+* <https://code.kx.com/insights/microservices/artefacts.html#storage-manager>
+
+### Data Access
+
+* <https://code.kx.com/insights/microservices/data-access/introduction.html>
+* <https://code.kx.com/insights/microservices/artefacts.html#data-access>
+
+### Service Gateway
+
+* <https://code.kx.com/insights/microservices/data-access/introduction_sg.html>
+* <https://code.kx.com/insights/microservices/artefacts.html#service-gateway>
+
 ## Create data folders 
 ```bash
 $ cd kxi-microservices-data-services
