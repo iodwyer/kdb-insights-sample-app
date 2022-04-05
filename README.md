@@ -10,6 +10,7 @@ $ chmod 777 db tplog cache
 
 ## Docker start
 ```bash
+$ docker login registry.dl.kx.com
 $ ./prepEnv.sh
 $ source .env
 $ docker-compose up -d
