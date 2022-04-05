@@ -62,6 +62,12 @@ q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$2014.11.22-1;"p"$2014.11.22+1);`f;(0#`)!())
 ```
 
+## Custom API
+```q
+q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`quote;"p"$.z.d-1;"p"$.z.d+1;`bidPrice);`f;(0#`)!())
+```
+
+
 ```bash
 curl -X POST --header "Content-Type: application/json"\
  --header "Accepted: application/json"    \

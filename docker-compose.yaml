@@ -234,7 +234,7 @@ services:
       - KXI_LOG_LEVELS=default:trace # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      ## - KXI_CUSTOM_FILE=/opt/kx/custom/custom_rdb_code.q # Optional
+      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KX_TRACE_OBJSTR=1
       - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
@@ -266,7 +266,8 @@ services:
       - KXI_LOG_LEVELS=default:trace # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${assembly_file_yaml}
       - KX_TRACE_OBJSTR=1
-      - KX_KURL_DEBUG_LOG=1      
+      - KX_KURL_DEBUG_LOG=1    
+      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q  
       - KXI_SG_RC_ADDR=sgrc:5060
       ## - KXI_CUSTOM_FILE=/opt/kx/custom/${custom_idb_code}.q # Optional
     ports:
@@ -299,6 +300,7 @@ services:
       - KX_KURL_DEBUG_LOG=1      
       - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
       - KX_S3_CACHE_SIZE=10000
+      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q      
       - KXI_SG_RC_ADDR=sgrc:5060
       #- KXI_CUSTOM_FILE=/opt/kx/custom/${custom_hdb_code}.q # Optional
     ports:
