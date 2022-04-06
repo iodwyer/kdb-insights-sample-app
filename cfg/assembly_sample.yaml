@@ -12,8 +12,14 @@ spec:
       value: ${AWS_ACCESS_KEY_ID}
     - name: AWS_SECRET_ACCESS_KEY
       value: ${AWS_SECRET_ACCESS_KEY}
-    - name: KX_TRACE_S3
-      value: "1"         
+    - name: AZURE_STORAGE_ACCOUNT
+      value: ${AZURE_STORAGE_ACCOUNT}
+    - name: AZURE_STORAGE_SHARED_KEY
+      value: ${AZURE_STORAGE_SHARED_KEY}
+    - name: KX_TRACE_OBJSTR
+      value: "1"   
+    - name: KX_KURL_DEBUG_LOG          
+      value: "1"        
 
 # Database schema
 tables:
