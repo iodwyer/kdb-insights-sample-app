@@ -19,23 +19,6 @@
 * <https://code.kx.com/insights/microservices/data-access/introduction_sg.html>
 * <https://code.kx.com/insights/microservices/artefacts.html#service-gateway>
 
-## Create data folders 
-```bash
-$ cd kxi-microservices-data-services
-$ mkdir db tplog cache
-$ chmod 777 db tplog cache
-```
-
-
-## Docker start
-```bash
-$ docker login registry.dl.kx.com
-$ ./prepEnv.sh
-$ source .env
-$ docker-compose up -d
-$ docker-compose logs -f 
-```
-
 ## Authentication
 ```bash
 ## create file and populate appropriately
@@ -49,6 +32,29 @@ export GOOGLE_TOKEN=
 export GCLOUD_PROJECT_ID=
 EOF
 ```
+
+## Create data folders 
+```bash
+$ cd kxi-microservices-data-services
+$ mkdir -p db/hdb/data tplog cache
+$ chmod 777 db tplog cache
+$ cp cfg/sym db/hdb/data
+$ sudo chown -R nobody:nogroup db tplog cache
+$ sudo chmod 777 -R db tplog cache
+```
+
+
+## Docker start
+```bash
+$ docker login registry.dl.kx.com
+$ ./prepEnv.sh
+$ source .env
+$ source .cloud_auth_env
+$ docker-compose up -d
+$ docker-compose logs -f 
+```
+
+
 
 ## Publish data
 ```q
