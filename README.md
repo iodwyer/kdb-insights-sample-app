@@ -1,5 +1,16 @@
 # kxi-microservices-data-services
-
+- [kxi-microservices-data-services](#kxi-microservices-data-services)
+  - [Quick Links](#quick-links)
+    - [Storage Manager](#storage-manager)
+    - [Data Access](#data-access)
+    - [Service Gateway](#service-gateway)
+  - [Create data folders](#create-data-folders)
+  - [Docker start](#docker-start)
+  - [Authentication](#authentication)
+  - [Publish data](#publish-data)
+  - [Fix Purview](#fix-purview)
+  - [Query Data](#query-data)
+  - [Custom API](#custom-api)
 ## Quick Links
 
 <https://code.kx.com/insights/microservices/intro.html>
