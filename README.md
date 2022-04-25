@@ -4,9 +4,9 @@
     - [Storage Manager](#storage-manager)
     - [Data Access](#data-access)
     - [Service Gateway](#service-gateway)
+  - [Authentication](#authentication)
   - [Create data folders](#create-data-folders)
   - [Docker start](#docker-start)
-  - [Authentication](#authentication)
   - [Publish data](#publish-data)
   - [Fix Purview](#fix-purview)
   - [Query Data](#query-data)
@@ -69,13 +69,12 @@ $ docker-compose logs -f
 ## Publish data
 ```q
 // open handle 
-q)tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-tp-1"
+q)tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services_tp_1"
 
 // publish data
-q)tp(`upd;`quote;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000;10?1000))
-q)tp(`upd;`trade;(10#.z.N;10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000))
 q)tp(`upd;`quote;flip (10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000f;10?1000f))
-q)tp(`upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
+q)tp(`upd;`trade;flip (10?`IBM`AAPL`GOOG;10#.z.p;10?`buy`sell;10?100j;10?1000f;10?`in`out;10?0ng;10?1000j;10?1000f;10?1000f))
+// q)tp(`upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
 ```
 
 
@@ -91,8 +90,7 @@ q)sgrc"update startTS:(exec max endTS from .sgrc.i.daps where not endTS=0Wp) fro
 
 ## Query Data
 ```q
-q)gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sggw-1"
-q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
+q)gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services_sggw_1"
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$2014.11.22-1;"p"$2014.11.22+1);`f;(0#`)!())
 ```
@@ -107,6 +105,3 @@ curl -X POST --header "Content-Type: application/json"\
 ```q
 q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`quote;"p"$.z.d-1;"p"$.z.d+1;`bidPrice);`f;(0#`)!())
 ```
-
-
-
