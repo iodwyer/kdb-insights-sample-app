@@ -11,6 +11,7 @@
   - [Fix Purview](#fix-purview)
   - [Query Data](#query-data)
   - [Custom API](#custom-api)
+
 ## Quick Links
 
 <https://code.kx.com/insights/microservices/intro.html>
@@ -80,7 +81,7 @@ q)tp(`upd;`trade;flip (10?`IBM`AAPL`GOOG;10#.z.p;10?`buy`sell;10?100j;10?1000f;1
 
 ## Fix Purview 
 ```q
-q)sgrc:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sgrc-1"
+q)sgrc:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services_sgrc_1"
 q)sgrc"update startTS:-0Wp, endTS:first `timestamp$(exec max prtns[;`max_date] from .sgrc.i.daps where instance = `HDB) from `.sgrc.i.daps where instance = `HDB"
 `.sgrc.i.daps
 q)sgrc"update startTS:(exec max endTS from .sgrc.i.daps where not endTS=0Wp) from `.sgrc.i.daps where instance = `RDB"

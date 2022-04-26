@@ -1,6 +1,6 @@
 /load schema
 
-\l cfg/schema.q
+\l cfg/process/tp/schema.q
 
 .tp.subscriptions:([handle:`int$();table:`symbol$()] syms:());
 
