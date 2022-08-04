@@ -1,8 +1,5 @@
-cfg/resolved_assembly_sample.yaml
 db/
+data/
 tplog/
 cache/
-restart.sh
-reset.sh
-test.q
 .cloud_auth_env

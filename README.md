@@ -7,8 +7,6 @@
   - [Authentication](#authentication)
   - [Create data folders](#create-data-folders)
   - [Docker start](#docker-start)
-  - [Publish data](#publish-data)
-  - [Fix Purview](#fix-purview)
   - [Query Data](#query-data)
   - [Custom API](#custom-api)
 
@@ -48,44 +46,17 @@ EOF
 ## Create data folders 
 ```bash
 $ cd kxi-microservices-data-services
-$ mkdir -p db/hdb/data tplog cache
-$ cp cfg/sym db/hdb/data
-$ sudo chown -R nobody:nogroup db tplog cache
-$ sudo chmod 777 -R db tplog cache
+$ mkdir data tplog cache
+# $ cp cfg/sym db/hdb/data
+# $ sudo chown -R nobody:nogroup db tplog cache
+$ sudo chmod 777 -R data tplog cache
 ```
-
 
 ## Docker start
 ```bash
 $ docker login registry.dl.kx.com
-$ ./prepEnv.sh
-$ source .env
-$ source .cloud_auth_env
 $ docker-compose up -d
 $ docker-compose logs -f 
-```
-
-
-
-## Publish data
-```q
-// open handle 
-q)tp:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services_tp_1"
-
-// publish data
-q)tp(`upd;`quote;flip (10?`IBM`AAPL`GOOG;10#.z.p;10?1000f;10?1000f;10?1000f;10?1000f))
-q)tp(`upd;`trade;flip (10?`IBM`AAPL`GOOG;10#.z.p;10?`buy`sell;10?100j;10?1000f;10?`in`out;10?0ng;10?1000j;10?1000f;10?1000f))
-// q)tp(`upd;`xref;(10#.z.p;10?`IBM`AAPL`GOOG;10?10;10?0Ng;10?10h;10?10;10?1000)) 
-```
-
-
-## Fix Purview 
-```q
-q)sgrc:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services_sgrc_1"
-q)sgrc"update startTS:-0Wp, endTS:first `timestamp$(exec max prtns[;`max_date] from .sgrc.i.daps where instance = `HDB) from `.sgrc.i.daps where instance = `HDB"
-`.sgrc.i.daps
-q)sgrc"update startTS:(exec max endTS from .sgrc.i.daps where not endTS=0Wp) from `.sgrc.i.daps where instance = `RDB"
-`.sgrc.i.daps
 ```
 
 
