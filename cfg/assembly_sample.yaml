@@ -1,109 +1,41 @@
-name: Example assembly
-description: Sample assembly file
+name: "trade-assembly"
+description: "Sample assembly file"
 
 labels:
-  region: canada,usa
+  user: "ian" 
 
-spec:
-  env:
-    - name: AWS_REGION
-      value: ${AWS_REGION}
-    - name: AWS_ACCESS_KEY_ID
-      value: ${AWS_ACCESS_KEY_ID}
-    - name: AWS_SECRET_ACCESS_KEY
-      value: ${AWS_SECRET_ACCESS_KEY}
-    - name: AZURE_STORAGE_ACCOUNT
-      value: ${AZURE_STORAGE_ACCOUNT}
-    - name: AZURE_STORAGE_SHARED_KEY
-      value: ${AZURE_STORAGE_SHARED_KEY}
-    - name: KX_TRACE_OBJSTR
-      value: "1"   
-    - name: KX_KURL_DEBUG_LOG          
-      value: "1"        
 
-# Database schema
 tables:
   trade:
     description: Trade data
     type: partitioned
     blockSize: 10000
-    prtnCol: timestamp
-    sortColsOrd: symbol
-    sortColsDisk: symbol
+    prtnCol: time
+    sortColsOrd: sym
+    sortColsDisk: sym
     columns:
-      - name: symbol
+      - name: sym
         description: Symbol name
         type: symbol
         attrMem: grouped
         attrDisk: parted
         attrOrd: parted
-      - name: timestamp
+      - name: time
         description: Time
         type: timestamp
-      - name: side
-        description: side
-        type: symbol
-      - name: size
-        description: bid price
-        type: long
       - name: price
         description: bid price
-        type: float        
-      - name: tickDirection
-        description: Big size
-        type: symbol
-      - name: trdMatchID
-        description: Ask size
-        type: guid
-      - name: grossValue
-        description: Ask size
-        type: long
-      - name: homeNotional
-        description: Ask size
-        type: float
-      - name: foreignNotional
-        description: Ask size
-        type: float                        
-
-  quote:
-    description: Quote data
-    type: partitioned
-    blockSize: 10000
-    prtnCol: timestamp
-    sortColsOrd: symbol
-    sortColsDisk: symbol
-    columns:
-      - name: symbol
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted
-      - name: timestamp
-        description: Time
-        type: timestamp
-      - name: bidSize
-        description: Bid price
-        type: float
-      - name: bidPrice
+        type: float    
+      - name: size
         description: bid price
-        type: float
-      - name: askPrice
-        description: Big size
-        type: float
-      - name: askSize
-        description: Ask size
-        type: float
+        type: int                       
 
-
-# Message bus configuration
 bus:
-  stream:   
+  stream:
     protocol: custom
     nodes: tp:5010
     topic: dataStream
 
-# Database mount configuration
 mounts:
   rdb:
     type: stream
@@ -116,51 +48,52 @@ mounts:
   hdb:
     type: local
     baseURI: file:///data/db/hdb
-    partition: date      
+    partition: date
 
-
-# Service configuration
 elements:
   rc:
-    host: sgrc
-    port: 5060
-    timeout: 30000
-  
-  # SM configuration (also used by EOI, EOD, and DBM)
+    host: sgrc 
+    port: 5060 
   sm:
     description: Storage manager
-    source: stream
-    # Tier configuration
+    source: stream      # bus configuration
     tiers:
-      - name: stream
+      - name: mem
         mount: rdb
-      - name: idb
+      - name: intra
         mount: idb
         schedule:
           freq: 0D00:10:00 # every 10 minutes
-      - name: ondisk
+      - name: hist1
         mount: hdb
         schedule:
           freq: 1D00:00:00 # every day
           snap:   01:35:00 # at 1:35 AM
         retain:
           time: 2 days
-          rows: 200000 
-      - name: s3
+          rows: 200000
+      - name: hist2
         mount: hdb
-        store: s3://bitmex-hdb/db          
-    disableDiscovery: true  # Disables registering with discovery
+        store: file:///data/db/hdbtier2/
+        retain:
+          time: 5 weeks
+          size: 2 TB
+          rows: 10000000
+      # - name: hist3
+      #   mount: hdb
+      #   store: s3://hdbtier3/
+      #   retain:
+      #     time: 3 months
+      #     size: 1 PB
+      #     rows: 20000000
+
   dap:
-    # These configs apply to all DA below
-    gwAssembly: gw-assembly
     smEndpoints: sm:10001
+    gwEndpoints: sgrc:5060
     instances:
       RDB:
-        # Config specific to DAPs with a KXI_SC of RDB
-        mountName: rdb # Must match name of mount in "mounts" section
+        mountName: rdb
       IDB:
-        # Config specific to DAPs with a KXI_SC of IDB
         mountName: idb
       HDB:
-        # Config specific to DAPs with a KXI_SC of HDB
         mountName: hdb
