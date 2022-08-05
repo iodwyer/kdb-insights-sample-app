@@ -45,10 +45,15 @@ mounts:
     type: local
     baseURI: file:///data/db/idb
     partition: ordinal
+  # hdb:
+  #   type: local
+  #   baseURI: file:///data/db/hdb
+  #   partition: date
   hdb:
     type: local
-    baseURI: file:///data/db/hdb
     partition: date
+    baseURI: file:///data/db/hdb
+
 
 elements:
   rc:
@@ -56,7 +61,7 @@ elements:
     port: 5060 
   sm:
     description: Storage manager
-    source: stream # bus configuration
+    source: stream      # bus configuration
     tiers:
       - name: mem
         mount: rdb
@@ -79,13 +84,13 @@ elements:
           time: 5 weeks
           size: 2 TB
           rows: 10000000
-      # - name: hist3
-      #   mount: hdb
-      #   store: s3://hdbtier3/
-      #   retain:
-      #     time: 3 months
-      #     size: 1 PB
-      #     rows: 20000000
+      - name: hist3
+        mount: hdb
+        store: s3://microservices-data-db/db
+        # retain:
+        #   time: 3 months
+        #   size: 1 PB
+        #   rows: 20000000
 
   dap:
     smEndpoints: sm:10001
@@ -97,3 +102,8 @@ elements:
         mountName: idb
       HDB:
         mountName: hdb
+        # sym: file:///opt/kx/s3/sym
+        # par: file:///opt/kx/s3/par.txt
+        # type: object
+        # partition: date
+        # baseURI: file://data/hdb
