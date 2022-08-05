@@ -138,7 +138,6 @@ services:
       - ./data:/data
       - ./tplog:/opt/kx/tplog
       - ./cfg:/opt/kx/cfg 
-      - ./s3:/opt/kx/s3
     env_file:
       - .env 
       - .cloud_auth_env  
