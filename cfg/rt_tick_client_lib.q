@@ -40,14 +40,19 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}]
 
   //replay log file and continue the live subscription
   if[null startIdx;startIdx:0W]; // null means follow only, not start from beginning
-
+  show "STEP 1";
   //subscribe
   res:h "(.tp.sub[`;`]; .tp `i`L; .tp.d)";  // "(.u.sub[`;`]; .u `i`L; .u.d)"
+  show "STEP 2";
+  .iod.res:res;
   .rt.schema:(!/)flip res 0; // used to convert arrays to tables during log replay
-
+  show "STEP 3";
   //if start index is less than current index, then recover
   if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0];
-     .rt.recoverMultiDay[res[1];startIdx]]; }
+     .rt.recoverMultiDay[res[1];startIdx]
+     ]; 
+  show "STEP 4 - END";
+  }
 
 //100 billion records per day
 .rt.MAX_LOG_SZ:"j"$1e11
@@ -75,4 +80,6 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}]
   //read all of all the log files except the last, where you read up to 'i'
   files:0W,/:files; files[(count files)-1;0]:i;
   //reset .rt.idx for each new day and replay the log file
-  {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files; }
+  {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files; 
+  
+  }

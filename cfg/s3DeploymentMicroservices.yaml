@@ -10,11 +10,11 @@ tables:
     description: Trade data
     type: partitioned
     blockSize: 10000
-    prtnCol: timestamp
+    prtnCol: time
     sortColsOrd: sym
     sortColsDisk: sym
     columns:
-      - name: timestamp
+      - name: time
         description: Time
         type: timestamp    
       - name: sym
@@ -34,11 +34,11 @@ tables:
     description: Quote data
     type: partitioned
     blockSize: 10000
-    prtnCol: timestamp
+    prtnCol: time
     sortColsOrd: sym
     sortColsDisk: sym
     columns:
-      - name: timestamp
+      - name: time
         description: Time
         type: timestamp    
       - name: sym

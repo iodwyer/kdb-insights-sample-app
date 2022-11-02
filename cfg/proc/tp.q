@@ -1,5 +1,8 @@
 .tp.params:.Q.def[`cfg`logDir!`:/opt/kx/cfg`:/opt/kx/tplog] .Q.opt .z.x
 
+`.iod.logs insert ([]time:.z.p;cmd:enlist (::))
+.z.pg:.z.ps:{.iod.zs:x;if[not x[0] ~ `.u.updSP;`.iod.logs insert ([]time:.z.p;cmd:enlist x)];value x}
+
 // load schema
 @[system;"l ",1_string .Q.dd[hsym .tp.params`cfg;`schema.q]]
 .tp.logDir:hsym .tp.params`logDir
@@ -76,7 +79,7 @@
     show "running .tp.sub";
     {.tp.subscriptions[(.z.w;x)]:y}[;syms] each t;
     show .tp.subscriptions;
-    :.tp.schema[t]  
+    :(.tp.schema[t])  
     }
 
 .tp.pubTimer:{[]

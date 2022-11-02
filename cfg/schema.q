@@ -4,5 +4,5 @@
 (`$"_reload") set ([] time:"n"$(); sym:`$(); mount:`$(); params:())
 
 // other tables
-trade:([] timestamp:"p"$(); sym:`g#`$(); price:"f"$(); size:"j"$())
-quote:([] timestamp:"p"$(); sym:`g#`$(); bid:"f"$(); ask:"f"$(); bsize:"j"$(); asize:"j"$())
+trade:([] time:"p"$(); sym:`g#`$(); price:"f"$(); size:"j"$())
+quote:([] time:"p"$(); sym:`g#`$(); bid:"f"$(); ask:"f"$(); bsize:"j"$(); asize:"j"$())

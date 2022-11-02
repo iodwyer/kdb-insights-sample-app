@@ -141,7 +141,7 @@ services:
   #
   # Storage Manager
   #  
-    image: "registry.dl.kx.com/kxi-sm-single:1.1.0"
+    image: "registry.dl.kx.com/kxi-sm-single:${DA_VERSION}"
     depends_on:
       - tp
     environment:
@@ -175,7 +175,7 @@ services:
       - KXI_SC=RDB
       - KXI_PORT=5080
       - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_LOG_LEVELS=default:info # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
@@ -187,6 +187,7 @@ services:
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
       - ./data:/data
+      - ./tplog:/opt/kx/tplog      
       - ./cfg:/opt/kx/cfg     
     deploy:
       mode: replicated
