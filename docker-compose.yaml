@@ -3,24 +3,44 @@ version: "3"
 # Services.
 #
 services:
-  feed:
-    image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+  # feed:
+  #   image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+  #   depends_on:
+  #     - tp    
+  #   environment:
+  #     - KX_KURL_DEBUG_LOG=1
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:debug # Optional
+  #   ports:
+  #     - 127.0.0.1::5009
+  #   command: /opt/kx/cfg/proc/feed.q -p 5009 
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./cfg:/opt/kx/cfg 
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true   
+  
+  sp_feed:
+    image: ${KX_DOCKER_REG}/kxi-sp-python:1.2.0
     depends_on:
       - tp    
     environment:
       - KX_KURL_DEBUG_LOG=1
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
     ports:
-      - 127.0.0.1::5009
-    command: /opt/kx/cfg/proc/feed.q -p 5009 
+      - 127.0.0.1::5000
+    # command: /opt/kx/cfg/proc/feed.q -p 5009 
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
       - ./cfg:/opt/kx/cfg 
     env_file:
       - .env 
     stdin_open: true
-    tty: true   
+    tty: true     
 
   tp:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}

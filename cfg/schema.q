@@ -5,3 +5,4 @@
 
 // other tables
 trade:([] sym:`g#`$(); time:"p"$(); price:"f"$(); size:"i"$())
+quote:([] timestamp:"p"$(); sym:`g#`$(); bid:"f"$(); ask:"f"$(); bsize:"j"$(); asize:"j"$())

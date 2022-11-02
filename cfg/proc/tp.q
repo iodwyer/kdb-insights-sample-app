@@ -51,10 +51,9 @@
     ]
     }
 
-
 .u.upd:{[t;d] 
     .tp.ts[.z.D];   // check time for log rollover
-
+    -1 "Received data";
     if[.tp.l;
       .tp.l enlist (`upd;t;d);
       .tp.i+:1
@@ -62,6 +61,9 @@
 
     t upsert d;      
     }
+
+// upd for Stream Processor
+.u.updSP:{.u.upd[x 0;x 1]}
 
 // sub function
 // @ returns schema(s)
@@ -102,7 +104,7 @@
     }
 
 .tp.handleOpen:{[h]
-    show "### Process connected on handle: ",string[h],"### Info: ",.Q.s1 (.z.u;.z.a)
+    -1 "### Process connected on handle: ",string[h],"### Info: ",.Q.s1 (.z.u;.z.a)
     }
 
 .tp.handleClose:{[h]
