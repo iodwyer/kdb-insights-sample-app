@@ -19,16 +19,16 @@ quote_schema = {
     'asize': 'long'
 }
 
-trade = (sp.read.from_kafka(topic='trade', brokers='104.198.219.51:9091')
+trade = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map('{[data] "PS*j"$data }')
     | sp.map(lambda x: ('trade', x))
-    | sp.write.to_process(handle=':tp:5010', mode='function', target='.u.updSP'))
+    | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.updSP'))
 
-quote = (sp.read.from_kafka(topic='quote', brokers='104.198.219.51:9091')
+quote = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map('{[data] "PS**jj"$data }')
     | sp.map(lambda x: ('quote', x))
-    | sp.write.to_process(handle=':tp:5010', mode='function', target='.u.updSP'))
+    | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.updSP'))
 
 sp.run(quote, trade)
