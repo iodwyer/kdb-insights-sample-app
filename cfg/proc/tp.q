@@ -53,7 +53,7 @@
 
 .u.upd:{[t;d] 
     .tp.ts[.z.D];   // check time for log rollover
-    -1 "Received data";
+    / -1 "Received data: ",string t;
     if[.tp.l;
       .tp.l enlist (`upd;t;d);
       .tp.i+:1

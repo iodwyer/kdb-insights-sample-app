@@ -10,10 +10,10 @@
 //
 .custom.countBy:{[table;startTS;endTS;byCols]
 	bc:$[not[`date in cols table]&`date in byCols;
-		(x,`date)!(x:(byCols,())except`date),enlist($;"d";`time);
+		(x,`date)!(x:(byCols,())except`date),enlist($;"d";`timestamp);
 		x!x:byCols,()];
 
-	?[table;enlist(within;`time`;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
+	?[table;enlist(within;`timestamp;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
 	}
 
 .da.registerAPI[`.custom.countBy;

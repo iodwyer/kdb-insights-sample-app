@@ -45,9 +45,9 @@ EOF
 
 ## Create data folders 
 ```bash
-$ cd kxi-microservices-data-services
+# $ cd kxi-microservices-data-services
 $ mkdir -p data/db/hdb/data tplog cache
-$ aws s3 cp s3://microservices-data-db/sym data/db/hdb/data
+# $ aws s3 cp s3://microservices-data-db/sym data/db/hdb/data
 $ sudo chmod 777 -R data tplog cache
 ```
 
@@ -62,7 +62,7 @@ $ docker-compose logs -f
 ## Query Data
 ```q
 q)gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sggw-1"
-// q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`f;(0#`)!())
 ```
 ```bash
