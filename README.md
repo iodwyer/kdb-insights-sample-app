@@ -45,9 +45,8 @@ EOF
 
 ## Create data folders 
 ```bash
-# $ cd kxi-microservices-data-services
-$ mkdir -p data/db/hdb/data tplog cache
-# $ aws s3 cp s3://microservices-data-db/sym data/db/hdb/data
+$ cd kxi-microservices-data-services
+$ mkdir -p data tplog cache
 $ sudo chmod 777 -R data tplog cache
 ```
 
