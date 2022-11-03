@@ -33,7 +33,6 @@ services:
       - KXI_SP_SPEC=/opt/kx/cfg/taq.py
     ports:
       - 127.0.0.1::5000
-    # command: /opt/kx/cfg/proc/feed.q -p 5009 
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
       - ./cfg:/opt/kx/cfg 
@@ -50,15 +49,74 @@ services:
       - KXI_LOG_LEVELS=default:debug # Optional
     ports:
       - 127.0.0.1::5010
-    command: /opt/kx/cfg/proc/tp.q -p 5010 -logDir /opt/kx/tplog -cfg /opt/kx/cfg
+    command: tick.q sym /logs -p 5010
+    working_dir: /opt/kx/tick
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./tplog:/opt/kx/tplog
-      - ./cfg:/opt/kx/cfg 
+      - ./tplog:/logs
+      - ./kdb-tick:/opt/kx/tick
     env_file:
       - .env 
     stdin_open: true
     tty: true    
+
+  sm:
+  #
+  # Storage Manager
+  #  
+    image: "registry.dl.kx.com/kxi-sm-single:${DA_VERSION}"
+    depends_on:
+      - tp
+    environment:
+      - KXI_NAME=sm
+      - KXI_SC=SM
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      # - KXI_PORT=10001
+      - KXI_LOG_FORMAT=text
+    ports:
+      - 127.0.0.1::10001
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./data:/data
+      - ./tplog:/logs
+      - ./cfg:/opt/kx/cfg 
+    env_file:
+      - .env 
+      - .cloud_auth_env  
+    stdin_open: true
+    tty: true      
+
+  da-single:
+    image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
+    environment:
+      - KXI_NAME=dap
+      - KXI_SC=dap
+      - KXI_PORT=5080
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:info # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
+      - KXI_SG_RC_ADDR=sgrc:5060
+    ports:
+      - 127.0.0.1::5080
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./data:/data
+      - ./tplog:/logs
+      - ./cfg:/opt/kx/cfg     
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env    
+      - .cloud_auth_env         
+    stdin_open: true
+    tty: true 
+
 
   
   #
@@ -121,7 +179,8 @@ services:
       - GATEWAY_HTTP_PORT=8080
       - KXI_AUTH_DISABLED=1
       - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:trace # Optional      
+      - KXI_LOG_LEVELS=default:trace # Optional  
+      - KXI_SG_RC_ADDR=sgrc:5060   
     ports:
       - 127.0.0.1::5040
       - 127.0.0.1::8080
@@ -137,130 +196,90 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg         
 
-  sm:
-  #
-  # Storage Manager
-  #  
-    image: "registry.dl.kx.com/kxi-sm-single:${DA_VERSION}"
-    depends_on:
-      - tp
-    environment:
-      - KXI_NAME=sm
-      - KXI_SC=SM
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      # - KXI_PORT=10001
-      - KXI_LOG_FORMAT=text
-    ports:
-      - 127.0.0.1::10001
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
-      - ./tplog:/opt/kx/tplog
-      - ./cfg:/opt/kx/cfg 
-    env_file:
-      - .env 
-      - .cloud_auth_env  
-    stdin_open: true
-    tty: true      
+     
 
-  rdb:
-  #
-  # Realtime Database
-  #
-    image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
-    # command: -p 5080
-    environment:
-      - KXI_NAME=rdb
-      - KXI_SC=RDB
-      - KXI_PORT=5080
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:info # Optional
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
-      - KX_TRACE_OBJSTR=1
-      - KX_KURL_DEBUG_LOG=1      
-      - KXI_SG_RC_ADDR=sgrc:5060
-    ports:
-      - 127.0.0.1::5080
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
-      - ./tplog:/opt/kx/tplog      
-      - ./cfg:/opt/kx/cfg     
-    deploy:
-      mode: replicated
-      replicas: 1
-    env_file:
-      - .env    
-      - .cloud_auth_env         
-    stdin_open: true
-    tty: true      
+  # idb:
+  # #
+  # # Intraday Database
+  # #
+  #   image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+  #   # command: -p 5090
+  #   environment:
+  #     - KXI_NAME=idb
+  #     - KXI_SC=IDB
+  #     - KXI_PORT=5090
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:trace # Optional
+  #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+  #     - KX_TRACE_OBJSTR=1
+  #     - KX_KURL_DEBUG_LOG=1    
+  #     # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q  
+  #     - KXI_SG_RC_ADDR=sgrc:5060
+  #   ports:
+  #     - 127.0.0.1::5090
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./data:/data
+  #     - ./cfg:/opt/kx/cfg       
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   env_file:
+  #     - .env  
+  #     - .cloud_auth_env           
+  #   stdin_open: true
+  #   tty: true    
 
-  idb:
-  #
-  # Intraday Database
-  #
-    image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
-    # command: -p 5090
-    environment:
-      - KXI_NAME=idb
-      - KXI_SC=IDB
-      - KXI_PORT=5090
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:trace # Optional
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KX_TRACE_OBJSTR=1
-      - KX_KURL_DEBUG_LOG=1    
-      # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q  
-      - KXI_SG_RC_ADDR=sgrc:5060
-    ports:
-      - 127.0.0.1::5090
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
-      - ./cfg:/opt/kx/cfg       
-    deploy:
-      mode: replicated
-      replicas: 1
-    env_file:
-      - .env  
-      - .cloud_auth_env           
-    stdin_open: true
-    tty: true    
+  # hdb:
+  # #
+  # # Historical Database
+  # #
+  #   image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+  #   command: -s 8
+  #   environment:
+  #     - KXI_NAME=hdb
+  #     - KXI_SC=HDB
+  #     - KXI_PORT=5100      
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:trace # Optional
+  #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+  #     - KX_TRACE_OBJSTR=1
+  #     - KX_KURL_DEBUG_LOG=1   
+  #     # - KX_OBJSTR_INVENTORY_FILE=_inventory/all.json.gz
+  #     # - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
+  #     # - KX_S3_CACHE_SIZE=10000
+  #     # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q      
+  #   ports:
+  #     - 127.0.0.1::5100
+  #   volumes: 
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic 
+  #     - ./cfg:/opt/kx/cfg 
+  #     - ./data:/data
+  #     - ./cache:/opt/kx/cache        
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   env_file:
+  #     - .env 
+  #     - .cloud_auth_env           
+  #   stdin_open: true
+  #   tty: true        
 
-  hdb:
-  #
-  # Historical Database
-  #
-    image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
-    command: -s 8
-    environment:
-      - KXI_NAME=hdb
-      - KXI_SC=HDB
-      - KXI_PORT=5100      
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:trace # Optional
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KX_TRACE_OBJSTR=1
-      - KX_KURL_DEBUG_LOG=1   
-      # - KX_OBJSTR_INVENTORY_FILE=_inventory/all.json.gz
-      # - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
-      # - KX_S3_CACHE_SIZE=10000
-      # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q      
-    ports:
-      - 127.0.0.1::5100
-    volumes: 
-      - ${HOME}/.qp.licenses:/opt/kx/lic 
-      - ./cfg:/opt/kx/cfg 
-      - ./data:/data
-      - ./cache:/opt/kx/cache        
-    deploy:
-      mode: replicated
-      replicas: 1
-    env_file:
-      - .env 
-      - .cloud_auth_env           
-    stdin_open: true
-    tty: true        
+
+  # tp:
+  #   image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+  #   environment:
+  #     - KX_KURL_DEBUG_LOG=1
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:debug # Optional
+  #   ports:
+  #     - 127.0.0.1::5010
+  #   command: /opt/kx/cfg/proc/tp.q -p 5010 -logDir /opt/kx/tplog -cfg /opt/kx/cfg
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./tplog:/opt/kx/tplog
+  #     - ./cfg:/opt/kx/cfg 
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true    

@@ -31,4 +31,4 @@ quote = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.updSP'))
 
-sp.run(quote, trade)
+sp.run(trade, quote)

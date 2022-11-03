@@ -4,7 +4,6 @@ description: "Sample assembly file"
 labels:
   user: "ian" 
 
-
 tables:
   trade:
     description: Trade data
@@ -60,7 +59,6 @@ tables:
         description: bid price
         type: long                  
 
-
 bus:
   stream:
     protocol: custom
@@ -70,55 +68,39 @@ bus:
 mounts:
   rdb:
     type: stream
-    baseURI: file:///mnt/foo/i/
+    baseURI: file://stream
     partition: none
   idb:
     type: local
-    baseURI: file:///data/db/idb
+    baseURI: file:///data/idb
     partition: ordinal
   hdb:
     type: local
+    baseURI: file:///data/hdb
     partition: date
-    baseURI: file:///data/db/hdb
-
 
 elements:
-  rc:
-    host: sgrc 
-    port: 5060 
+  dap:
+    gwAssembly: sgrc:5060 
+    gwEndpoints: sgrc:5060    
+    smEndpoints: sm:10001
+    instances:
+      dap:
+        mountList: [rdb, idb, hdb]
+
   sm:
     description: Storage manager
-    source: stream      # bus configuration
+    source: stream
     tiers:
-      - name: mem
+      - name: stream
         mount: rdb
-      - name: intra
+      - name: idb
         mount: idb
         schedule:
           freq: 0D00:10:00 # every 10 minutes
-      - name: hist1
+      - name: hdb
         mount: hdb
         schedule:
           freq: 1D00:00:00 # every day
-          snap:   00:00:00 
-      #   retain:
-      #     time: 2 days
-      #     rows: 200000
-      # - name: hist2
-      #   mount: hdb
-      #   store: file:///data/db/hdbtier2/
-      #   retain:
-      #     time: 5 weeks
-      #     size: 2 TB
-      #     rows: 10000000
-
-  dap:
-    smEndpoints: sm:10001
-    gwEndpoints: sgrc:5060
-    instances:
-      RDB:
-        mountName: rdb
-      IDB:
-        mountName: idb
-      HDB:
-        mountName: hdb
+          snap:   00:00:00 # at 1:35 AM
+    disableDiscovery: true  # Disables registering with discovery
