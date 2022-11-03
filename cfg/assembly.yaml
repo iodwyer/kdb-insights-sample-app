@@ -81,8 +81,8 @@ mounts:
 
 elements:
   dap:
-    gwAssembly: sgrc:5060 
-    gwEndpoints: sgrc:5060    
+    # gwAssembly: sgrc:5060 
+    # gwEndpoints: sgrc:5060    
     smEndpoints: sm:10001
     instances:
       dap:
@@ -102,5 +102,5 @@ elements:
         mount: hdb
         schedule:
           freq: 1D00:00:00 # every day
-          snap:   00:00:00 # at 1:35 AM
+          snap:   00:00:00 # 
     disableDiscovery: true  # Disables registering with discovery
