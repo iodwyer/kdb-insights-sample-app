@@ -2,3 +2,4 @@ data/
 tplog/
 cache/
 .cloud_auth_env
+.ipynb_checkpoints

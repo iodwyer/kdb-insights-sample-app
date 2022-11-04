@@ -1,4 +1,6 @@
 import pykx as kx
+import pandas as pd
+import matplotlib.pyplot as plt
 import datetime
 import pytz
 
@@ -20,5 +22,9 @@ empty_dict = {'':''}
 tab = gw(kx.SymbolAtom('.kxi.getData'), query_params, 'f', empty_dict)
 
 data = tab[1].pd()
+
+# data.plot('size', 'price', kind = 'scatter')
+plt.plot(data.size)
+plt.show()
 
 print(data)
