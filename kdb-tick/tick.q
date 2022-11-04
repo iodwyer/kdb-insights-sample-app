@@ -36,7 +36,14 @@ system"t 1000"
 
 if[system"t";
  .z.ts:{pub'[t;value each t];@[`.;t;@[;`sym;`g#]0#];i::j;ts .z.D};
- upd:{[t;x] t upsert x; if[l;l enlist (`upd;t;x);j+:1]}
+ upd:{[t;x] 
+    $[0h = type x;
+        t insert x;
+        t upsert x
+    ]; 
+    
+    if[l;l enlist (`upd;t;x);j+:1]
+    }
  
  ];
 
@@ -50,9 +57,6 @@ if[system"t";
 
 .u.updSP:{.u.upd[x 0;x 1]}
 .u.tick[src;.z.x 1];
-
-
-
 
 \
  globals used

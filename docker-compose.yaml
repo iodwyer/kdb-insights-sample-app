@@ -16,7 +16,8 @@ services:
     ports:
       - 127.0.0.1::5000
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./sp:/sp   
       - ./cfg:/opt/kx/cfg 
     env_file:
       - .env 
@@ -56,6 +57,7 @@ services:
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       # - KXI_PORT=10001
       - KXI_LOG_FORMAT=text
+      - KXI_LOG_LEVELS=default:trace      
     ports:
       - 127.0.0.1::10001
     volumes:

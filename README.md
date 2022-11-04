@@ -4,6 +4,7 @@
     - [Storage Manager](#storage-manager)
     - [Data Access](#data-access)
     - [Service Gateway](#service-gateway)
+    - [Stream Processor](#stream-processor)
   - [Authentication](#authentication)
   - [Create data folders](#create-data-folders)
   - [Docker start](#docker-start)
@@ -29,6 +30,11 @@
 * <https://code.kx.com/insights/microservices/data-access/introduction_sg.html>
 * <https://code.kx.com/insights/microservices/artefacts.html#service-gateway>
 
+### Stream Processor
+
+* <https://code.kx.com/insights/microservices/stream-processor/index.html>
+* <https://code.kx.com/insights/microservices/stream-processor/release-notes.html#artifacts>
+
 ## Authentication
 ```bash
 ## create file and populate appropriately
@@ -46,8 +52,8 @@ EOF
 ## Create data folders 
 ```bash
 $ cd kxi-microservices-data-services
-$ mkdir -p data tplog cache
-$ sudo chmod 777 -R data tplog cache
+$ mkdir -p data tplog sp/checkpoints
+$ sudo chmod 777 -R data tplog sp
 ```
 
 ## Docker start
