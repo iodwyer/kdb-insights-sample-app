@@ -1,22 +1,22 @@
 from kxi import sp
 
 tp_hostport = ':tp:5010'
-kfk_broker = '104.198.219.51:9091'
+kfk_broker  = '104.198.219.51:9091'
 
 trade_schema = {
-    'timestamp': 'timestamp',
-    'sym': 'symbol',
-    'price': 'float',
-    'size': 'long'
+    'timestamp':  'timestamp',
+    'sym':        'symbol',
+    'price':      'float',
+    'size':       'long'
 }
 
 quote_schema = {
-    'timestamp': 'timestamp',
-    'sym': 'symbol',
-    'bid': 'float',
-    'ask': 'float',
-    'bsize': 'long',
-    'asize': 'long'
+    'timestamp':  'timestamp',
+    'sym':        'symbol',
+    'bid':        'float',
+    'ask':        'float',
+    'bsize':      'long',
+    'asize':      'long'
 }
 
 trade = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
