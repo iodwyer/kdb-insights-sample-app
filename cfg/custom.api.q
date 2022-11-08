@@ -13,7 +13,7 @@
 		(x,`date)!(x:(byCols,())except`date),enlist($;"d";`time);
 		x!x:byCols,()];
 
-	?[table;enlist(within;`time`;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
+	?[table;enlist(within;`timestamp;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
 	}
 
 .da.registerAPI[`.custom.countBy;

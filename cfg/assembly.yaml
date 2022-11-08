@@ -1,0 +1,106 @@
+name: "trade-assembly"
+description: "Sample assembly file"
+
+labels:
+  user: "ian" 
+
+tables:
+  trade:
+    description: Trade data
+    type: partitioned
+    blockSize: 10000
+    prtnCol: time
+    sortColsOrd: sym
+    sortColsDisk: sym
+    columns:
+      - name: time
+        description: Time
+        type: timestamp    
+      - name: sym
+        description: Symbol name
+        type: symbol
+        attrMem: grouped
+        attrDisk: parted
+        attrOrd: parted
+      - name: price
+        description: Price
+        type: float    
+      - name: size
+        description: Size
+        type: long      
+
+  quote:
+    description: Quote data
+    type: partitioned
+    blockSize: 10000
+    prtnCol: time
+    sortColsOrd: sym
+    sortColsDisk: sym
+    columns:
+      - name: time
+        description: Time
+        type: timestamp    
+      - name: sym
+        description: Symbol name
+        type: symbol
+        attrMem: grouped
+        attrDisk: parted
+        attrOrd: parted
+      - name: bid
+        description: bid price
+        type: float    
+      - name: ask
+        description: bid price
+        type: float   
+      - name: bsize
+        description: bid price
+        type: long  
+      - name: asize
+        description: bid price
+        type: long                  
+
+bus:
+  stream:
+    protocol: custom
+    nodes: tp:5010
+    topic: dataStream
+
+mounts:
+  rdb:
+    type: stream
+    baseURI: file://stream
+    partition: none
+  idb:
+    type: local
+    baseURI: file:///data/idb
+    partition: ordinal
+  hdb:
+    type: local
+    baseURI: file:///data/hdb
+    partition: date
+
+elements:
+  dap:
+    # gwAssembly: sgrc:5060 
+    # gwEndpoints: sgrc:5060    
+    smEndpoints: sm:10001
+    instances:
+      dap:
+        mountList: [rdb, idb, hdb]
+
+  sm:
+    description: Storage manager
+    source: stream
+    tiers:
+      - name: stream
+        mount: rdb
+      - name: idb
+        mount: idb
+        schedule:
+          freq: 0D00:10:00 # every 10 minutes
+      - name: hdb
+        mount: hdb
+        schedule:
+          freq: 1D00:00:00 # every day
+          snap:   00:00:00 # 
+    disableDiscovery: true  # Disables registering with discovery

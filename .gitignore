@@ -1,5 +1,6 @@
-db/
 data/
 tplog/
-cache/
+sp/
+cfg/__pycache__/
 .cloud_auth_env
+.ipynb_checkpoints

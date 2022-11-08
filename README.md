@@ -4,6 +4,7 @@
     - [Storage Manager](#storage-manager)
     - [Data Access](#data-access)
     - [Service Gateway](#service-gateway)
+    - [Stream Processor](#stream-processor)
   - [Authentication](#authentication)
   - [Create data folders](#create-data-folders)
   - [Docker start](#docker-start)
@@ -29,6 +30,11 @@
 * <https://code.kx.com/insights/microservices/data-access/introduction_sg.html>
 * <https://code.kx.com/insights/microservices/artefacts.html#service-gateway>
 
+### Stream Processor
+
+* <https://code.kx.com/insights/microservices/stream-processor/index.html>
+* <https://code.kx.com/insights/microservices/stream-processor/release-notes.html#artifacts>
+
 ## Authentication
 ```bash
 ## create file and populate appropriately
@@ -46,9 +52,8 @@ EOF
 ## Create data folders 
 ```bash
 $ cd kxi-microservices-data-services
-$ mkdir -p data/db/hdb/data tplog cache
-$ aws s3 cp s3://microservices-data-db/sym data/db/hdb/data
-$ sudo chmod 777 -R data tplog cache
+$ mkdir -p data tplog sp/checkpoints
+$ sudo chmod 777 -R data tplog sp
 ```
 
 ## Docker start
@@ -62,7 +67,7 @@ $ docker-compose logs -f
 ## Query Data
 ```q
 q)gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sggw-1"
-// q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`f;(0#`)!())
 ```
 ```bash
