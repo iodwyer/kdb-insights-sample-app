@@ -57,7 +57,7 @@ services:
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       # - KXI_PORT=10001
       - KXI_LOG_FORMAT=text
-      - KXI_LOG_LEVELS=default:trace      
+      - KXI_LOG_LEVELS=default:info      
     ports:
       - 127.0.0.1::10001
     volumes:
