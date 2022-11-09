@@ -23,12 +23,13 @@ trade = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }')
     | sp.map(lambda x: ('trade', x))
-    | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.updSP'))
+    | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
+
 
 quote = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS**jj"$data }')
     | sp.map(lambda x: ('quote', x))
-    | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.updSP'))
+    | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
 sp.run(trade, quote)

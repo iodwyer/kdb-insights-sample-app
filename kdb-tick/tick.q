@@ -55,7 +55,6 @@ if[system"t";
 
 \d .
 
-.u.updSP:{.u.upd[x 0;x 1]}
 .u.tick[src;.z.x 1];
 
 \
