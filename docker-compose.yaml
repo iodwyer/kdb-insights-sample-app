@@ -80,6 +80,9 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:info # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KXI_DA_RDB_THREADS=0
+      - KXI_DA_IDB_THREADS=4
+      - KXI_DA_HDB_THREADS=8
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KX_TRACE_OBJSTR=1
