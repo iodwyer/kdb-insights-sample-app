@@ -1,0 +1,554 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ebs-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources:
+    requests:
+      storage: 4Gi
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: ebs-sc
+provisioner: ebs.csi.aws.com
+volumeBindingMode: WaitForFirstConsumer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxinsights-hdb-da
+  labels:
+    app.kubernetes.io/name: hdb-da
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 5080
+      targetPort: hdb-da
+      protocol: TCP
+      name: hdb-da
+  selector:
+    app.kubernetes.io/name: hdb-da
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxinsights-resource-coordinator
+  labels:
+    app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5060
+      targetPort: resource-coordi
+      protocol: TCP
+      name: resource-coordi
+  selector:
+    app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxinsights-aggregator
+  labels:
+    app.kubernetes.io/name: aggregator
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5070
+      targetPort: aggregator
+      protocol: TCP
+      name: aggregator
+  selector:
+    app.kubernetes.io/name: aggregator
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxinsights-sg-gateway
+  labels:
+    app.kubernetes.io/name: sg-gateway
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: LoadBalancer
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: ipc-port
+      protocol: TCP
+      port: 5050
+      targetPort: 5050
+  selector:
+    app.kubernetes.io/name: sg-gateway
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kxinsights-aggregator
+  labels:
+    app.kubernetes.io/name: aggregator
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: aggregator
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: aggregator
+        app.kubernetes.io/instance: kxinsights
+    spec:
+      serviceAccountName: kxinsights-aggregator
+      securityContext:
+        {}
+      containers:
+        - name: aggregator
+          args: [ -p, "5070" ]
+          securityContext:
+            {}
+          image: registry.dl.kx.com/kxi-sg-agg:1.1.0    
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kx-license-info
+                  key: license
+            - name: KXI_ASSEMBLY_FILE
+              value: /opt/kx/config/assembly.yaml
+            - name: KXI_SG_RC_ADDR
+              value: kxinsights-resource-coordinator.kdb.svc:5060                
+          ports:
+            - name: aggregator
+              containerPort: 5070
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: assemblyconfig
+              mountPath: /opt/kx/config/assembly.yaml
+              subPath: assembly.yaml
+          tty: true   
+          stdin: true               
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: assemblyconfig
+        configMap:
+          name: kxi-assembly-configmap  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kxinsights-resource-coordinator
+  labels:
+    app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: resource-coordinator
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: resource-coordinator
+        app.kubernetes.io/instance: kxinsights
+    spec:
+
+      serviceAccountName: kxinsights-resource-coordinator
+      securityContext:
+        {}
+      containers:
+        - name: resource-coordinator
+          securityContext:
+            {}
+          image: registry.dl.kx.com/kxi-sg-rc:1.1.0      
+          imagePullPolicy: IfNotPresent
+          args: [ -p, "5060" ]
+          env:
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kx-license-info
+                  key: license
+            - name: KXI_ASSEMBLY_FILE
+              value: /opt/kx/config/assembly.yaml
+            - name: KXI_ALLOWED_SBX_APIS
+              value: ".kxi.sql,.kxi.qsql"              
+          ports:
+            - name: resource-coordi
+              containerPort: 5060
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: assemblyconfig
+              mountPath: /opt/kx/config/assembly.yaml
+              subPath: assembly.yaml
+          tty: true   
+          stdin: true               
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: assemblyconfig
+        configMap:
+          name: kxi-assembly-configmap  
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kxinsights-sg-gateway
+  labels:
+    app.kubernetes.io/name: sg-gateway
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sg-gateway
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sg-gateway
+        app.kubernetes.io/instance: kxinsights
+    spec:
+
+      serviceAccountName: kxinsights-sg-gateway
+      securityContext:
+        {}
+      containers:
+        - name: sg-gateway
+          securityContext:
+            {}
+          image: registry.dl.kx.com/kxi-sg-gw:1.1.0   
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kx-license-info
+                  key: license
+            - name: KXI_ASSEMBLY_FILE
+              value: /opt/kx/config/assembly.yaml
+            - name: GATEWAY_QIPC_PORT
+              value: "5050"
+            - name: GATEWAY_HTTP_PORT
+              value: "8080"
+            - name: KXI_SG_RC_ADDR
+              value: kxinsights-resource-coordinator.kdb.svc:5060                
+          ports:
+            - name: http-port
+              containerPort: 8080
+            - name: ipc-port
+              containerPort: 5050
+          resources:
+            {}
+          volumeMounts:
+            - name: assemblyconfig
+              mountPath: /opt/kx/config/assembly.yaml
+              subPath: assembly.yaml
+          tty: true   
+          stdin: true     
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: assemblyconfig
+        configMap:
+          name: kxi-assembly-configmap  
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kxinsights-hdb-da
+  labels:
+    app.kubernetes.io/name: hdb-da
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  serviceName: kxinsights-hdb-da
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: hdb-da
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: hdb-da
+        app.kubernetes.io/instance: kxinsights
+    spec:
+    #  serviceAccountName: kx-s3-read-access
+      initContainers:
+      - name: take-data-dir-ownership
+        image: alpine:3
+        command:
+        - chmod
+        - -R
+        - "777"
+        - /data
+        volumeMounts:
+          - name: persistent-storage
+            mountPath: /data    
+      containers:
+        - name: hdb-da
+          securityContext:
+            {}
+          image: registry.dl.kx.com/kxi-da:1.1.0         
+          imagePullPolicy: IfNotPresent
+          args: [ -p, "5080" ]          
+          tty: true   
+          stdin: true 
+          env:
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kx-license-info
+                  key: license
+            - name: KXI_LOG_LEVELS
+              value: "default:trace"     
+            # - name: KXI_PORT
+            #   value: "5080"                  
+            - name: KX_TRACE_OBJSTR
+              value: "1"
+            - name: KX_KURL_DEBUG_LOG          
+              value: "1"                 
+            - name: AWS_REGION
+              value: eu-west-1
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: aws-access-secret
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: aws-access-secret
+                  key: AWS_SECRET_ACCESS_KEY  
+            - name: KX_OBJSTR_INVENTORY_FILE
+              value: "_inventory/all.json.gz"                           
+            - name: ENABLE_IRP
+              value: "true"
+            - name: KXI_SC
+              value: HDB
+            - name: KXI_ASSEMBLY_FILE
+              value: /opt/kx/config/assembly.yaml
+            - name: KXI_ALLOWED_SBX_APIS
+              value: ".kxi.sql,.kxi.qsql"  
+            - name: KXI_CUSTOM_FILE
+              value: "/opt/kx/config/custom.api.q"    
+            - name: KX_OBJSTR_CACHE_PATH
+              value: "/data"                                     
+          ports:
+            - name: hdb-da
+              containerPort: 5080
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: persistent-storage
+              mountPath: /data          
+            - name: assemblyconfig
+              mountPath: /opt/kx/config/assembly.yaml
+              subPath: assembly.yaml
+            - name: customconfig
+              mountPath: /opt/kx/config/custom.api.q
+              subPath: custom.api.q              
+            - name: s3config
+              mountPath: /opt/kx/data/current/hdb/par.txt
+              subPath: par.txt
+            - name: s3config
+              mountPath: /opt/kx/data/current/hdb/sym
+              subPath: sym
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: ebs-claim      
+      - name: assemblyconfig
+        configMap:
+          name: kxi-assembly-configmap 
+      - name: customconfig
+        configMap:
+          name: kxi-custom-file-configmap           
+      - name: s3config
+        configMap:
+          name: kxinsights-s3-configmap
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kxinsights-aggregator
+  labels:
+    app.kubernetes.io/name: aggregator
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kxinsights-resource-coordinator
+  labels:
+    app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kxinsights-sg-gateway
+  labels:
+    app.kubernetes.io/name: sg-gateway
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kxi-assembly-configmap 
+data:
+  assembly.yaml: |-
+    name: trade-assembly
+    description: Assembly for Data Access processes. Defines labels that apply only to these DAs
+    labels:
+      region: Canada
+      assetClass: tick
+    tables:
+      trade:
+        description: Trade data
+        type: partitioned
+        blockSize: 10000
+        prtnCol: timestamp
+        sortColsOrd: symbol
+        sortColsDisk: symbol
+        columns:
+          - name: symbol
+            description: Symbol name
+            type: symbol
+            attrMem: grouped
+            attrDisk: parted
+            attrOrd: parted
+          - name: timestamp
+            description: Time
+            type: timestamp
+          - name: side
+            description: side
+            type: symbol
+          - name: size
+            description: bid price
+            type: long
+          - name: price
+            description: bid price
+            type: float        
+          - name: tickDirection
+            description: Big size
+            type: symbol
+          - name: trdMatchID
+            description: Ask size
+            type: guid
+          - name: grossValue
+            description: Ask size
+            type: long
+          - name: homeNotional
+            description: Ask size
+            type: float
+          - name: foreignNotional
+            description: Ask size
+            type: float                        
+      quote:
+        description: Quote data
+        type: partitioned
+        blockSize: 10000
+        prtnCol: timestamp
+        sortColsOrd: symbol
+        sortColsDisk: symbol
+        columns:
+          - name: symbol
+            description: Symbol name
+            type: symbol
+            attrMem: grouped
+            attrDisk: parted
+            attrOrd: parted
+          - name: timestamp
+            description: Time
+            type: timestamp
+          - name: bidSize
+            description: Bid price
+            type: float
+          - name: bidPrice
+            description: bid price
+            type: float
+          - name: askPrice
+            description: Big size
+            type: float
+          - name: askSize
+            description: Ask size
+            type: float     
+    mounts:
+      hdb:
+        type: object
+        baseURI: file:///opt/kx/data/current/hdb
+        partition: none        
+    elements:
+      rc:
+        host: kxinsights-resource-coordinator.kdb.svc
+        port: 5060
+      dap:
+        gwEndpoints: kxinsights-resource-coordinator.kdb.svc:5060
+        instances:
+          HDB:
+            mountName: hdb
+            sym: /opt/kx/data/current/hdb/sym
+            par: /opt/kx/data/current/hdb/par.txt
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kxi-custom-file-configmap 
+data:
+  custom.api.q: |-
+    .da.i.eorReceived:1b
+    .db.getHdbStatus:{``pos!(::;0)}
+    .db.getIdbStatus:{``pos!(::;0)}
+
+    //
+    // @desc Define a new API. Counts number of entries by specified columns.
+    //
+    // @param table		{symbol}			Table name.
+    // @param byCols	{symbol|symbol[]}	Column(s) to count by.
+    // @param startTS	{timestamp}			Start time (inclusive).
+    // @param endTS		{timestamp}			End time (exclusive).
+    //
+    // @return			{table}				Count by specified columns.
+    //
+    .custom.countBy:{[table;startTS;endTS;byCols]
+      bc:$[not[`date in cols table]&`date in byCols;
+        (x,`date)!(x:(byCols,())except`date),enlist($;"d";`timestamp);
+        x!x:byCols,()];
+
+      ?[table;enlist(within;`timestamp;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
+      }
+
+    .da.registerAPI[`.custom.countBy;
+      .sapi.metaDescription["Test custom API - does a count by."],
+      .sapi.metaMisc[enlist[`safe]!enlist 1b],
+      .sapi.metaParam[`name`type`isReq`description!(`table;-11h;1b;"Table name.")],
+      .sapi.metaParam[`name`type`isReq`description!(`byCols;-11 11h;1b;"Column(s) to count by.")],
+      .sapi.metaParam[`name`type`isReq`description!(`startTS;-12h;1b;"Start time (inclusive).")],
+      .sapi.metaParam[`name`type`isReq`description!(`endTS;-12h;1b;"End time (exclusive).")],
+      .sapi.metaReturn`type`description!(98h;"Count by specified columns.")]
