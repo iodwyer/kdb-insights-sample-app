@@ -5,7 +5,7 @@ version: "3"
 services:
 
   sp_feed:
-    image: ${KX_DOCKER_REG}/kxi-sp-python:1.2.0
+    image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     depends_on:
       - tp    
     environment:
@@ -47,7 +47,7 @@ services:
   #
   # Storage Manager
   #  
-    image: "registry.dl.kx.com/kxi-sm-single:${DA_VERSION}"
+    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
     depends_on:
       - tp
     environment:
