@@ -1,42 +1,3 @@
-# ---
-# apiVersion: storage.k8s.io/v1
-# kind: StorageClass
-# metadata:
-#   name: ebs-sc
-# provisioner: ebs.csi.aws.com
-# volumeBindingMode: WaitForFirstConsumer
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: ebs-claim
-# spec:
-#   accessModes:
-#     - ReadWriteOnce
-#   storageClassName: ebs-sc
-#   resources:
-#     requests:
-#       storage: 4Gi
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: kx-data
-spec:
-  accessModes:
-  - ReadWriteMany
-  resources:
-    requests:
-      storage: 25Gi
-  storageClassName: rook-cephfs
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxinsights-resource-coordinator
-  labels:
-    app.kubernetes.io/name: resource-coordinator
-    app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: v1
 kind: Service
@@ -75,7 +36,6 @@ spec:
         app.kubernetes.io/name: resource-coordinator
         app.kubernetes.io/instance: kxinsights
     spec:
-      serviceAccountName: kxinsights-resource-coordinator
       securityContext:
         {}
       containers:
@@ -115,14 +75,6 @@ spec:
           name: kxi-assembly-configmap  
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxinsights-aggregator
-  labels:
-    app.kubernetes.io/name: aggregator
-    app.kubernetes.io/instance: kxinsights
----
-apiVersion: v1
 kind: Service
 metadata:
   name: kxinsights-aggregator
@@ -159,7 +111,6 @@ spec:
         app.kubernetes.io/name: aggregator
         app.kubernetes.io/instance: kxinsights
     spec:
-      serviceAccountName: kxinsights-aggregator
       securityContext:
         {}
       containers:
@@ -197,14 +148,6 @@ spec:
       - name: assembly-config
         configMap:
           name: kxi-assembly-configmap  
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxinsights-sg-gateway
-  labels:
-    app.kubernetes.io/name: sg-gateway
-    app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: v1
 kind: Service
@@ -247,7 +190,6 @@ spec:
         app.kubernetes.io/name: sg-gateway
         app.kubernetes.io/instance: kxinsights
     spec:
-      serviceAccountName: kxinsights-sg-gateway
       securityContext:
         {}
       containers:
@@ -291,14 +233,6 @@ spec:
           name: kxi-assembly-configmap  
 ---
 apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxi-sp-feed
-  labels:
-    app.kubernetes.io/name: sp-feed
-    app.kubernetes.io/instance: kxinsights
----
-apiVersion: v1
 kind: Service
 metadata:
   name: kxi-sp-feed
@@ -335,9 +269,9 @@ spec:
         app.kubernetes.io/name: sp-feed
         app.kubernetes.io/instance: kxinsights
     spec:
-      serviceAccountName: kxi-sp-feed
       securityContext:
-        {}
+        # 'nobody' user
+        fsGroup: 65534
       containers:
         - name: sp-feed
           args: [ -p, "5000" ]
@@ -362,6 +296,9 @@ spec:
           resources:
             {}
           volumeMounts:
+            - name: kx-data-pvc
+              mountPath: /sp/checkpoints 
+              # subPath: checkpoints 
             - name: kxi-sp-spec
               mountPath: /opt/kx/cfg/taq.py
               subPath: taq.py
@@ -370,17 +307,12 @@ spec:
       imagePullSecrets:
         - name: kx-repo-access
       volumes:
+      - name: kx-data-pvc
+        persistentVolumeClaim:
+          claimName: kx-data   
       - name: kxi-sp-spec
         configMap:
           name: kxi-sp-spec-configmap 
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kdb-tick
-  labels:
-    app.kubernetes.io/name: tp
-    app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: v1
 kind: Service
@@ -419,7 +351,6 @@ spec:
         app.kubernetes.io/name: tp
         app.kubernetes.io/instance: kxinsights
     spec:
-      serviceAccountName: kdb-tick
       securityContext:
         # 'nobody' user
         fsGroup: 65534

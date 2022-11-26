@@ -38,6 +38,15 @@ $ kubectl create secret generic aws-access-secret \
     --from-literal=AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ```    
 
+```bash
+$ kubectl apply -f rook-ceph-pvc.yaml -n kdb
+$ kubectl apply -f microservices-assembly.yaml -n kdb
+```
+
+
+```bash
+$ kubectl delete -f microservices-assembly.yaml -n kdb
+```
 
 ## To do 
 * Add Service Discovery microservice (remove need for `sed` command)
@@ -51,3 +60,4 @@ $ kubectl create secret generic aws-access-secret \
 * issue with load balancer ( `kubectl describe svc kxinsights-sg-gateway -n kdb` )
 * mount path of rook ceph
 * sp checkpoint mount
+* issue with sm (length error)
