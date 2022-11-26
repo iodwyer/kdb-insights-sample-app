@@ -48,3 +48,6 @@ $ kubectl create secret generic aws-access-secret \
 * authentication (add layer in front of GW? Link to SAML; Active Directory?)
 * provision different PVC's for SP/DAP etc
 * place load balancer in front of GW (not DAPs; do auth here?)
+* issue with load balancer ( `kubectl describe svc kxinsights-sg-gateway -n kdb` )
+* mount path of rook ceph
+* sp checkpoint mount
