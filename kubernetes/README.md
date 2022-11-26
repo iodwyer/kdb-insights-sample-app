@@ -40,10 +40,11 @@ $ kubectl create secret generic aws-access-secret \
 
 
 ## To do 
-* Add service discovery microservice (remove need for `sed` command)
-* add historic data to s3 bucket + add s3 tier to SM
+* Add Service Discovery microservice (remove need for `sed` command)
+* Add RT microservice
+* Add historic data to s3 bucket + add s3 tier to SM
 * consider autoscaling DAP's + Agg procs based on CPU
 * consider autoscaling on number of queries in the queue (RC? or GW?)
 * authentication (add layer in front of GW? Link to SAML; Active Directory?)
 * provision different PVC's for SP/DAP etc
-* Add RT microservice
+* place load balancer in front of GW (not DAPs; do auth here?)

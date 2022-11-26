@@ -1,40 +1,41 @@
+# ---
+# apiVersion: storage.k8s.io/v1
+# kind: StorageClass
+# metadata:
+#   name: ebs-sc
+# provisioner: ebs.csi.aws.com
+# volumeBindingMode: WaitForFirstConsumer
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: ebs-claim
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: ebs-sc
+#   resources:
+#     requests:
+#       storage: 4Gi
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: kx-data
+# spec:
+#   accessModes:
+#   - ReadWriteMany
+#   resources:
+#     requests:
+#       storage: 25Gi
+#   storageClassName: rook-cephfs
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: ServiceAccount
 metadata:
-  name: ebs-claim
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: ebs-sc
-  resources:
-    requests:
-      storage: 4Gi
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: ebs-sc
-provisioner: ebs.csi.aws.com
-volumeBindingMode: WaitForFirstConsumer
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kxinsights-hdb-da
+  name: kxinsights-resource-coordinator
   labels:
-    app.kubernetes.io/name: hdb-da
-    app.kubernetes.io/instance: kxinsights
-spec:
-  type: ClusterIP
-  clusterIP: None
-  ports:
-    - port: 5080
-      targetPort: hdb-da
-      protocol: TCP
-      name: hdb-da
-  selector:
-    app.kubernetes.io/name: hdb-da
+    app.kubernetes.io/name: resource-coordinator
     app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: v1
@@ -48,11 +49,77 @@ spec:
   type: ClusterIP
   ports:
     - port: 5060
-      targetPort: resource-coordi
+      targetPort: 5060
       protocol: TCP
-      name: resource-coordi
+      name: ipc-port ##  resource-coordi
   selector:
     app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kxinsights-resource-coordinator
+  labels:
+    app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: resource-coordinator
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: resource-coordinator
+        app.kubernetes.io/instance: kxinsights
+    spec:
+      serviceAccountName: kxinsights-resource-coordinator
+      securityContext:
+        {}
+      containers:
+        - name: resource-coordinator
+          securityContext:
+            {}
+          image: registry.dl.kx.com/kxi-sg-rc:1.3.1      
+          imagePullPolicy: IfNotPresent
+          args: [ -p, "5060" ]
+          env:
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kdb-license-info
+                  key: license
+            - name: KXI_ASSEMBLY_FILE
+              value: /opt/kx/cfg/assembly.yaml
+            - name: KXI_ALLOWED_SBX_APIS
+              value: ".kxi.sql,.kxi.qsql"              
+          ports:
+            - name: ipc-port  ## resource-coordi
+              containerPort: 5060
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: assembly-config
+              mountPath: /opt/kx/cfg/assembly.yaml
+              subPath: assembly.yaml
+          tty: true   
+          stdin: true               
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: assembly-config
+        configMap:
+          name: kxi-assembly-configmap  
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kxinsights-aggregator
+  labels:
+    app.kubernetes.io/name: aggregator
     app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: v1
@@ -65,34 +132,12 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 5070
-      targetPort: aggregator
+    - port: 5050
+      targetPort: 5050
       protocol: TCP
       name: aggregator
   selector:
     app.kubernetes.io/name: aggregator
-    app.kubernetes.io/instance: kxinsights
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kxinsights-sg-gateway
-  labels:
-    app.kubernetes.io/name: sg-gateway
-    app.kubernetes.io/instance: kxinsights
-spec:
-  type: LoadBalancer
-  ports:
-    - name: http-port
-      protocol: TCP
-      port: 8080
-      targetPort: 8080
-    - name: ipc-port
-      protocol: TCP
-      port: 5050
-      targetPort: 5050
-  selector:
-    app.kubernetes.io/name: sg-gateway
     app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: apps/v1
@@ -119,98 +164,69 @@ spec:
         {}
       containers:
         - name: aggregator
-          args: [ -p, "5070" ]
+          args: [ -p, "5050" ]
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sg-agg:1.1.0    
+          image: registry.dl.kx.com/kxi-sg-agg:1.3.1    
           imagePullPolicy: IfNotPresent
           env:
             - name: KDB_LICENSE_B64
               valueFrom:
                 secretKeyRef:
-                  name: kx-license-info
+                  name: kdb-license-info
                   key: license
             - name: KXI_ASSEMBLY_FILE
-              value: /opt/kx/config/assembly.yaml
+              value: /opt/kx/cfg/assembly.yaml
             - name: KXI_SG_RC_ADDR
               value: kxinsights-resource-coordinator.kdb.svc:5060                
           ports:
             - name: aggregator
-              containerPort: 5070
+              containerPort: 5050
               protocol: TCP
           resources:
             {}
           volumeMounts:
-            - name: assemblyconfig
-              mountPath: /opt/kx/config/assembly.yaml
+            - name: assembly-config
+              mountPath: /opt/kx/cfg/assembly.yaml
               subPath: assembly.yaml
           tty: true   
           stdin: true               
       imagePullSecrets:
         - name: kx-repo-access
       volumes:
-      - name: assemblyconfig
+      - name: assembly-config
         configMap:
           name: kxi-assembly-configmap  
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: kxinsights-resource-coordinator
+  name: kxinsights-sg-gateway
   labels:
-    app.kubernetes.io/name: resource-coordinator
+    app.kubernetes.io/name: sg-gateway
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxinsights-sg-gateway
+  labels:
+    app.kubernetes.io/name: sg-gateway
     app.kubernetes.io/instance: kxinsights
 spec:
-  replicas: 1
+  type: LoadBalancer
+  ports:
+    - name: http-port
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: ipc-port
+      protocol: TCP
+      port: 5040
+      targetPort: 5040
   selector:
-    matchLabels:
-      app.kubernetes.io/name: resource-coordinator
-      app.kubernetes.io/instance: kxinsights
-  template:
-    metadata:
-      labels:
-        app.kubernetes.io/name: resource-coordinator
-        app.kubernetes.io/instance: kxinsights
-    spec:
-
-      serviceAccountName: kxinsights-resource-coordinator
-      securityContext:
-        {}
-      containers:
-        - name: resource-coordinator
-          securityContext:
-            {}
-          image: registry.dl.kx.com/kxi-sg-rc:1.1.0      
-          imagePullPolicy: IfNotPresent
-          args: [ -p, "5060" ]
-          env:
-            - name: KDB_LICENSE_B64
-              valueFrom:
-                secretKeyRef:
-                  name: kx-license-info
-                  key: license
-            - name: KXI_ASSEMBLY_FILE
-              value: /opt/kx/config/assembly.yaml
-            - name: KXI_ALLOWED_SBX_APIS
-              value: ".kxi.sql,.kxi.qsql"              
-          ports:
-            - name: resource-coordi
-              containerPort: 5060
-              protocol: TCP
-          resources:
-            {}
-          volumeMounts:
-            - name: assemblyconfig
-              mountPath: /opt/kx/config/assembly.yaml
-              subPath: assembly.yaml
-          tty: true   
-          stdin: true               
-      imagePullSecrets:
-        - name: kx-repo-access
-      volumes:
-      - name: assemblyconfig
-        configMap:
-          name: kxi-assembly-configmap  
+    app.kubernetes.io/name: sg-gateway
+    app.kubernetes.io/instance: kxinsights
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -231,7 +247,6 @@ spec:
         app.kubernetes.io/name: sg-gateway
         app.kubernetes.io/instance: kxinsights
     spec:
-
       serviceAccountName: kxinsights-sg-gateway
       securityContext:
         {}
@@ -239,18 +254,18 @@ spec:
         - name: sg-gateway
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sg-gw:1.1.0   
+          image: registry.dl.kx.com/kxi-sg-gw:1.3.1   
           imagePullPolicy: IfNotPresent
           env:
             - name: KDB_LICENSE_B64
               valueFrom:
                 secretKeyRef:
-                  name: kx-license-info
+                  name: kdb-license-info
                   key: license
             - name: KXI_ASSEMBLY_FILE
-              value: /opt/kx/config/assembly.yaml
+              value: /opt/kx/cfg/assembly.yaml
             - name: GATEWAY_QIPC_PORT
-              value: "5050"
+              value: "5040"
             - name: GATEWAY_HTTP_PORT
               value: "8080"
             - name: KXI_SG_RC_ADDR
@@ -259,79 +274,278 @@ spec:
             - name: http-port
               containerPort: 8080
             - name: ipc-port
-              containerPort: 5050
+              containerPort: 5040
           resources:
             {}
           volumeMounts:
-            - name: assemblyconfig
-              mountPath: /opt/kx/config/assembly.yaml
+            - name: assembly-config
+              mountPath: /opt/kx/cfg/assembly.yaml
               subPath: assembly.yaml
           tty: true   
           stdin: true     
       imagePullSecrets:
         - name: kx-repo-access
       volumes:
-      - name: assemblyconfig
+      - name: assembly-config
         configMap:
           name: kxi-assembly-configmap  
 ---
-apiVersion: apps/v1
-kind: StatefulSet
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: kxinsights-hdb-da
+  name: kxi-sp-feed
   labels:
-    app.kubernetes.io/name: hdb-da
+    app.kubernetes.io/name: sp-feed
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxi-sp-feed
+  labels:
+    app.kubernetes.io/name: sp-feed
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      name: sp-feed
+  selector:
+    app.kubernetes.io/name: sp-feed
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kxi-sp-feed
+  labels:
+    app.kubernetes.io/name: sp-feed
     app.kubernetes.io/instance: kxinsights
 spec:
   replicas: 1
-  serviceName: kxinsights-hdb-da
   selector:
     matchLabels:
-      app.kubernetes.io/name: hdb-da
+      app.kubernetes.io/name: sp-feed
       app.kubernetes.io/instance: kxinsights
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: hdb-da
+        app.kubernetes.io/name: sp-feed
         app.kubernetes.io/instance: kxinsights
     spec:
-    #  serviceAccountName: kx-s3-read-access
-      initContainers:
-      - name: take-data-dir-ownership
-        image: alpine:3
-        command:
-        - chmod
-        - -R
-        - "777"
-        - /data
-        volumeMounts:
-          - name: persistent-storage
-            mountPath: /data    
+      serviceAccountName: kxi-sp-feed
+      securityContext:
+        {}
       containers:
-        - name: hdb-da
+        - name: sp-feed
+          args: [ -p, "5000" ]
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-da:1.1.0         
+          image: registry.dl.kx.com/kxi-sp-python:1.3.1    
           imagePullPolicy: IfNotPresent
-          args: [ -p, "5080" ]          
+          env:
+            - name: KXI_LOG_LEVELS
+              value: "default:trace" 
+            - name: KXI_SP_SPEC
+              value: /opt/kx/cfg/taq.py 
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kdb-license-info
+                  key: license              
+          ports:
+            - name: sp-feed
+              containerPort: 5000
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: kxi-sp-spec
+              mountPath: /opt/kx/cfg/taq.py
+              subPath: taq.py
           tty: true   
-          stdin: true 
+          stdin: true               
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: kxi-sp-spec
+        configMap:
+          name: kxi-sp-spec-configmap 
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kdb-tick
+  labels:
+    app.kubernetes.io/name: tp
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kdb-tick
+  labels:
+    app.kubernetes.io/name: tp
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5010
+      targetPort: 5010
+      protocol: TCP
+      name: tp
+  selector:
+    app.kubernetes.io/name: tp
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kdb-tick
+  labels:
+    app.kubernetes.io/name: tp
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tp
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tp
+        app.kubernetes.io/instance: kxinsights
+    spec:
+      serviceAccountName: kdb-tick
+      securityContext:
+        {}
+      containers:
+        - name: tp
+          args: [ tick.q, sym, /logs, -p, "5010" ] 
+          workingDir: /opt/kx/kdb-tick
+          securityContext:
+            {}
+          image: registry.dl.kx.com/qce:3.2.5   
+          imagePullPolicy: IfNotPresent
           env:
             - name: KDB_LICENSE_B64
               valueFrom:
                 secretKeyRef:
-                  name: kx-license-info
+                  name: kdb-license-info
+                  key: license              
+          ports:
+            - name: tp
+              containerPort: 5010
+              protocol: TCP
+          resources:
+            {}
+          volumeMounts:
+            - name: tick-q
+              mountPath: /opt/kx/kdb-tick/tick.q
+              subPath: tick.q
+            - name: r-q
+              mountPath: /opt/kx/kdb-tick/tick/r.q
+              subPath: r.q
+            - name: u-q
+              mountPath: /opt/kx/kdb-tick/tick/u.q
+              subPath: u.q
+            - name: sym-q
+              mountPath: /opt/kx/kdb-tick/tick/sym.q
+              subPath: sym.q
+          tty: true   
+          stdin: true               
+      imagePullSecrets:
+        - name: kx-repo-access
+      volumes:
+      - name: tick-q
+        configMap:
+          name: tick-q
+      - name: r-q
+        configMap:
+          name: r-q
+      - name: u-q
+        configMap:
+          name: u-q
+      - name: sym-q
+        configMap:
+          name: sym-q
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kxi-da-single
+  labels:
+    app.kubernetes.io/name: kxi-data-access-single
+    app.kubernetes.io/instance: kxinsights
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - port: 5080
+      targetPort: 5080
+      protocol: TCP
+      name: kxi-data-access-single
+  selector:
+    app.kubernetes.io/name: kxi-data-access-single
+    app.kubernetes.io/instance: kxinsights
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kxi-da-single
+  labels:
+    app.kubernetes.io/name: kxi-data-access-single
+    app.kubernetes.io/instance: kxinsights
+spec:
+  replicas: 1
+  serviceName: kxi-da-single
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kxi-data-access-single
+      app.kubernetes.io/instance: kxinsights
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: kxi-data-access-single
+        app.kubernetes.io/instance: kxinsights
+    spec:
+      containers:
+        - name: kxi-data-access-single
+          securityContext:
+            {}
+          image: registry.dl.kx.com/kxi-da-single:1.3.1         
+          imagePullPolicy: IfNotPresent       
+          tty: true   
+          stdin: true 
+          env:
+            - name: KXI_NAME
+              value: dap
+            - name: KXI_SC
+              value: dap
+            - name: KDB_LICENSE_B64
+              valueFrom:
+                secretKeyRef:
+                  name: kdb-license-info
                   key: license
             - name: KXI_LOG_LEVELS
               value: "default:trace"     
-            # - name: KXI_PORT
-            #   value: "5080"                  
+            - name: KXI_PORT
+              value: "5080"                  
             - name: KX_TRACE_OBJSTR
               value: "1"
             - name: KX_KURL_DEBUG_LOG          
-              value: "1"                 
-            - name: AWS_REGION
-              value: eu-west-1
+              value: "1"  
+            - name: KXI_ASSEMBLY_FILE
+              value: /opt/kx/cfg/assembly.yaml
+            - name: KXI_RT_LIB
+              value: /opt/kx/cfg/rt_tick_client_lib.q
+            - name: KXI_ALLOWED_SBX_APIS
+              value: ".kxi.sql,.kxi.qsql"                 
+            # - name: AWS_REGION
+            #   value: eu-west-1
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
@@ -342,80 +556,150 @@ spec:
                 secretKeyRef:
                   name: aws-access-secret
                   key: AWS_SECRET_ACCESS_KEY  
-            - name: KX_OBJSTR_INVENTORY_FILE
-              value: "_inventory/all.json.gz"                           
-            - name: ENABLE_IRP
-              value: "true"
-            - name: KXI_SC
-              value: HDB
-            - name: KXI_ASSEMBLY_FILE
-              value: /opt/kx/config/assembly.yaml
-            - name: KXI_ALLOWED_SBX_APIS
-              value: ".kxi.sql,.kxi.qsql"  
+            # - name: KX_OBJSTR_INVENTORY_FILE
+            #   value: "_inventory/all.json.gz"                           
             - name: KXI_CUSTOM_FILE
-              value: "/opt/kx/config/custom.api.q"    
-            - name: KX_OBJSTR_CACHE_PATH
-              value: "/data"                                     
+              value: "/opt/kx/cfg/custom.api.q"    
+            # - name: KX_OBJSTR_CACHE_PATH
+            #   value: "/data"                                     
           ports:
-            - name: hdb-da
+            - name: kxi-data-access-single
               containerPort: 5080
               protocol: TCP
           resources:
             {}
           volumeMounts:
-            - name: persistent-storage
-              mountPath: /data          
-            - name: assemblyconfig
-              mountPath: /opt/kx/config/assembly.yaml
+            # - name: persistent-storage
+            #   mountPath: /data          
+            - name: assembly-config
+              mountPath: /opt/kx/cfg/assembly.yaml
               subPath: assembly.yaml
-            - name: customconfig
-              mountPath: /opt/kx/config/custom.api.q
+            - name: custom-file
+              mountPath: /opt/kx/cfg/custom.api.q
               subPath: custom.api.q              
-            - name: s3config
-              mountPath: /opt/kx/data/current/hdb/par.txt
-              subPath: par.txt
-            - name: s3config
-              mountPath: /opt/kx/data/current/hdb/sym
-              subPath: sym
+            - name: rt-tick-client
+              mountPath: /opt/kx/cfg/rt_tick_client_lib.q
+              subPath: rt_tick_client_lib.q 
       imagePullSecrets:
         - name: kx-repo-access
       volumes:
-      - name: persistent-storage
-        persistentVolumeClaim:
-          claimName: ebs-claim      
-      - name: assemblyconfig
+      # - name: persistent-storage
+      #   persistentVolumeClaim:
+      #     claimName: ebs-claim      
+      - name: assembly-config
         configMap:
           name: kxi-assembly-configmap 
-      - name: customconfig
+      - name: custom-file
         configMap:
           name: kxi-custom-file-configmap           
-      - name: s3config
+      - name: rt-tick-client
         configMap:
-          name: kxinsights-s3-configmap
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxinsights-aggregator
-  labels:
-    app.kubernetes.io/name: aggregator
-    app.kubernetes.io/instance: kxinsights
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxinsights-resource-coordinator
-  labels:
-    app.kubernetes.io/name: resource-coordinator
-    app.kubernetes.io/instance: kxinsights
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: kxinsights-sg-gateway
-  labels:
-    app.kubernetes.io/name: sg-gateway
-    app.kubernetes.io/instance: kxinsights
+          name: kxi-rt-tick-client-lib-configmap    
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: kxi-sm-single
+#   labels:
+#     app.kubernetes.io/name: sm-single
+#     app.kubernetes.io/instance: kxinsights
+# spec:
+#   type: ClusterIP
+#   clusterIP: None
+#   ports:
+#     - port: 10001
+#       targetPort: 10001
+#       protocol: TCP
+#       name: sm-single
+#   selector:
+#     app.kubernetes.io/name: sm-single
+#     app.kubernetes.io/instance: kxinsights
+# ---
+# apiVersion: apps/v1
+# kind: StatefulSet
+# metadata:
+#   name: kxi-sm-single
+#   labels:
+#     app.kubernetes.io/name: sm-single
+#     app.kubernetes.io/instance: kxinsights
+# spec:
+#   replicas: 1
+#   serviceName: kxi-sm-single
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/name: sm-single
+#       app.kubernetes.io/instance: kxinsights
+#   template:
+#     metadata:
+#       labels:
+#         app.kubernetes.io/name: sm-single
+#         app.kubernetes.io/instance: kxinsights
+#     spec:
+#       containers:
+#         - name: sm-single
+#           securityContext:
+#             {}
+#           image: registry.dl.kx.com/kxi-sm-single:1.3.1         
+#           imagePullPolicy: IfNotPresent       
+#           tty: true   
+#           stdin: true 
+#           env:
+#             - name: KXI_NAME
+#               value: sm
+#             - name: KXI_SC
+#               value: sm
+#             - name: KDB_LICENSE_B64
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: kdb-license-info
+#                   key: license
+#             - name: KXI_LOG_LEVELS
+#               value: "default:trace"     
+#             # - name: KXI_PORT
+#             #   value: "5080"                  
+#             - name: KXI_ASSEMBLY_FILE
+#               value: /opt/kx/cfg/assembly.yaml
+#             - name: KXI_RT_LIB
+#               value: /opt/kx/cfg/rt_tick_client_lib.q              
+#             # - name: AWS_REGION
+#             #   value: eu-west-1
+#             - name: AWS_ACCESS_KEY_ID
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: aws-access-secret
+#                   key: AWS_ACCESS_KEY_ID
+#             - name: AWS_SECRET_ACCESS_KEY
+#               valueFrom:
+#                 secretKeyRef:
+#                   name: aws-access-secret
+#                   key: AWS_SECRET_ACCESS_KEY                        
+#           ports:
+#             - name: sm-single
+#               containerPort: 10001
+#               protocol: TCP
+#           resources:
+#             {}
+#           volumeMounts:
+#             # - name: persistent-storage
+#             #   mountPath: /data          
+#             - name: assembly-config
+#               mountPath: /opt/kx/cfg/assembly.yaml
+#               subPath: assembly.yaml 
+#             - name: rt-tick-client
+#               mountPath: /opt/kx/cfg/rt_tick_client_lib.q
+#               subPath: rt_tick_client_lib.q 
+#       imagePullSecrets:
+#         - name: kx-repo-access
+#       volumes:
+#       # - name: persistent-storage
+#       #   persistentVolumeClaim:
+#       #     claimName: ebs-claim      
+#       - name: assembly-config
+#         configMap:
+#           name: kxi-assembly-configmap        
+#       - name: rt-tick-client
+#         configMap:
+#           name: kxi-rt-tick-client-lib-configmap    
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -423,98 +707,194 @@ metadata:
   name: kxi-assembly-configmap 
 data:
   assembly.yaml: |-
-    name: trade-assembly
-    description: Assembly for Data Access processes. Defines labels that apply only to these DAs
-    labels:
-      region: Canada
-      assetClass: tick
+    name: "taq-assembly"
+    description: "Sample assembly file"
+
     tables:
       trade:
         description: Trade data
         type: partitioned
         blockSize: 10000
-        prtnCol: timestamp
-        sortColsOrd: symbol
-        sortColsDisk: symbol
+        prtnCol: time
+        sortColsOrd: sym
+        sortColsDisk: sym
         columns:
-          - name: symbol
+          - name: time
+            description: Time
+            type: timestamp    
+          - name: sym
             description: Symbol name
             type: symbol
             attrMem: grouped
             attrDisk: parted
             attrOrd: parted
-          - name: timestamp
-            description: Time
-            type: timestamp
-          - name: side
-            description: side
-            type: symbol
-          - name: size
-            description: bid price
-            type: long
           - name: price
-            description: bid price
-            type: float        
-          - name: tickDirection
-            description: Big size
-            type: symbol
-          - name: trdMatchID
-            description: Ask size
-            type: guid
-          - name: grossValue
-            description: Ask size
-            type: long
-          - name: homeNotional
-            description: Ask size
-            type: float
-          - name: foreignNotional
-            description: Ask size
-            type: float                        
+            description: Price
+            type: float    
+          - name: size
+            description: Size
+            type: long      
+
       quote:
         description: Quote data
         type: partitioned
         blockSize: 10000
-        prtnCol: timestamp
-        sortColsOrd: symbol
-        sortColsDisk: symbol
+        prtnCol: time
+        sortColsOrd: sym
+        sortColsDisk: sym
         columns:
-          - name: symbol
+          - name: time
+            description: Time
+            type: timestamp    
+          - name: sym
             description: Symbol name
             type: symbol
             attrMem: grouped
             attrDisk: parted
             attrOrd: parted
-          - name: timestamp
-            description: Time
-            type: timestamp
-          - name: bidSize
-            description: Bid price
-            type: float
-          - name: bidPrice
+          - name: bid
             description: bid price
-            type: float
-          - name: askPrice
-            description: Big size
-            type: float
-          - name: askSize
-            description: Ask size
-            type: float     
+            type: float    
+          - name: ask
+            description: bid price
+            type: float   
+          - name: bsize
+            description: bid price
+            type: long  
+          - name: asize
+            description: bid price
+            type: long                  
+
+    bus:
+      stream:
+        protocol: custom
+        nodes: kdb-tick.kdb.svc:5010
+        topic: dataStream
+
     mounts:
+      rdb:
+        type: stream
+        baseURI: file://stream
+        partition: none
+      idb:
+        type: local
+        baseURI: file:///data/idb
+        partition: ordinal
       hdb:
-        type: object
-        baseURI: file:///opt/kx/data/current/hdb
-        partition: none        
+        type: local
+        baseURI: file:///data/hdb
+        partition: date
+
     elements:
       rc:
         host: kxinsights-resource-coordinator.kdb.svc
         port: 5060
+
       dap:
-        gwEndpoints: kxinsights-resource-coordinator.kdb.svc:5060
+        # gwAssembly: sgrc:5060 
+        gwEndpoints: kxinsights-resource-coordinator.kdb.svc:5060  
+        # smEndpoints: sm:10001
         instances:
-          HDB:
-            mountName: hdb
-            sym: /opt/kx/data/current/hdb/sym
-            par: /opt/kx/data/current/hdb/par.txt
+          dap:
+            mountList: [rdb, idb, hdb]
+
+      sm:
+        description: Storage manager
+        source: stream
+        tiers:
+          - name: stream
+            mount: rdb
+          - name: idb
+            mount: idb
+            schedule:
+              freq: 0D00:10:00 # every 10 minutes
+          - name: hdb
+            mount: hdb
+            schedule:
+              freq: 1D00:00:00 # every day
+              snap:   00:00:00 # 
+        disableDiscovery: true  # Disables registering with discovery
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kxi-rt-tick-client-lib-configmap 
+data:
+  rt_tick_client_lib.q: |-
+    // === internal tables without time/sym columns ===
+    .rt.NO_TIME_SYM:`$("_prtnEnd";"_reload")
+
+    // === rt publish and push functions ===
+    .rt.push:{'"cannot push unless you have called .rt.pub first"}; // will be overridden
+
+    .rt.pub:{[topic]
+      if[not 10h=type topic;'"topic must be a string"];
+      h:neg hopen hsym`$getenv `KXI_RT_NODES;
+      .rt.push:{[nph;payload]
+        if[type x:last payload; x:value flip x];
+        if[(t:first payload)in .rt.NO_TIME_SYM; x:(count[first x]#'(0Nn;`)),x];
+        nph(`.u.upd;t;x);}[h;];
+        .rt.push }
+
+    // === rt update and subscribe ===
+
+    if[`upd in key `.;  '"do not define upd: rt+tick will implement this"];
+    if[`end in key `.u; '"do not define .u.end: rt+tick will implement this"];
+
+    if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
+
+    .rt.sub:{[topic;startIdx;uf]
+      if[not 10h=type topic;'"topic must be a string"];
+
+      //connect to the tickerplant
+      h:hopen hsym`$getenv `KXI_RT_NODES;
+
+      //initialise our message counter
+      .rt.idx:0;
+
+      // === tick.q will call back to these ===
+      upd::{[uf;t;x]
+        if[not type x; x:flip(cols .rt.schema t)!x]; // for log replay 
+        if[t in .rt.NO_TIME_SYM; x:`time`sym _x]; 
+        uf[(t;x);.rt.idx]; 
+        .rt.idx+:1; }[uf];
+
+      .u.end:{.rt.idx:.rt.date2startIdx x+1};
+
+      //replay log file and continue the live subscription
+      if[null startIdx;startIdx:0W]; // null means follow only, not start from beginning
+
+      //subscribe
+      res:h "(.u.sub[`;`]; .u `i`L; .u.d)";
+      .rt.schema:(!/)flip res 0; // used to convert arrays to tables during log replay
+
+      //if start index is less than current index, then recover
+      if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0]; 
+        .rt.recoverMultiDay[res[1];startIdx]]; }
+
+    //100 billion records per day
+    .rt.MAX_LOG_SZ:"j"$1e11;
+
+    .rt.date2startIdx:{("J"$(string x) except ".")*.rt.MAX_LOG_SZ};
+
+    .rt.recoverMultiDay:{[iL;startIdx]
+      //iL - index and Log (as can be fed into -11!)
+      i:first iL; L:last iL;
+      //get all files in the same folder as the tp log file
+      files:key dir:first pf:` vs last L; 
+      //get the name of the logfile itself
+      fileName:last pf;
+      //get all the lognameXXXX.XX.XX files (logname is sym by default - so usually the files are of the form sym2021.01.01, sym2021.01.02, sym2021.01.03, etc)
+      files:files where files like (-10_ string fileName),"*";
+      //from those files, get those with dates in the range we are interested in
+      files:` sv/: dir,/:asc files where ("J"$(-10#/:string files) except\: ".")>=startIdx div .rt.MAX_LOG_SZ;
+      //set up upd to skip the first part of the file and revert to regular definition when you hit start index
+      upd::{[startIdx;updo;t;x] $[.rt.idx>=startIdx; [upd::updo; upd[t;x]]; .rt.idx+:1]}[startIdx;upd];
+      //read all of all the log files except the last, where you read up to 'i'
+      files:0W,/:files; files[(count files)-1;0]:i;
+      //reset .rt.idx for each new day and replay the log file
+      {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files; 
+      };
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -522,10 +902,6 @@ metadata:
   name: kxi-custom-file-configmap 
 data:
   custom.api.q: |-
-    .da.i.eorReceived:1b
-    .db.getHdbStatus:{``pos!(::;0)}
-    .db.getIdbStatus:{``pos!(::;0)}
-
     //
     // @desc Define a new API. Counts number of entries by specified columns.
     //
@@ -538,7 +914,7 @@ data:
     //
     .custom.countBy:{[table;startTS;endTS;byCols]
       bc:$[not[`date in cols table]&`date in byCols;
-        (x,`date)!(x:(byCols,())except`date),enlist($;"d";`timestamp);
+        (x,`date)!(x:(byCols,())except`date),enlist($;"d";`time);
         x!x:byCols,()];
 
       ?[table;enlist(within;`timestamp;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
@@ -552,3 +928,171 @@ data:
       .sapi.metaParam[`name`type`isReq`description!(`startTS;-12h;1b;"Start time (inclusive).")],
       .sapi.metaParam[`name`type`isReq`description!(`endTS;-12h;1b;"End time (exclusive).")],
       .sapi.metaReturn`type`description!(98h;"Count by specified columns.")]
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kxi-sp-spec-configmap
+data:
+  taq.py: |-
+    from kxi import sp
+
+    tp_hostport = ':kdb-tick.kdb.svc:5010'
+    kfk_broker  = '104.198.219.51:9091'
+
+    trade_schema = {
+        'timestamp':  'timestamp',
+        'sym':        'symbol',
+        'price':      'float',
+        'size':       'long'
+    }
+
+    quote_schema = {
+        'timestamp':  'timestamp',
+        'sym':        'symbol',
+        'bid':        'float',
+        'ask':        'float',
+        'bsize':      'long',
+        'asize':      'long'
+    }
+
+    trade_pipeline = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
+        | sp.decode.json()
+        | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }')
+        | sp.map(lambda x: ('trade', x))
+        | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
+
+
+    quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
+        | sp.decode.json()
+        | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS**jj"$data }')
+        | sp.map(lambda x: ('quote', x))
+        | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
+
+    sp.run(trade_pipeline, quote_pipeline)
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tick-q
+data:
+  tick.q: |-
+    / q tick.q sym . -p 5001 </dev/null >foo 2>&1 &
+    /2014.03.12 remove license check
+    /2013.09.05 warn on corrupt log
+    /2013.08.14 allow <endofday> when -u is set
+    /2012.11.09 use timestamp type rather than time. -19h/"t"/.z.Z -> -16h/"n"/.z.P
+    /2011.02.10 i->i,j to avoid duplicate data if subscription whilst data in buffer
+    /2009.07.30 ts day (and "d"$a instead of floor a)
+    /2008.09.09 .k -> .q, 2.4
+    /2008.02.03 tick/r.k allow no log
+    /2007.09.03 check one day flip
+    /2006.10.18 check type?
+    /2006.07.24 pub then log
+    /2006.02.09 fix(2005.11.28) .z.ts end-of-day
+    /2006.01.05 @[;`sym;`g#] in tick.k load
+    /2005.12.21 tick/r.k reset `g#sym
+    /2005.12.11 feed can send .u.endofday
+    /2005.11.28 zero-end-of-day
+    /2005.10.28 allow`time on incoming
+    /2005.10.10 zero latency
+    "kdb+tick 2.8 2014.03.12"
+
+    /q tick.q SRC [DST] [-p 5010] [-o h]
+    system"l tick/",(src:first .z.x,enlist"sym"),".q"
+
+    if[not system"p";system"p 5010"]
+
+    \l tick/u.q
+    \d .u
+    ld:{if[not type key L::`$(-10_string L),string x;.[L;();:;()]];i::j::-11!(-2;L);if[0<=type i;-2 (string L)," is a corrupt log. Truncate to length ",(string last i)," and restart";exit 1];hopen L};
+    tick:{init[];if[not min(`time`sym~2#key flip value@)each t;'`timesym];@[;`sym;`g#]each t;d::.z.D;if[l::count y;L::`$":",y,"/",x,10#".";l::ld d]};
+
+    endofday:{end d;d+:1;if[l;hclose l;l::0(`.u.ld;d)]};
+    ts:{if[d<x;if[d<x-1;system"t 0";'"more than one day?"];endofday[]]};
+
+    system"t 1000"
+
+    if[system"t";
+        .z.ts:{pub'[t;value each t];@[`.;t;@[;`sym;`g#]0#];i::j;ts .z.D};
+        upd:{[t;x] 
+            $[0h = type x;
+                t insert x;
+                t upsert x
+            ]; 
+            
+            if[l;l enlist (`upd;t;x);j+:1]
+            }
+
+        ];
+
+    \d .
+
+    .u.tick[src;.z.x 1];
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: r-q
+data:
+  r.q: |-
+    /q tick/r.q [host]:port[:usr:pwd] [host]:port[:usr:pwd]
+    /2008.09.09 .k ->.q
+
+    if[not "w"=first string .z.o;system "sleep 1"];
+
+    upd:insert;
+
+    / get the ticker plant and history ports, defaults are 5010,5012
+    .u.x:.z.x,(count .z.x)_(":5010";":5012");
+
+    / end of day: save, clear, hdb reload
+    .u.end:{t:tables`.;t@:where `g=attr each t@\:`sym;.Q.hdpf[`$":",.u.x 1;`:.;x;`sym];@[;`sym;`g#] each t;};
+
+    / init schema and sync up from log file;cd to hdb(so client save can run)
+    .u.rep:{(.[;();:;].)each x;if[null first y;:()];-11!y;system "cd ",1_-10_string first reverse y};
+    / HARDCODE \cd if other than logdir/db
+
+    / connect to ticker plant for (schema;(logcount;log))
+    .u.rep .(hopen `$":",.u.x 0)"(.u.sub[`;`];`.u `i`L)";
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sym-q
+data:
+  sym.q: |-
+    // internal tables
+    // with `time` and `sym` columns added by RT client for compatibility
+    (`$"_prtnEnd")set ([] time:"n"$(); sym:`$(); signal:`$(); endTS:"p"$(); opts:());
+    (`$"_reload")set ([] time:"n"$(); sym:`$(); mount:`$(); params:(); asm:`$())
+
+
+    // other tables
+    trade:([] time:"p"$(); sym:`g#`$(); price:"f"$(); size:"j"$())
+    quote:([] time:"p"$(); sym:`g#`$(); bid:"f"$(); ask:"f"$(); bsize:"j"$(); asize:"j"$())
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: u-q
+data:
+  u.q: |-
+    /2019.06.17 ensure sym has g attr for schema returned to new subscriber
+    /2008.09.09 .k -> .q
+    /2006.05.08 add
+
+    \d .u
+    init:{w::t!(count t::tables`.)#()}
+
+    del:{w[x]_:w[x;;0]?y};.z.pc:{del[;x]each t};
+
+    sel:{$[`~y;x;select from x where sym in y]}
+
+    pub:{[t;x]{[t;x;w]if[count x:sel[x]w 1;(neg first w)(`upd;t;x)]}[t;x]each w t}
+
+    add:{$[(count w x)>i:w[x;;0]?.z.w;.[`.u.w;(x;i;1);union;y];w[x],:enlist(.z.w;y)];(x;$[99=type v:value x;sel[v]y;@[0#v;`sym;`g#]])}
+
+    sub:{if[x~`;:sub[;y]each t];if[not x in t;'x];del[x].z.w;add[x;y]}
+
+    end:{(neg union/[w[;;0]])@\:(`.u.end;x)}
