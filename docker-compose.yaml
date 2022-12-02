@@ -183,8 +183,6 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg         
 
-     
-
   # idb:
   # #
   # # Intraday Database
