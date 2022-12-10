@@ -356,7 +356,7 @@ spec:
         fsGroup: 65534
       containers:
         - name: tp
-          args: [ tick.q, sym, /logs/tplogs, -p, "5010" ] 
+          args: [ tick.q, sym, /data/tplogs, -p, "5010" ] 
           workingDir: /opt/kx/kdb-tick
           securityContext:
             {}
@@ -376,7 +376,7 @@ spec:
             {}
           volumeMounts:
             - name: kx-data-pvc
-              mountPath: /logs       
+              mountPath: /data       
             - name: tick-q
               mountPath: /opt/kx/kdb-tick/tick.q
               subPath: tick.q
