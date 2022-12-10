@@ -380,9 +380,6 @@ spec:
             - name: tick-q
               mountPath: /opt/kx/kdb-tick/tick.q
               subPath: tick.q
-            # - name: r-q
-            #   mountPath: /opt/kx/kdb-tick/tick/r.q
-            #   subPath: r.q
             - name: u-q
               mountPath: /opt/kx/kdb-tick/tick/u.q
               subPath: u.q
@@ -400,9 +397,6 @@ spec:
       - name: tick-q
         configMap:
           name: tick-q
-      # - name: r-q
-      #   configMap:
-      #     name: r-q
       - name: u-q
         configMap:
           name: u-q
