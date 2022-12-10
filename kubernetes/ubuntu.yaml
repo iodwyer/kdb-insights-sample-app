@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: ubuntu
+  labels:
+    app: ubuntu
+spec:
+  securityContext:
+    # 'nobody' user
+    fsGroup: 65534
+  containers:
+  - name: ubuntu
+    image: ubuntu:latest
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+      - name: kx-data-pvc
+        mountPath: /data       
+    tty: true   
+    stdin: true       
+  restartPolicy: Always
+  volumes:
+  - name: kx-data-pvc
+    persistentVolumeClaim:
+      claimName: kx-data   
