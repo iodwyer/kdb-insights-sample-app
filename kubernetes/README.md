@@ -60,3 +60,4 @@ $ kubectl delete -f microservices-assembly.yaml -n kdb
 * issue with load balancer ( `kubectl describe svc kxinsights-sg-gateway -n kdb` )
 * mount path of rook ceph
 * sp checkpoint mount
+* add loadbalancer and DNS entry 

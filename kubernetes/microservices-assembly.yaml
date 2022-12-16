@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: kxinsights-resource-coordinator
+  name: kxi-sg-rc
   labels:
     app.kubernetes.io/name: resource-coordinator
     app.kubernetes.io/instance: kxinsights
@@ -20,7 +20,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kxinsights-resource-coordinator
+  name: kxi-sg-rc
   labels:
     app.kubernetes.io/name: resource-coordinator
     app.kubernetes.io/instance: kxinsights
@@ -77,7 +77,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kxinsights-aggregator
+  name: kxi-sg-agg
   labels:
     app.kubernetes.io/name: aggregator
     app.kubernetes.io/instance: kxinsights
@@ -95,7 +95,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kxinsights-aggregator
+  name: kxi-sg-agg
   labels:
     app.kubernetes.io/name: aggregator
     app.kubernetes.io/instance: kxinsights
@@ -129,7 +129,7 @@ spec:
             - name: KXI_ASSEMBLY_FILE
               value: /opt/kx/cfg/assembly.yaml
             - name: KXI_SG_RC_ADDR
-              value: kxinsights-resource-coordinator.kdb.svc:5060                
+              value: kxi-sg-rc.kdb.svc:5060                
           ports:
             - name: aggregator
               containerPort: 5050
@@ -152,7 +152,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: kxinsights-sg-gateway
+  name: kxi-sg-gw
   labels:
     app.kubernetes.io/name: sg-gateway
     app.kubernetes.io/instance: kxinsights
@@ -174,7 +174,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kxinsights-sg-gateway
+  name: kxi-sg-gw
   labels:
     app.kubernetes.io/name: sg-gateway
     app.kubernetes.io/instance: kxinsights
@@ -211,7 +211,7 @@ spec:
             - name: GATEWAY_HTTP_PORT
               value: "8080"
             - name: KXI_SG_RC_ADDR
-              value: kxinsights-resource-coordinator.kdb.svc:5060                
+              value: kxi-sg-rc.kdb.svc:5060                
           ports:
             - name: http-port
               containerPort: 8080
@@ -727,12 +727,12 @@ data:
 
     elements:
       rc:
-        host: kxinsights-resource-coordinator.kdb.svc
+        host: kxi-sg-rc.kdb.svc
         port: 5060
 
       dap:
         # gwAssembly: sgrc:5060 
-        gwEndpoints: kxinsights-resource-coordinator.kdb.svc:5060  
+        gwEndpoints: kxi-sg-rc.kdb.svc:5060  
         # smEndpoints: sm:10001
         instances:
           dap:
