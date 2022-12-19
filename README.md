@@ -35,6 +35,9 @@
 * <https://code.kx.com/insights/microservices/stream-processor/index.html>
 * <https://code.kx.com/insights/microservices/stream-processor/release-notes.html#artifacts>
 
+## Architecture
+![Architecture](img/arch_diagram.png)
+
 ## Authentication
 ```bash
 ## create file and populate appropriately
