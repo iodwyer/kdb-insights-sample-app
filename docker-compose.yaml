@@ -88,6 +88,7 @@ services:
       - KX_TRACE_OBJSTR=1
       - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
+      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
     ports:
       - 127.0.0.1::5080
     volumes:
@@ -118,6 +119,7 @@ services:
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_AUTH_DISABLED=1
+      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
     ports:
       - 127.0.0.1::5060
     stdin_open: true
