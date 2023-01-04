@@ -5,11 +5,11 @@
     - [Data Access](#data-access)
     - [Service Gateway](#service-gateway)
     - [Stream Processor](#stream-processor)
+  - [Architecture](#architecture)
   - [Authentication](#authentication)
   - [Create data folders](#create-data-folders)
   - [Docker start](#docker-start)
   - [Query Data](#query-data)
-  - [Custom API](#custom-api)
 
 ## Quick Links
 
@@ -76,10 +76,10 @@ q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`f;(0#`)!())
 ```bash
 curl -X POST --header "Content-Type: application/json"\
  --header "Accepted: application/json"    \
- --data '{ "table":  "trade", "startTS":"2022.02.10D00:00:00.000", "endTS":"2023.02.12D00:00:00.000"}'\
+ --data '{ "table":  "trade", "startTS":"2022.02.10D00:00:00.000", "endTS":"2022.02.12D00:00:00.000"}'\
   `docker port kxi-microservices-data-services-sggw-1 | grep 8080 | cut -f3 -d " "`"/kxi/getData"
 ```
-
+```
 ## Custom API
 ```q
 q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`trade;"p"$.z.d-1;"p"$.z.d+1;`size);`f;(0#`)!())
