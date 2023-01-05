@@ -18,6 +18,7 @@
 ## Pre-requisites
 * Valid kdb license including feature flags
 * Access to KX Docker repo ([nexus.dl.kx.com](https://nexus.dl.kx.com) / [registry.dl.kx.com](registry.dl.kx.com))
+* [PyKX](https://code.kx.com/pykx)
 
 ## Get started
 Choose you preferred orchestration:
