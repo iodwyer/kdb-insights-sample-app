@@ -1,4 +1,4 @@
-# kubernetes
+# Kubernetes
 
 ## Pre-reqs
 * EKS Cluster with ~~AWS Load Balancer~~ , Rook Ceph, Autoscaler provisioned
