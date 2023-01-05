@@ -6,6 +6,7 @@
     - [Data Access](#data-access)
     - [Service Gateway](#service-gateway)
     - [Stream Processor](#stream-processor)
+  - [Pre-requisites](#pre-requisites)
 
 ## Architecture
 ![Architecture](img/arch_diagram.png)
@@ -24,3 +25,7 @@
 
 ### Stream Processor
 * <https://code.kx.com/insights/microservices/stream-processor/index.html>
+
+## Pre-requisites
+* Valid kdb license including feature flags
+* Access to KX Docker repo ([nexus.dl.kx.com](https://nexus.dl.kx.com) / [registry.dl.kx.com](registry.dl.kx.com))
