@@ -3,6 +3,7 @@
   - [Architecture](#architecture)
   - [Quick Links](#quick-links)
   - [Prerequisites](#prerequisites)
+  - [Features](#features)
   - [Get started](#get-started)
 
 ## Architecture
@@ -19,6 +20,14 @@
 * Valid kdb license including feature flags
 * Access to KX Docker repo ([nexus.dl.kx.com](https://nexus.dl.kx.com) / [registry.dl.kx.com](registry.dl.kx.com))
 * [PyKX](https://code.kx.com/pykx) installed
+
+## Features
+This application demonstrates how you can use kdb Insights Microservices to do the following:
+
+- Create a data ingestion pipeline using python code subscribing to Kafka topics.
+- Write and query data in q.
+- Write and query data in Python.
+- Generate data visualizations in Jupyter Notebooks.
 
 ## Get started
 Choose you preferred orchestration:
