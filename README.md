@@ -12,7 +12,7 @@
 ![Architecture](img/arch_diagram.png)
 
 ## Quick Links
-<https://code.kx.com/insights/microservices/intro.html>
+<https://code.kx.com/insights/microservices>
 
 ### Storage Manager
 * <https://code.kx.com/insights/microservices/storage-manager/introduction.html>
