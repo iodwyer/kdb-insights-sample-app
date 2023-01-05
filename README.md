@@ -1,5 +1,5 @@
-# kxi-microservices-data-services
-- [kxi-microservices-data-services](#kxi-microservices-data-services)
+# kdb Insights Sample Application
+- [kdb Insights Sample Application](#kdb-insights-sample-application)
   - [Architecture](#architecture)
   - [Quick Links](#quick-links)
   - [Prerequisites](#prerequisites)
@@ -25,8 +25,8 @@
 This application demonstrates how you can use kdb Insights Microservices to do the following:
 
 - Create a data ingestion pipeline using python code subscribing to Kafka topics.
-- Write and query data in q.
-- Write and query data in Python.
+- Query data in Q.
+- Query data in Python.
 - Generate data visualizations in Jupyter Notebooks.
 
 ## Get started
