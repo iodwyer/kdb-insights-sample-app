@@ -33,7 +33,7 @@ $ docker-compose logs -f
 ### Q
 ```q
 ## getData
-q)gw:hopen "J"$last ":" vs first system"docker port kxi-microservices-data-services-sggw-1"
+q)gw:hopen "J"$last ":" vs first system"docker port docker-sggw-1"
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`f;(0#`)!())
 ```
@@ -48,5 +48,5 @@ q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`trade;"p"$.z.d-1;"p"$.z.d+
 curl -X POST --header "Content-Type: application/json"\
  --header "Accepted: application/json"    \
  --data '{ "table":  "trade", "startTS":"2022.02.10D00:00:00.000", "endTS":"2022.02.12D00:00:00.000"}'\
-  `docker port kxi-microservices-data-services-sggw-1 | grep 8080 | cut -f3 -d " "`"/kxi/getData"
+  `docker port docker-sggw-1 | grep 8080 | cut -f3 -d " "`"/kxi/getData"
 ```
