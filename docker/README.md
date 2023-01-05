@@ -32,15 +32,50 @@ $ docker-compose logs -f
 ## Query Data
 ### Q
 ```q
-## getData
+// getData API
 q)gw:hopen "J"$last ":" vs first system"docker port docker-sggw-1"
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`f;(0#`)!())
+
+// Custom API
+q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`trade;"p"$.z.d-1;"p"$.z.d+1;`size);`f;(0#`)!())
+
+// SQL API
+q)gw(`.kxi.sql;enlist[`query]!enlist"SELECT * FROM trade WHERE (date between '2022.12.19' and '2022.12.20') and (sym = 'AAPL')";`cb;(0#`)!())
+  
+// getMeta API
+q)args:`region`startTS`endTS!(`nyc;-0Wp;0Wp)
+q)gw(`.kxi.getMeta;args;`;(0#`)!())
 ```
 
-```q
-## Custom API
-q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`trade;"p"$.z.d-1;"p"$.z.d+1;`size);`f;(0#`)!())
+### Python
+```python
+import pykx as kx
+import pandas as pd
+import matplotlib.pyplot as plt
+import datetime
+import pytz
+
+gw = kx.QConnection(host='localhost', port=49164, no_ctx = True)                        ## SG Gateway port
+
+START_TIME = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(minutes = 36000)   ## 15 Mins ago
+END_TIME = datetime.datetime.now(tz=pytz.utc)                                           ## Now
+
+query_params = {
+    'table': 'trade',
+    'startTS': START_TIME,
+    'endTS': END_TIME
+}
+
+empty_dict = {'':''}
+
+tab = gw(kx.SymbolAtom('.kxi.getData'), query_params, 'f', empty_dict)
+
+data = tab[1].pd()
+print(data)
+
+plt.plot(data.size)
+plt.show()
 ```
 
 ### Curl

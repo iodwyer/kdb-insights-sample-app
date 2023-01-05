@@ -2,7 +2,7 @@
 - [kxi-microservices-data-services](#kxi-microservices-data-services)
   - [Architecture](#architecture)
   - [Quick Links](#quick-links)
-  - [Pre-requisites](#pre-requisites)
+  - [Prerequisites](#prerequisites)
   - [Get started](#get-started)
 
 ## Architecture
@@ -15,10 +15,10 @@
   * [Service Gateway](https://code.kx.com/insights/microservices/data-access/introduction_sg.html)
   * [Stream Processor](https://code.kx.com/insights/microservices/stream-processor/index.html)
 
-## Pre-requisites
+## Prerequisites
 * Valid kdb license including feature flags
 * Access to KX Docker repo ([nexus.dl.kx.com](https://nexus.dl.kx.com) / [registry.dl.kx.com](registry.dl.kx.com))
-* [PyKX](https://code.kx.com/pykx)
+* [PyKX](https://code.kx.com/pykx) installed
 
 ## Get started
 Choose you preferred orchestration:
