@@ -21,9 +21,16 @@ $ mkdir -p data tplog sp/checkpoints
 $ sudo chmod 777 -R data tplog sp
 ```
 
+## KX License
+Copy obtained KX License into the `.qp.licenses` folder in your `$HOME` directory. Further info here: https://code.kx.com/insights/core/qpacker/qpacker.html#licenses
+```bash
+$ mkdir $HOME/.qp.licenses
+$ cp k[4,c,x].lic $HOME/.qp.licenses
+```
+
 ## Docker start
 ```bash
-$ docker login registry.dl.kx.com
+$ docker login registry.dl.kx.com          ## enter obtained credentials
 $ docker-compose up -d
 $ docker-compose logs -f 
 ```
