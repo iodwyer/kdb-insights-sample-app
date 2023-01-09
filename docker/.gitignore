@@ -2,4 +2,3 @@ data/
 tplog/
 sp/
 cfg/__pycache__/
-.cloud_auth_env

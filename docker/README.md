@@ -1,20 +1,6 @@
 
 # Docker 
 
-## Authentication
-```bash
-## create file and populate appropriately
-$ tee .cloud_auth_env << EOF
-AWS_REGION=
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AZURE_STORAGE_ACCOUNT=
-AZURE_STORAGE_SHARED_KEY=
-GOOGLE_TOKEN=
-GCLOUD_PROJECT_ID=
-EOF
-```
-
 ## Create data folders 
 ```bash
 $ mkdir -p data tplog sp/checkpoints

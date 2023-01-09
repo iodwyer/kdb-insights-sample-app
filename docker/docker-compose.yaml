@@ -67,7 +67,7 @@ services:
       - ./cfg:/opt/kx/cfg 
     env_file:
       - .env 
-      - .cloud_auth_env  
+      # - .cloud_auth_env  
     stdin_open: true
     tty: true      
 
@@ -101,7 +101,7 @@ services:
       replicas: 1
     env_file:
       - .env    
-      - .cloud_auth_env         
+      # - .cloud_auth_env         
     stdin_open: true
     tty: true 
 
