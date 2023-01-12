@@ -47,6 +47,11 @@ $ kubectl apply -f microservices-assembly.yaml -n kdb
 ```bash
 $ kubectl delete -f microservices-assembly.yaml -n kdb
 ```
+### ceph-toolbox
+```bash
+https://rook.github.io/docs/rook/v1.5/ceph-toolbox.html
+```
+
 
 ## To do 
 * Add Service Discovery microservice (remove need for `sed` command)
