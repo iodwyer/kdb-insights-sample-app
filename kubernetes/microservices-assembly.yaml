@@ -12,7 +12,7 @@ spec:
     - port: 5060
       targetPort: 5060
       protocol: TCP
-      name: ipc-port ##  resource-coordi
+      name: ipc-port 
   selector:
     app.kubernetes.io/name: resource-coordinator
     app.kubernetes.io/instance: kxinsights
@@ -56,7 +56,7 @@ spec:
             - name: KXI_ALLOWED_SBX_APIS
               value: ".kxi.sql,.kxi.qsql"              
           ports:
-            - name: ipc-port  ## resource-coordi
+            - name: ipc-port  
               containerPort: 5060
               protocol: TCP
           resources:
@@ -413,7 +413,7 @@ metadata:
     app.kubernetes.io/instance: kxinsights
 spec:
   type: ClusterIP
-  clusterIP: None
+  # clusterIP: None
   ports:
     - port: 5080
       targetPort: 5080
@@ -539,7 +539,7 @@ metadata:
     app.kubernetes.io/instance: kxinsights
 spec:
   type: ClusterIP
-  clusterIP: None
+  # clusterIP: None
   ports:
     - port: 10001
       targetPort: 10001
