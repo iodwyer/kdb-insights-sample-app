@@ -282,6 +282,8 @@ spec:
           env:
             - name: KXI_LOG_LEVELS
               value: "default:trace" 
+            - name: KXI_SP_CHECKPOINT_FREQ
+              value: "0"  
             - name: KXI_SP_SPEC
               value: /opt/kx/cfg/taq.py 
             - name: KDB_LICENSE_B64
@@ -747,13 +749,13 @@ data:
           - name: idb
             mount: idb
             schedule:
-              freq: 0D00:10:00 # every 10 minutes
+              freq: 0D00:10:00      # every 10 minutes
+              snap: 0D00:00:00
           - name: hdb
             mount: hdb
-            schedule:
-              freq: 1D00:00:00 # every day
-              snap:   00:00:00 # 
-        disableDiscovery: true  # Disables registering with discovery
+            retain: 
+              time: 30 days
+        disableDiscovery: true      # Disables registering with discovery
 ---
 apiVersion: v1
 kind: ConfigMap

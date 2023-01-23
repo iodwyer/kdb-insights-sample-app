@@ -97,10 +97,10 @@ elements:
       - name: idb
         mount: idb
         schedule:
-          freq: 0D00:10:00 # every 10 minutes
+          freq: 0D00:10:00      # every 10 minutes
+          snap: 0D00:00:00
       - name: hdb
         mount: hdb
-        schedule:
-          freq: 1D00:00:00 # every day
-          snap:   00:00:00 # 
+        retain: 
+          time: 30 days
     disableDiscovery: true  # Disables registering with discovery
