@@ -54,7 +54,9 @@ spec:
             - name: KXI_ASSEMBLY_FILE
               value: /opt/kx/cfg/assembly.yaml
             - name: KXI_ALLOWED_SBX_APIS
-              value: ".kxi.sql,.kxi.qsql"              
+              value: ".kxi.sql,.kxi.qsql"  
+            - name: KXI_LOG_FORMAT
+              value: "text"            
           ports:
             - name: ipc-port  
               containerPort: 5060
@@ -129,7 +131,9 @@ spec:
             - name: KXI_ASSEMBLY_FILE
               value: /opt/kx/cfg/assembly.yaml
             - name: KXI_SG_RC_ADDR
-              value: kxi-sg-rc.kdb.svc:5060                
+              value: kxi-sg-rc.kdb.svc:5060  
+            - name: KXI_LOG_FORMAT
+              value: "text"              
           ports:
             - name: aggregator
               containerPort: 5050
@@ -206,6 +210,8 @@ spec:
                   key: license
             - name: KXI_ASSEMBLY_FILE
               value: /opt/kx/cfg/assembly.yaml
+            - name: KXI_LOG_FORMAT
+              value: "text"
             - name: GATEWAY_QIPC_PORT
               value: "5040"
             - name: GATEWAY_HTTP_PORT
@@ -290,7 +296,9 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: kdb-license-info
-                  key: license              
+                  key: license   
+            - name: KXI_LOG_FORMAT
+              value: "text"           
           ports:
             - name: sp-feed
               containerPort: 5000
@@ -497,7 +505,9 @@ spec:
             - name: KXI_CUSTOM_FILE
               value: "/opt/kx/cfg/custom.api.q"    
             # - name: KX_OBJSTR_CACHE_PATH
-            #   value: "/data"                                     
+            #   value: "/data"            
+            - name: KXI_LOG_FORMAT
+              value: "text"                         
           ports:
             - name: kxi-data-access
               containerPort: 5080
@@ -611,7 +621,9 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: aws-access-secret
-                  key: AWS_SECRET_ACCESS_KEY                        
+                  key: AWS_SECRET_ACCESS_KEY      
+            - name: KXI_LOG_FORMAT
+              value: "text"                  
           ports:
             - name: sm-single
               containerPort: 10001
@@ -735,7 +747,7 @@ data:
       dap:
         # gwAssembly: sgrc:5060 
         gwEndpoints: kxi-sg-rc.kdb.svc:5060  
-        # smEndpoints: sm:10001
+        smEndpoints: kxi-sm-single.kdb.svc:10001
         instances:
           dap:
             mountList: [rdb, idb, hdb]
