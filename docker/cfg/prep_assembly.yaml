@@ -1,5 +1,5 @@
-name: trade-assembly
-description: Sample assembly file
+name: "trade-assembly"
+description: "Sample assembly file"
 
 labels:
   user: root
@@ -72,11 +72,11 @@ mounts:
     partition: none
   idb:
     type: local
-    baseURI: file:///home/sbruce1/Desktop/Work/Projects/RnD/kdb-insights-sample-app/docker/data/idb
+    baseURI: file://${mnt_dir}/idb
     partition: ordinal
   hdb:
     type: local
-    baseURI: file:///home/sbruce1/Desktop/Work/Projects/RnD/kdb-insights-sample-app/docker/data/hdb
+    baseURI: file://${mnt_dir}/hdb
     partition: date
 
 elements:

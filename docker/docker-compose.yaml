@@ -5,6 +5,7 @@ version: "3"
 services:
 
   sp_feed:
+    user: root
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     depends_on:
       - tp    
@@ -25,6 +26,7 @@ services:
     tty: true     
 
   tp:
+    user: root
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
     environment:
       - KX_KURL_DEBUG_LOG=1
@@ -43,10 +45,31 @@ services:
     stdin_open: true
     tty: true    
 
+# Attempt at RT
+  # tp:
+  #   image: ${KX_DOCKER_REG}/kxi-rt:${RT_VERSION}
+  #   environment:
+  #     - KX_KURL_DEBUG_LOG=1
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:debug # Optional
+  #   ports:
+  #     - 127.0.0.1::5010
+  #   # command: tick.q sym /logs -p 5010
+  #   working_dir: /opt/kx/tick
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./tplog:/logs
+  #     - ./kdb-tick:/opt/kx/tick
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true    
+
   sm:
   #
   # Storage Manager
   #  
+    user: root
     image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
     depends_on:
       - tp
@@ -62,7 +85,7 @@ services:
       - 127.0.0.1::10001
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
+      - ${mnt_dir}:${mnt_dir}
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg 
     env_file:
@@ -71,6 +94,7 @@ services:
     tty: true      
 
   da-single:
+    user: root
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
     environment:
       - KXI_NAME=dap
@@ -92,7 +116,7 @@ services:
       - 127.0.0.1::5080
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
+      - ${mnt_dir}:${mnt_dir}
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg     
     deploy:
@@ -109,6 +133,7 @@ services:
   # Resource Coordinator -- 1 per assembly.
   #
   sgrc:
+    user: root
     image: ${KX_DOCKER_REG}/kxi-sg-rc:${SG_VERSION}
     environment:
       - KXI_NAME=sg_rc
@@ -132,6 +157,7 @@ services:
   # Aggregator. Note we only have one here, but multiple can be configured.
   #
   sgagg:
+    user: root
     image: ${KX_DOCKER_REG}/kxi-sg-agg:${SG_VERSION}
     environment:
       - KXI_NAME=sg_agg
@@ -159,6 +185,7 @@ services:
   # Gateway.
   #
   sggw:
+    user: root
     image: ${KX_DOCKER_REG}/kxi-sg-gw:${SG_VERSION}
     environment:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
