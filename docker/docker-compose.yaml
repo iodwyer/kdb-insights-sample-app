@@ -196,7 +196,7 @@ services:
       - KXI_LOG_LEVELS=default:trace # Optional  
       - KXI_SG_RC_ADDR=sgrc:5060   
     ports:
-      - 127.0.0.1::5040
+      - 127.0.0.1:5555:5040
       - 127.0.0.1::8080
     # Optional: deploy multiple replicas.
     deploy:
