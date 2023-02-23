@@ -51,6 +51,16 @@ import pytz
 
 gw = kx.QConnection(host='localhost', port=5040, no_ctx = True)                        ## SG Gateway port
 
+
+## SQL
+sql_query_params = {
+    'query': b"SELECT * FROM trade WHERE (date between '2022.12.19' and '2022.12.20') and (sym = 'AAPL')" 
+}
+
+tab = gw(kx.SymbolAtom('.kxi.sql'), sql_query_params, 'f', empty_dict)
+data = tab[1].pd()
+
+
 ## getData
 START_TIME = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(minutes = 36000)   ## 15 Mins ago
 END_TIME = datetime.datetime.now(tz=pytz.utc)                                           ## Now
@@ -70,15 +80,6 @@ print(data)
 
 plt.plot(data.size)
 plt.show()
-
-
-## SQL
-sql_query_params = {
-    'query': b"SELECT * FROM trade WHERE (date between '2022.12.19' and '2022.12.20') and (sym = 'AAPL')" 
-}
-
-tab = gw(kx.SymbolAtom('.kxi.sql'), sql_query_params, 'f', empty_dict)
-data = tab[1].pd()
 ```
 ### Curl
 ```bash
