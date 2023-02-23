@@ -2,7 +2,7 @@ name: "trade-assembly"
 description: "Sample assembly file"
 
 labels:
-  user: "ian" 
+  region: "nyc" 
 
 tables:
   trade:
