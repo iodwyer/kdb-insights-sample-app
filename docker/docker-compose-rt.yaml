@@ -1,0 +1,181 @@
+# Volumes required by the three rt nodes, publisher and susbcriber
+volumes:
+  rt-data-0:        # persistent volume for rt-data-0
+  rt-data-1:        # persistent volume for rt-data-1
+  rt-data-2:        # persistent volume for rt-data-2
+  rt-data-session:  # shared volume across all three rt containers, used to orchestrate hard reset
+  subscriber-1:     # persistent volume for simple subscriber
+  # publisher-1:      # persistent volume for simple publisher
+  sp_feed:   # persistent volume for python publisher
+
+# Bridge network across all containers
+x-kxnet:
+  &kxnet
+  networks:
+    - kx
+# Intra-RT ports, used for comms within the rt cluster:
+#      - 127.0.0.1:4000:4000/tcp
+#      - 127.0.0.1:5009:5009/tcp
+#      - 127.0.0.1:7000:7000/udp
+#      - 127.0.0.1:7100:7100/tcp
+#      - 127.0.0.1:8000:8000/udp
+#      - 127.0.0.1:9000:9000/udp
+# Internal ports, used for comms between the internal publishers/subscribers and the rt cluster:
+#      - 127.0.0.1:5001:5001/tcp
+#      - 127.0.0.1:5002:5002/tcp
+# External ports, used for comms between the external publishers and the rt cluster:
+#      - 127.0.0.1:5000:5000/tcp
+
+# Environment variables common to all RT sequencers
+x-rt-env:
+  &rt-env
+    environment:
+      - RT_TOPIC_PREFIX
+      - RT_SINK
+      - RAFT_HEARTBEAT
+      - RAFT_LOG_SIZE
+      - RAFT_CHUNK_SIZE
+      - RT_LOGLEVEL_CONSOLE
+      - RT_SEQ_SESSION_PATH
+      - RT_EXTERN_PREFIX
+
+# Startup command line common to all RT sequencers
+x-rt-command:
+  &rt-command
+    command:
+      [
+        '-p',
+        '6000',
+        '-in',
+        '$in_dir',
+        '-out',
+        '$out_dir',
+        '-cp',
+        '$state_dir',
+        '-size',
+        '$size',
+        '-limit',
+        '$limit',
+        '-time',
+        '$time',
+        '-disk',
+        '$disk'
+      ]
+
+
+networks:
+  kx:
+    name: kx
+    driver: bridge
+
+services:
+
+  # RT services - these are different services (not replicas), each with its own volume
+  rt-data-0:
+    image: ${rt_sequencer}:${rt_sequencer_ver}
+    # Need to set hostname so rt nodes/publishers/subcribers can find each other
+    hostname: rt-data-0
+    container_name: rt-data-0
+    <<: *rt-command
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5000:5000/tcp
+      - 127.0.0.1:5001:5001/tcp
+      - 127.0.0.1:5002:5002/tcp
+    <<: *rt-env
+    volumes:
+      - rt-data-0:/s
+      - rt-data-session:/rt-session
+      - ${kx_licence_dir}:/opt/kx/lic
+      - ${server_certs_dir}:/cert
+    <<: *kxnet
+
+  rt-data-1:
+    image: ${rt_sequencer}:${rt_sequencer_ver}
+    # Need to set hostname so rt nodes/publishers/subcribers can find each other
+    hostname: rt-data-1
+    container_name: rt-data-1
+    <<: *rt-command
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    restart: unless-stopped
+    ports:
+      - 127.0.0.2:5000:5000/tcp
+      - 127.0.0.2:5001:5001/tcp
+      - 127.0.0.2:5002:5002/tcp
+    <<: *rt-env
+    volumes:
+      - rt-data-1:/s
+      - rt-data-session:/rt-session
+      - ${kx_licence_dir}:/opt/kx/lic
+      - ${server_certs_dir}:/cert
+    <<: *kxnet
+
+  rt-data-2:
+    image: ${rt_sequencer}:${rt_sequencer_ver}
+    # Need to set hostname so rt nodes/publishers/subcribers can find each other
+    hostname: rt-data-2
+    container_name: rt-data-2
+    <<: *rt-command
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    restart: unless-stopped
+    ports:
+      - 127.0.0.3:5000:5000/tcp
+      - 127.0.0.3:5001:5001/tcp
+      - 127.0.0.3:5002:5002/tcp
+    <<: *rt-env
+    volumes:
+      - rt-data-2:/s
+      - rt-data-session:/rt-session
+      - ${kx_licence_dir}:/opt/kx/lic
+      - ${server_certs_dir}:/cert
+    <<: *kxnet
+
+  subscriber-1:
+    image: ${rt_subscriber}:${rt_subscriber_ver}
+    container_name: rt-subscriber-1
+    command: [ '-e', '1', '-p', '6000' ]
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    # Open a TTY for interactive publishing
+    tty: true
+    stdin_open: true
+    environment:
+      - RT_TOPIC_PREFIX
+      - RT_LOG_PATH
+    volumes:
+      - subscriber-1:/s
+      - ${kx_licence_dir}:/opt/kx/lic
+    <<: *kxnet
+
+
+  sp_feed:
+    user: root
+    # image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    image: ${DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    container_name: rt-sp-feed
+    # depends_on:
+    #   - tp    
+    environment:
+      # - KX_KURL_DEBUG_LOG=0
+      - KXI_SP_CHECKPOINT_DIR=${RT_LOG_PATH}
+      - KX_KURL_LOG_LEVEL="OFF"
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
+      - RT_TOPIC_PREFIX=${RT_TOPIC_PREFIX}
+      - RT_LOG_PATH=${RT_LOG_PATH}
+      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+    ports:
+      - 127.0.0.1::${sp_feed_port}
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - sp_feed:/s
+      - ./cfg:/opt/kx/cfg 
+    env_file:
+      - .env 
+    stdin_open: true
+    tty: true     
+    <<: *kxnet

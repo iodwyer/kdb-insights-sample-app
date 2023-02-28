@@ -59,11 +59,23 @@ tables:
         description: bid price
         type: long                  
 
+# bus:
+#   stream:
+#     protocol: custom
+#     nodes: tp:5010
+#     topic: dataStream
+
 bus:
   stream:
-    protocol: custom
-    nodes: tp:5010
-    topic: dataStream
+    protocol: rt
+    topic: data
+    topicPrefix: rt-
+    nodes:
+    - rt-data-0:5001
+    - rt-data-1:5001
+    - rt-data-2:5001
+
+
 
 mounts:
   rdb:
