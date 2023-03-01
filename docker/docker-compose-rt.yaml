@@ -134,31 +134,11 @@ services:
       - ${server_certs_dir}:/cert
     <<: *kxnet
 
-  subscriber-1:
-    image: ${rt_subscriber}:${rt_subscriber_ver}
-    container_name: rt-subscriber-1
-    command: [ '-e', '1', '-p', '6000' ]
-    # Have to run as root (default is nobody) in order to write to docker volume
-    user: root
-    # Open a TTY for interactive publishing
-    tty: true
-    stdin_open: true
-    environment:
-      - RT_TOPIC_PREFIX
-      - RT_LOG_PATH
-    volumes:
-      - subscriber-1:/s
-      - ${kx_licence_dir}:/opt/kx/lic
-    <<: *kxnet
-
-
   sp_feed:
     user: root
     # image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     image: ${DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     container_name: rt-sp-feed
-    # depends_on:
-    #   - tp    
     environment:
       # - KX_KURL_DEBUG_LOG=0
       - KXI_SP_CHECKPOINT_DIR=${RT_LOG_PATH}
@@ -179,3 +159,149 @@ services:
     stdin_open: true
     tty: true     
     <<: *kxnet
+
+  sm:
+  #
+  # Storage Manager
+  #  
+    user: root
+    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+    environment:
+      - KXI_NAME=sm
+      - KXI_SC=SM
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_PORT=10001
+      - KXI_LOG_FORMAT=text
+      - KXI_LOG_LEVELS=default:debug   
+    ports:
+      - 127.0.0.1::10001
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ${mnt_dir}:${mnt_dir}
+      - ./tplog:/logs
+      - ./cfg:/opt/kx/cfg 
+    env_file:
+      - .env 
+    stdin_open: true
+    tty: true
+    <<: *kxnet      
+
+  da-single:
+    user: root
+    image: ${DOCKER_REG}/kxi-da-single:${DA_VERSION}
+    environment:
+      - KXI_NAME=dap
+      - KXI_SC=dap
+      - KXI_PORT=5080
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KXI_DA_RDB_THREADS=0
+      - KXI_DA_IDB_THREADS=4
+      - KXI_DA_HDB_THREADS=8
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1      
+      - KXI_SG_RC_ADDR=sgrc:5060
+      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+      - RT_SOURCE=data
+    ports:
+      - 127.0.0.1::5080
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ${mnt_dir}:${mnt_dir}
+      - ./tplog:/logs
+      - ./cfg:/opt/kx/cfg     
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env    
+    stdin_open: true
+    tty: true 
+    <<: *kxnet  
+
+  
+  #
+  # Resource Coordinator -- 1 per assembly.
+  #
+  sgrc:
+    user: root
+    image: ${KX_DOCKER_REG}/kxi-sg-rc:${SG_VERSION}
+    environment:
+      - KXI_NAME=sg_rc
+      - KXI_PORT=5060
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KXI_AUTH_DISABLED=1
+      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+    ports:
+      - 127.0.0.1::5060
+    stdin_open: true
+    tty: true 
+    env_file:
+      - .env     
+    volumes: 
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./cfg:/opt/kx/cfg         
+    <<: *kxnet  
+  #
+  # Aggregator. Note we only have one here, but multiple can be configured.
+  #
+  sgagg:
+    user: root
+    image: ${KX_DOCKER_REG}/kxi-sg-agg:${SG_VERSION}
+    environment:
+      - KXI_NAME=sg_agg
+      - KXI_PORT=5050
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:info # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KXI_SG_RC_ADDR=sgrc:5060
+      - KXI_AUTH_DISABLED=1
+    ports:
+      - 127.0.0.1::5050
+    # Optional: deploy multiple replicas.
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env     
+    stdin_open: true
+    tty: true 
+    volumes: 
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./cfg:/opt/kx/cfg          
+    <<: *kxnet  
+  #
+  # Gateway.
+  #
+  sggw:
+    user: root
+    image: ${KX_DOCKER_REG}/kxi-sg-gw:${SG_VERSION}
+    environment:
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - GATEWAY_QIPC_PORT=5040
+      - GATEWAY_HTTP_PORT=8080
+      - KXI_AUTH_DISABLED=1
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional  
+      - KXI_SG_RC_ADDR=sgrc:5060   
+    ports:
+      - 127.0.0.1:5555:5040
+      - 127.0.0.1::8080
+    # Optional: deploy multiple replicas.
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env     
+    stdin_open: true
+    tty: true  
+    volumes: 
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./cfg:/opt/kx/cfg        
+    <<: *kxnet  
