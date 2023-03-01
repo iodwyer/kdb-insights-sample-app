@@ -80,7 +80,7 @@ bus:
 mounts:
   rdb:
     type: stream
-    baseURI: file:///mnt/foo/i/
+    baseURI: file://stream
     partition: none
   idb:
     type: local

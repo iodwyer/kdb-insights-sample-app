@@ -165,7 +165,7 @@ services:
   # Storage Manager
   #  
     user: root
-    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+    image: "${DOCKER_REG}/kxi-sm-single:${SM_VERSION}"
     environment:
       - KXI_NAME=sm
       - KXI_SC=SM
@@ -197,21 +197,18 @@ services:
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_DA_RDB_THREADS=0
+      - KXI_DA_RDB_THREADS=1
       - KXI_DA_IDB_THREADS=4
       - KXI_DA_HDB_THREADS=8
-      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KX_TRACE_OBJSTR=1
       - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
-      - RT_SOURCE=data
     ports:
       - 127.0.0.1::5080
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ${mnt_dir}:${mnt_dir}
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg     
     deploy:
