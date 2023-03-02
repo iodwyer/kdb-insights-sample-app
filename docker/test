@@ -1,0 +1,2 @@
+gw:hopen "J"$last ":" vs first system"docker port docker-sggw-1"
+count (gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())) 1
