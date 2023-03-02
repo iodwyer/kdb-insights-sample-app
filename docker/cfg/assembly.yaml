@@ -80,7 +80,9 @@ bus:
 mounts:
   rdb:
     type: stream
-    baseURI: file://stream
+    # baseURI: file://stream
+    baseURI: none
+    # baseURI: file:///home/sbruce1/Desktop/Work/Projects/RnD/kdb-insights-sample-app/docker/data/rdb
     partition: none
   idb:
     type: local

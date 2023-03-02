@@ -25,6 +25,6 @@
 	.sapi.metaParam[`name`type`isReq`description!(`endTS;-12h;1b;"End time (exclusive).")],
 	.sapi.metaReturn`type`description!(98h;"Count by specified columns.")]
 
-/ .da.i.eorReceived:1b
-
-/ .z.ps:value
+// TEST
+.da.ORIG_LOG_PATH:"/logs/rdb";
+.da.i.eorReceived:1b;

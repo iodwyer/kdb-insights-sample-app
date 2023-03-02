@@ -4,9 +4,9 @@ volumes:
   rt-data-1:        # persistent volume for rt-data-1
   rt-data-2:        # persistent volume for rt-data-2
   rt-data-session:  # shared volume across all three rt containers, used to orchestrate hard reset
-  subscriber-1:     # persistent volume for simple subscriber
   # publisher-1:      # persistent volume for simple publisher
   sp_feed:   # persistent volume for python publisher
+  da-orig:
 
 # Bridge network across all containers
 x-kxnet:
@@ -173,7 +173,8 @@ services:
       # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_PORT=10001
       - KXI_LOG_FORMAT=text
-      - KXI_LOG_LEVELS=default:debug   
+      - KXI_LOG_LEVELS=default:debug  
+      - RT_LOG_PATH=${RT_LOG_PATH}
     ports:
       - 127.0.0.1::10001
     volumes:
@@ -195,9 +196,9 @@ services:
       - KXI_SC=dap
       - KXI_PORT=5080
       - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_DA_RDB_THREADS=1
+      - KXI_DA_RDB_THREADS=0
       - KXI_DA_IDB_THREADS=4
       - KXI_DA_HDB_THREADS=8
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
@@ -211,7 +212,8 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ${mnt_dir}:${mnt_dir}   
       - ./tplog:/logs
-      - ./cfg:/opt/kx/cfg     
+      - ./cfg:/opt/kx/cfg    
+      - da-orig:/logs/rdb
     deploy:
       mode: replicated
       replicas: 1
