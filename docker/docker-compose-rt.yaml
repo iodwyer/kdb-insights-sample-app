@@ -6,7 +6,8 @@ volumes:
   rt-data-session:  # shared volume across all three rt containers, used to orchestrate hard reset
   # publisher-1:      # persistent volume for simple publisher
   sp_feed:   # persistent volume for python publisher
-  da-orig:
+  da-orig:   # persistent volume for da orig
+  sp_py:     # persistent volume for python sp
 
 # Bridge network across all containers
 x-kxnet:
@@ -305,3 +306,30 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg        
     <<: *kxnet  
+
+
+  sp_py:
+    user: root
+    # image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    image: ${DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    container_name: rt-sp-py
+    environment:
+      # - KX_KURL_DEBUG_LOG=0
+      - KXI_SP_CHECKPOINT_DIR=${RT_LOG_PATH}
+      - KX_KURL_LOG_LEVEL="OFF"
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
+      - RT_TOPIC_PREFIX=${RT_TOPIC_PREFIX}
+      - RT_LOG_PATH=${RT_LOG_PATH}
+      - KXI_SP_SPEC=/opt/kx/cfg/python_sp.py
+    ports:
+      - 127.0.0.1::${sp_py_port}
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - sp_py:/s
+      - ./cfg:/opt/kx/cfg 
+    env_file:
+      - .env 
+    stdin_open: true
+    tty: true     
+    <<: *kxnet
