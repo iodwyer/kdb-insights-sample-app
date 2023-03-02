@@ -165,7 +165,7 @@ services:
   # Storage Manager
   #  
     user: root
-    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+    image: "ext-dev-registry.kxi-dev.kx.com/kxi-sm-single:${SM_VERSION}"
     environment:
       - KXI_NAME=sm
       - KXI_SC=SM
@@ -222,6 +222,34 @@ services:
   #   stdin_open: true
   #   tty: true 
   #   <<: *kxnet  
+
+  rdb:
+    image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+    environment:
+      - KXI_NAME=rdb
+      - KXI_SC=RDB
+      - KXI_PORT=5110
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KX_TRACE_OBJSTR=1
+      - KX_KURL_DEBUG_LOG=1    
+      # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q  
+      - KXI_SG_RC_ADDR=sgrc:5060
+    ports:
+      - 127.0.0.1::5110
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./data:/data
+      - ./cfg:/opt/kx/cfg       
+    deploy:
+      mode: replicated
+      replicas: 1
+    env_file:
+      - .env           
+    stdin_open: true
+    tty: true    
+    <<: *kxnet
 
   idb:
   #

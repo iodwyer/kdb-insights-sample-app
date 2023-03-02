@@ -24,8 +24,8 @@ trade_pipeline = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }')
     # | sp.map(lambda x: ('trade', x))
-    | sp.write.to_console())
-    # | sp.write.to_stream(table='trade',stream="data", prefix="rt-"))
+    # | sp.write.to_console())
+    | sp.write.to_stream(table='trade',stream="data", prefix="rt-"))
 
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)

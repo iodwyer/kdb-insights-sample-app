@@ -72,7 +72,7 @@ services:
 
   # RT services - these are different services (not replicas), each with its own volume
   rt-data-0:
-    image: ${rt_sequencer}:${rt_sequencer_ver}
+    image: ${DOCKER_REG}/kxi-rt:${RT_VERSION}
     # Need to set hostname so rt nodes/publishers/subcribers can find each other
     hostname: rt-data-0
     container_name: rt-data-0
@@ -93,7 +93,7 @@ services:
     <<: *kxnet
 
   rt-data-1:
-    image: ${rt_sequencer}:${rt_sequencer_ver}
+    image: ${DOCKER_REG}/kxi-rt:${RT_VERSION}
     # Need to set hostname so rt nodes/publishers/subcribers can find each other
     hostname: rt-data-1
     container_name: rt-data-1
@@ -114,7 +114,7 @@ services:
     <<: *kxnet
 
   rt-data-2:
-    image: ${rt_sequencer}:${rt_sequencer_ver}
+    image: ${DOCKER_REG}/kxi-rt:${RT_VERSION}
     # Need to set hostname so rt nodes/publishers/subcribers can find each other
     hostname: rt-data-2
     container_name: rt-data-2
@@ -208,7 +208,8 @@ services:
     ports:
       - 127.0.0.1::5080
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ${mnt_dir}:${mnt_dir}   
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg     
     deploy:
@@ -226,7 +227,7 @@ services:
   #
   sgrc:
     user: root
-    image: ${KX_DOCKER_REG}/kxi-sg-rc:${SG_VERSION}
+    image: ${DOCKER_REG}/kxi-sg-rc:${SG_VERSION}
     environment:
       - KXI_NAME=sg_rc
       - KXI_PORT=5060
@@ -250,7 +251,7 @@ services:
   #
   sgagg:
     user: root
-    image: ${KX_DOCKER_REG}/kxi-sg-agg:${SG_VERSION}
+    image: ${DOCKER_REG}/kxi-sg-agg:${SG_VERSION}
     environment:
       - KXI_NAME=sg_agg
       - KXI_PORT=5050
@@ -278,7 +279,7 @@ services:
   #
   sggw:
     user: root
-    image: ${KX_DOCKER_REG}/kxi-sg-gw:${SG_VERSION}
+    image: ${DOCKER_REG}/kxi-sg-gw:${SG_VERSION}
     environment:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - GATEWAY_QIPC_PORT=5040
