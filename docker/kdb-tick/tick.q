@@ -36,7 +36,9 @@ system"t 1000"
 
 if[system"t";
  .z.ts:{pub'[t;value each t];@[`.;t;@[;`sym;`g#]0#];i::j;ts .z.D};
+
  upd:{[t;x] 
+  if[99h=type x;x:enlist x];
     $[0h = type x;
         t insert x;
         t upsert x
