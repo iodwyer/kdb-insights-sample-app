@@ -60,7 +60,7 @@ tables:
         type: long             
 
   ohlcv:
-    description: Ohlcv aggregation
+    description: ohlcv aggregation
     type: partitioned
     blockSize: 10000
     prtnCol: time
@@ -91,6 +91,30 @@ tables:
       - name: volume
         description: volume
         type: long          
+
+  vwap:
+    description: vwap aggregation
+    type: partitioned
+    blockSize: 10000
+    prtnCol: time
+    sortColsOrd: sym
+    sortColsDisk: sym
+    columns:
+      - name: sym
+        description: Symbol name
+        type: symbol
+        attrMem: grouped
+        attrDisk: parted
+        attrOrd: parted
+      - name: time
+        description: Time
+        type: timestamp    
+      - name: vwap
+        description: vwap
+        type: float    
+      - name: accVol
+        description: volume
+        type: long       
 
 # bus:
 #   stream:
