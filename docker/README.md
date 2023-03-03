@@ -1,6 +1,7 @@
 
 # Docker 
-
+## Pre-reqs
+* [Run docker commands without `sudo`](https://docs.docker.com/engine/install/linux-postinstall/)
 ## Create data folders 
 ```bash
 $ mkdir -p data tplog sp/checkpoints
