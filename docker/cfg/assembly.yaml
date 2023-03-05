@@ -57,7 +57,64 @@ tables:
         type: long  
       - name: asize
         description: bid price
-        type: long                  
+        type: long             
+
+  ohlcv:
+    description: ohlcv aggregation
+    type: partitioned
+    blockSize: 10000
+    prtnCol: time
+    sortColsOrd: sym
+    sortColsDisk: sym
+    columns:
+      - name: sym
+        description: Symbol name
+        type: symbol
+        attrMem: grouped
+        attrDisk: parted
+        attrOrd: parted
+      - name: time
+        description: Time
+        type: timestamp    
+      - name: open
+        description: open price
+        type: float    
+      - name: high
+        description: high price
+        type: float   
+      - name: low
+        description: low price
+        type: float  
+      - name: close
+        description: close price
+        type: float  
+      - name: volume
+        description: volume
+        type: long          
+
+  vwap:
+    description: vwap aggregation
+    type: partitioned
+    blockSize: 10000
+    prtnCol: time
+    sortColsOrd: sym
+    sortColsDisk: sym
+    columns:
+      - name: sym
+        description: Symbol name
+        type: symbol
+        attrMem: grouped
+        attrDisk: parted
+        attrOrd: parted
+      - name: time
+        description: Time
+        type: timestamp    
+      - name: vwap
+        description: vwap
+        type: float    
+      - name: accVol
+        description: volume
+        type: long       
 
 # bus:
 #   stream:

@@ -197,7 +197,7 @@ services:
       - KXI_SC=dap
       - KXI_PORT=5080
       - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_DA_RDB_THREADS=0
       - KXI_DA_IDB_THREADS=4
@@ -207,6 +207,7 @@ services:
       - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+      - RT_LOG_PATH=${RT_LOG_PATH}
     ports:
       - 127.0.0.1::5080
     volumes:
