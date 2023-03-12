@@ -1,22 +1,121 @@
 version: "3"
+
+volumes:
+  rt-dfx-assembly-0:        # persistent volume for rt-dfx-assembly-0
+  rt-dfx-assembly-1:        # persistent volume for rt-dfx-assembly-1
+  rt-dfx-assembly-2:        # persistent volume for rt-dfx-assembly-2
+  rt-dfx-assembly-session:  
+  sp_feed:   # persistent volume for python publisher
+  da-orig:   # persistent volume for da orig
+
+x-rt-command:
+  &rt-command
+    command:
+      [
+        '-p',
+        '6000',
+        '-in',
+        '$in_dir',
+        '-out',
+        '$out_dir',
+        '-cp',
+        '$state_dir',
+        '-size',
+        '$size',
+        '-limit',
+        '$limit',
+        '-time',
+        '$time',
+        '-disk',
+        '$disk'
+      ]
+
 #
 # Services.
 #
 services:
 
+  rt-dfx-assembly-0:
+    image: ${KX_DOCKER_REG}/kxi-rt:${RT_VERSION}
+    # Need to set hostname so rt nodes/publishers/subcribers can find each other
+    hostname: rt-dfx-assembly-0
+    container_name: rt-dfx-assembly-0
+    <<: *rt-command
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    restart: unless-stopped
+    ports:
+      - 127.0.0.1:5000:5000/tcp
+      - 127.0.0.1:5001:5001/tcp
+      - 127.0.0.1:5002:5002/tcp
+    env_file:
+      - .env 
+    volumes:
+      - rt-dfx-assembly-0:/s
+      - rt-dfx-assembly-session:/rt-session
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      # - ${server_certs_dir}:/cert
+
+  rt-dfx-assembly-1:
+    image: ${KX_DOCKER_REG}/kxi-rt:${RT_VERSION}
+    # Need to set hostname so rt nodes/publishers/subcribers can find each other
+    hostname: rt-dfx-assembly-1
+    container_name: rt-dfx-assembly-1
+    <<: *rt-command
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    restart: unless-stopped
+    ports:
+      - 127.0.0.2:5000:5000/tcp
+      - 127.0.0.2:5001:5001/tcp
+      - 127.0.0.2:5002:5002/tcp
+    env_file:
+      - .env 
+    volumes:
+      - rt-dfx-assembly-1:/s
+      - rt-dfx-assembly-session:/rt-session
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      # - ${server_certs_dir}:/cert
+
+  rt-dfx-assembly-2:
+    image: ${KX_DOCKER_REG}/kxi-rt:${RT_VERSION}
+    # Need to set hostname so rt nodes/publishers/subcribers can find each other
+    hostname: rt-dfx-assembly-2
+    container_name: rt-dfx-assembly-2
+    <<: *rt-command
+    # Have to run as root (default is nobody) in order to write to docker volume
+    user: root
+    restart: unless-stopped
+    ports:
+      - 127.0.0.3:5000:5000/tcp
+      - 127.0.0.3:5001:5001/tcp
+      - 127.0.0.3:5002:5002/tcp
+    env_file:
+      - .env 
+    volumes:
+      - rt-dfx-assembly-2:/s
+      - rt-dfx-assembly-session:/rt-session
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      # - ${server_certs_dir}:/cert
+
+
   sp_feed:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
-    depends_on:
-      - tp    
+    container_name: rt-sp-feed
+    user: root
+    # depends_on:
+    #   - tp    
     environment:
       - KX_KURL_DEBUG_LOG=1
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      - KXI_SP_CHECKPOINT_DIR=${RT_LOG_PATH}
     ports:
       - 127.0.0.1::5000
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - sp_feed:/s
       - ./sp:/sp   
       - ./cfg:/opt/kx/cfg 
     env_file:
@@ -24,40 +123,41 @@ services:
     stdin_open: true
     tty: true     
 
-  tp:
-    image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
-    environment:
-      - KX_KURL_DEBUG_LOG=1
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
-    ports:
-      - 127.0.0.1::5010
-    command: tick.q sym /logs -p 5010
-    working_dir: /opt/kx/tick
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./tplog:/logs
-      - ./kdb-tick:/opt/kx/tick
-    env_file:
-      - .env 
-    stdin_open: true
-    tty: true    
+  # tp:
+  #   image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+  #   environment:
+  #     - KX_KURL_DEBUG_LOG=1
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:debug # Optional
+  #   ports:
+  #     - 127.0.0.1::5010
+  #   command: tick.q sym /logs -p 5010
+  #   working_dir: /opt/kx/tick
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./tplog:/logs
+  #     - ./kdb-tick:/opt/kx/tick
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true    
 
   sm:
   #
   # Storage Manager
   #  
-    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
-    depends_on:
-      - tp
+    image: ${KX_DOCKER_REG}/kxi-sm-single:${SM_VERSION}
+    # depends_on:
+    #   - tp
     environment:
       - KXI_NAME=sm
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       # - KXI_PORT=10001
       - KXI_LOG_FORMAT=text
-      - KXI_LOG_LEVELS=default:info      
+      - KXI_LOG_LEVELS=default:info  
+      - RT_LOG_PATH=${RT_LOG_PATH}    
     ports:
       - 127.0.0.1::10001
     volumes:
@@ -72,6 +172,7 @@ services:
 
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
+    user: root
     environment:
       - KXI_NAME=dap
       - KXI_SC=dap
@@ -82,12 +183,13 @@ services:
       - KXI_DA_RDB_THREADS=0
       - KXI_DA_IDB_THREADS=4
       - KXI_DA_HDB_THREADS=8
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KX_TRACE_OBJSTR=1
       - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+      - RT_LOG_PATH=${RT_LOG_PATH}
     ports:
       - 127.0.0.1::5080
     volumes:
@@ -95,6 +197,7 @@ services:
       - ./data:/data
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg     
+      - da-orig:/logs/rdb
     deploy:
       mode: replicated
       replicas: 1

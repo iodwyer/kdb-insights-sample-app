@@ -59,11 +59,21 @@ tables:
         description: bid price
         type: long                  
 
+# bus:
+#   stream:
+#     protocol: custom
+#     nodes: tp:5010
+#     topic: dataStream
+
 bus:
   stream:
-    protocol: custom
-    nodes: tp:5010
-    topic: dataStream
+    protocol: rt
+    topic: dfx-assembly
+    topicPrefix: rt-
+    nodes:
+    - rt-dfx-assembly-1:5001
+    - rt-dfx-assembly-2:5001
+    - rt-dfx-assembly-3:5001
 
 mounts:
   rdb:
