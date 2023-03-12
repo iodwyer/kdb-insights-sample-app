@@ -7,7 +7,7 @@ tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
 
-def transform(data):
+def transform_quote(data):
     dict = data.pd()
     dict['bsize'] = int(dict['bsize'])
     dict['asize'] = int(dict['asize'])
@@ -26,7 +26,7 @@ trade_pipeline = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
-    | sp.map(transform)
+    | sp.map(transform_quote)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
