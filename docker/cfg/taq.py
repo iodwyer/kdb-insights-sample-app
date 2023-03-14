@@ -33,8 +33,6 @@ def ohlcv_agg(data):
     ohlcv = ohlcv.reset_index()[['sym', 'time', 'open', 'high', 'low', 'close', 'volume']]
     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
     print(ohlcv)
-    # tab = kx.toq.from_pandas_dataframe(ohlcv)
-    # return tab
     return ohlcv
 
 def vwap_agg(data):
@@ -59,30 +57,20 @@ def vwap_agg(data):
         vwap = vwap.reset_index()[['sym', 'time', 'vwap', 'accVol']]
         vwap = vwap.astype({'vwap':'float', 'accVol':'int64'})
         print(vwap)
-    # tab = kx.toq.from_pandas_dataframe(vwap)
     return vwap
-    # return tab
-
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
 
 trade_pipeline = (trade_source
-    # | sp.decode.json()
-    # | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }')
     | sp.map(lambda x: ('trade', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
-
 ohlcv_pipeline = (trade_source
-    # | sp.decode.json()
-    # | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }')
     | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
     | sp.map(ohlcv_agg)
     | sp.map(lambda x: ('ohlcv', x))
-    # | sp.write.to_console())
-    # | sp.write.to_stream(table='ohlcv',stream="data", prefix="rt-"))  
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
 vwap_pipeline = (trade_source
@@ -90,7 +78,6 @@ vwap_pipeline = (trade_source
     | sp.map(vwap_agg)
     | sp.map(lambda x: ('vwap', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
-    # | sp.write.to_stream(table='vwap',stream="data", prefix="rt-"))
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
