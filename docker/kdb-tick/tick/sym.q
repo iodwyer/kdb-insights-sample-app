@@ -7,3 +7,5 @@
 // other tables
 trade:([] time:"p"$(); sym:`g#`$(); price:"f"$(); size:"j"$())
 quote:([] time:"p"$(); sym:`g#`$(); bid:"f"$(); ask:"f"$(); bsize:"j"$(); asize:"j"$())
+ohlcv:([] time:"p"$(); sym:`g#`$(); open:"f"$(); high:"f"$(); low:"f"$(); close:"f"$(); volume:"j"$())
+vwap: ([] time:"p"$(); sym:`g#`$(); vwap:"f"$(); accVol:"j"$())
