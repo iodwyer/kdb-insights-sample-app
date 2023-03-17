@@ -7,14 +7,14 @@ import datetime
 tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
-quote_schema_types = {
-    # 'time':       'timestamp',
-    # 'sym':        'symbol',
-    'bid':        'float',
-    'ask':        'float',
-    'bsize':      'int64',
-    'asize':      'int64'
-}
+# quote_schema_types = {
+#     # 'time':       'timestamp',
+#     # 'sym':        'symbol',
+#     'bid':        'float',
+#     'ask':        'float',
+#     'bsize':      'int64',
+#     'asize':      'int64'
+# }
 
 def transform_quote(data):
     dict = data.pd()
@@ -24,6 +24,21 @@ def transform_quote(data):
     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
     dict['sym']   = dict['sym'].decode("utf-8")
     return dict
+
+# def transform_quote(data):
+#     print(data)
+#     print(type(data))
+#     return data
+
+# def transform_trade(data):
+#     dict = data.pd()
+#     # dict['price'] = int(dict['bsize'])
+#     dict['size']  = int(dict['size'])
+#     dict['time']  = dict.pop('timestamp')
+#     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
+#     dict['sym']   = dict['sym'].decode("utf-8")
+#     # print(dict)
+#     return dict
 
 # def transform_quote(data):
 #     dict = data.pd()
@@ -81,6 +96,7 @@ def vwap_agg(data):
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
+    # | sp.map(transform_trade))
     | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
 
 trade_pipeline = (trade_source
@@ -110,8 +126,13 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
-# sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, ohlcv_sql_pipeline, quote_pipeline)
-sp.run(quote_pipeline)
+# test_byte_stream = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
+#     | sp.map(transform_quote)
+#     | sp.write.to_console())
+
+
+sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, ohlcv_sql_pipeline, quote_pipeline)
+# sp.run(test)
 
 # trade_schema_types = {
 #     'timestamp':  'timestamp',
