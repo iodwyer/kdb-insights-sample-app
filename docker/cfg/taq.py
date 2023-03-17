@@ -7,15 +7,35 @@ import datetime
 tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
+quote_schema_types = {
+    # 'time':       'timestamp',
+    # 'sym':        'symbol',
+    'bid':        'float',
+    'ask':        'float',
+    'bsize':      'int64',
+    'asize':      'int64'
+}
 
 def transform_quote(data):
     dict = data.pd()
     dict['bsize'] = int(dict['bsize'])
     dict['asize'] = int(dict['asize'])
-    dict['time']  = pd.to_datetime(dict['timestamp'].decode("utf-8"))
+    dict['time']  = dict.pop('timestamp')
+    dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
     dict['sym']   = dict['sym'].decode("utf-8")
-    del dict['timestamp'] 
     return dict
+
+# def transform_quote(data):
+#     dict = data.pd()
+#     print(dict)
+#     print(type(dict))
+#     dict['time'] = dict.pop('timestamp')
+#     # df.rename(columns={'timestamp':'time'}, inplace=True)
+#     df.astype(quote_schema_types)
+
+#     df['time']  = pd.to_datetime(df['time'].decode("utf-8"))
+#     df['sym']   = df['sym'].decode("utf-8")
+#     return df
 
 def ohlcv_agg(data):
     df = data.pd()
@@ -32,7 +52,7 @@ def ohlcv_agg(data):
     # reset index to make columns sym and datetime
     ohlcv = ohlcv.reset_index()[['sym', 'time', 'open', 'high', 'low', 'close', 'volume']]
     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
-    print(ohlcv)
+    # print(ohlcv)
     return ohlcv
 
 def vwap_agg(data):
@@ -48,7 +68,7 @@ def vwap_agg(data):
         # group by sym and datetime, and calculate VWAP and accumulated volume
         agg = {
             'price': 'mean',
-            'size': 'sum'
+            'size' : 'sum'
         }
         vwap = df.groupby(['sym', 'time']).apply(lambda x: pd.Series({
             'vwap': (x['price'] * x['size']).sum() / x['size'].sum(),
@@ -56,7 +76,7 @@ def vwap_agg(data):
         }))
         vwap = vwap.reset_index()[['sym', 'time', 'vwap', 'accVol']]
         vwap = vwap.astype({'vwap':'float', 'accVol':'int64'})
-        print(vwap)
+        # print(vwap)
     return vwap
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
@@ -73,6 +93,11 @@ ohlcv_pipeline = (trade_source
     | sp.map(lambda x: ('ohlcv', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
+ohlcv_sql_pipeline = (trade_source
+    | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
+    | sp.sql('SELECT sym, MAX(price) AS high, MIN(price) AS low from $1 GROUP BY sym')
+    | sp.write.to_console())
+
 vwap_pipeline = (trade_source
     | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
     | sp.map(vwap_agg)
@@ -85,20 +110,19 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
-sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
+# sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, ohlcv_sql_pipeline, quote_pipeline)
+sp.run(quote_pipeline)
 
-# trade_schema = {
+# trade_schema_types = {
 #     'timestamp':  'timestamp',
 #     'sym':        'symbol',
 #     'price':      'float',
 #     'size':       'long'
 # }
 
-# quote_schema = {
-#     'timestamp':  'timestamp',
-#     'sym':        'symbol',
-#     'bid':        'float',
-#     'ask':        'float',
-#     'bsize':      'long',
-#     'asize':      'long'
+# trade_schema_columns = {
+#     'timestamp':  'time',
+#     'sym':        'sym',
+#     'price':      'price',
+#     'size':       'size'
 # }
