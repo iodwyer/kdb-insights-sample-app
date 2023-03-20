@@ -16,6 +16,14 @@ quote_schema_types = {
     'asize':      'int64'
 }
 
+def transform_trade(data):
+    dict = data.pd()
+    dict['size']  = int(dict['size'])
+    dict['time']  = dict.pop('timestamp')
+    dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
+    dict['sym']   = dict['sym'].decode("utf-8")
+    return dict
+
 def transform_quote(data):
     dict = data.pd()
     dict['bsize'] = int(dict['bsize'])
@@ -34,17 +42,6 @@ def transform_quote(data):
 #     dict['sym']   = dict['sym'].decode("utf-8")
 #     # print(dict)
 #     return dict
-
-# def transform_quote(data):
-#     df = data.pd()
-#     print(df)
-#     print(type(df))
-#     df['time']  = df.pop('timestamp')
-#     # df.rename(columns={'timestamp':'time'}, inplace=True)
-#     # df.astype(quote_schema_types)
-#     df['time']  = pd.to_datetime(df['time'].decode("utf-8"))
-#     df['sym']   = df['sym'].decode("utf-8")
-#     return df
 
 def ohlcv_agg(data):
     df = data.pd()
@@ -92,8 +89,8 @@ def vwap_agg(data):
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
-    # | sp.map(transform_trade))
-    | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
+    | sp.map(transform_trade))
+    # | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
 
 trade_pipeline = (trade_source
     | sp.map(lambda x: ('trade', x))
@@ -118,8 +115,8 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
 
-sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
-# sp.run(test_byte_stream)
+# sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
+sp.run(trade_pipeline)
 # sp.run(quote_pipeline)
 
 #### WIP #####
@@ -143,6 +140,18 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #         print('Empty Dataframe')  ## do nothing
 #     else:
 #         df.rename(columns={'o':'open', 'h':'high', 'l':'low', 'c':'close', 'v':'volume'}, inplace=True, errors='raise')
+#     return df
+
+
+# def transform_quote(data):
+#     df = data.pd()
+#     print(df)
+#     print(type(df))
+#     df['time']  = df.pop('timestamp')
+#     # df.rename(columns={'timestamp':'time'}, inplace=True)
+#     # df.astype(quote_schema_types)
+#     df['time']  = pd.to_datetime(df['time'].decode("utf-8"))
+#     df['sym']   = df['sym'].decode("utf-8")
 #     return df
 
 # trade_schema_types = {
