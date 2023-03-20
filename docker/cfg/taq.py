@@ -7,14 +7,14 @@ import datetime
 tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
-# quote_schema_types = {
-#     # 'time':       'timestamp',
-#     # 'sym':        'symbol',
-#     'bid':        'float',
-#     'ask':        'float',
-#     'bsize':      'int64',
-#     'asize':      'int64'
-# }
+quote_schema_types = {
+    # 'time':       'timestamp',
+    # 'sym':        'symbol',
+    'bid':        'float',
+    'ask':        'float',
+    'bsize':      'int64',
+    'asize':      'int64'
+}
 
 def transform_quote(data):
     dict = data.pd()
@@ -24,11 +24,6 @@ def transform_quote(data):
     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
     dict['sym']   = dict['sym'].decode("utf-8")
     return dict
-
-# def transform_quote(data):
-#     print(data)
-#     print(type(data))
-#     return data
 
 # def transform_trade(data):
 #     dict = data.pd()
@@ -41,13 +36,12 @@ def transform_quote(data):
 #     return dict
 
 # def transform_quote(data):
-#     dict = data.pd()
-#     print(dict)
-#     print(type(dict))
-#     dict['time'] = dict.pop('timestamp')
+#     df = data.pd()
+#     print(df)
+#     print(type(df))
+#     df['time']  = df.pop('timestamp')
 #     # df.rename(columns={'timestamp':'time'}, inplace=True)
-#     df.astype(quote_schema_types)
-
+#     # df.astype(quote_schema_types)
 #     df['time']  = pd.to_datetime(df['time'].decode("utf-8"))
 #     df['sym']   = df['sym'].decode("utf-8")
 #     return df
@@ -69,6 +63,8 @@ def ohlcv_agg(data):
     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
     # print(ohlcv)
     return ohlcv
+
+
 
 def vwap_agg(data):
     df = data.pd()
@@ -109,11 +105,6 @@ ohlcv_pipeline = (trade_source
     | sp.map(lambda x: ('ohlcv', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
-ohlcv_sql_pipeline = (trade_source
-    | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
-    | sp.sql('SELECT sym, MAX(price) AS high, MIN(price) AS low from $1 GROUP BY sym')
-    | sp.write.to_console())
-
 vwap_pipeline = (trade_source
     | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
     | sp.map(vwap_agg)
@@ -126,13 +117,33 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
-# test_byte_stream = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
-#     | sp.map(transform_quote)
-#     | sp.write.to_console())
 
+sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
+# sp.run(test_byte_stream)
+# sp.run(quote_pipeline)
 
-sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, ohlcv_sql_pipeline, quote_pipeline)
-# sp.run(test)
+#### WIP #####
+
+# #### Issue of second 60 seconds data comes in as type 0h
+# ohlcv_sql_pipeline = (trade_source
+#     | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
+#     # | sp.map('{[data] show data; data }')
+#     | sp.sql("SELECT sym, date_trunc('minute', time), FIRST(price) AS o, MAX(price) AS h, MIN(price) AS l, LAST(price) AS c, SUM(size) AS v from $1 GROUP BY sym, date_trunc('minute', time)")
+#     | sp.map(ohlcv_format)
+#     # | sp.map('{[data]show meta data; data }')
+#     | sp.map(lambda x: ('ohlcv', x))
+#     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
+#     # | sp.write.to_console())
+
+# def ohlcv_format(data):
+#     print("$$$$$$$$$$$$$$$$$   type of incoming data: " + str(pykx.q.type(data)) + "  $$$$$$$$$$$$$$$$")
+#     df = data.pd()
+#     print(df[:2])
+#     if df.empty:
+#         print('Empty Dataframe')  ## do nothing
+#     else:
+#         df.rename(columns={'o':'open', 'h':'high', 'l':'low', 'c':'close', 'v':'volume'}, inplace=True, errors='raise')
+#     return df
 
 # trade_schema_types = {
 #     'timestamp':  'timestamp',
