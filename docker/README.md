@@ -7,6 +7,10 @@ $ mkdir -p data tplog sp/checkpoints
 $ sudo chmod 777 -R data tplog sp
 ```
 
+## Adjust Environmental Variables
+
+Set ```mnt_dir``` in the ```.env``` file to be the full directory to the data folder created above.
+
 ## KX License
 Copy obtained KX License into the `.qp.licenses` folder in your `$HOME` directory. Further info here: https://code.kx.com/insights/core/qpacker/qpacker.html#licenses
 ```bash
