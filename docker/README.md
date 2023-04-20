@@ -1,6 +1,7 @@
 
 # Docker 
 ## Pre-reqs
+* [Install docker](https://docs.docker.com/engine/install/)
 * [Run docker commands without `sudo`](https://docs.docker.com/engine/install/linux-postinstall/)
 ## Create data folders 
 ```bash
@@ -18,8 +19,8 @@ $ cp k[4,c,x].lic $HOME/.qp.licenses
 ## Docker start
 ```bash
 $ docker login registry.dl.kx.com          ## enter obtained credentials
-$ docker-compose up -d
-$ docker-compose logs -f 
+$ docker compose up -d
+$ docker compose logs -f 
 ```
 
 
