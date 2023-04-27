@@ -6,13 +6,14 @@ services:
 
   sp_feed:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    restart: "always"
     depends_on:
       - tp    
     environment:
-      - KX_KURL_DEBUG_LOG=1
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
       - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
     volumes:
@@ -26,8 +27,8 @@ services:
 
   tp:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+    restart: "always"
     environment:
-      - KX_KURL_DEBUG_LOG=1
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
     ports:
@@ -48,6 +49,7 @@ services:
   # Storage Manager
   #  
     image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+    restart: "always"
     depends_on:
       - tp
     environment:
@@ -55,7 +57,8 @@ services:
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      # - KXI_PORT=10001
+      - KXI_SM_SMPORT=10001
+      - KXI_SM_EOIPORT=10002
       - KXI_LOG_FORMAT=text
       - KXI_LOG_LEVELS=default:info      
     ports:
@@ -72,6 +75,7 @@ services:
 
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
+    restart: "always"
     environment:
       - KXI_NAME=dap
       - KXI_SC=dap
@@ -84,8 +88,6 @@ services:
       - KXI_DA_HDB_THREADS=8
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
-      - KX_TRACE_OBJSTR=1
-      - KX_KURL_DEBUG_LOG=1      
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
     ports:
@@ -110,6 +112,7 @@ services:
   #
   sgrc:
     image: ${KX_DOCKER_REG}/kxi-sg-rc:${SG_VERSION}
+    restart: "always"
     environment:
       - KXI_NAME=sg_rc
       - KXI_PORT=5060
@@ -133,6 +136,7 @@ services:
   #
   sgagg:
     image: ${KX_DOCKER_REG}/kxi-sg-agg:${SG_VERSION}
+    restart: "always"
     environment:
       - KXI_NAME=sg_agg
       - KXI_PORT=5050
@@ -160,6 +164,7 @@ services:
   #
   sggw:
     image: ${KX_DOCKER_REG}/kxi-sg-gw:${SG_VERSION}
+    restart: "always"
     environment:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - GATEWAY_QIPC_PORT=5040
@@ -196,8 +201,7 @@ services:
   #     - KXI_LOG_FORMAT=text # Optional
   #     - KXI_LOG_LEVELS=default:trace # Optional
   #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-  #     - KX_TRACE_OBJSTR=1
-  #     - KX_KURL_DEBUG_LOG=1    
+  #     - KX_TRACE_OBJSTR=1  
   #     # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q  
   #     - KXI_SG_RC_ADDR=sgrc:5060
   #   ports:
@@ -228,7 +232,6 @@ services:
   #     - KXI_LOG_LEVELS=default:trace # Optional
   #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
   #     - KX_TRACE_OBJSTR=1
-  #     - KX_KURL_DEBUG_LOG=1   
   #     # - KX_OBJSTR_INVENTORY_FILE=_inventory/all.json.gz
   #     # - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
   #     # - KX_S3_CACHE_SIZE=10000
@@ -252,7 +255,6 @@ services:
   # tp:
   #   image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
   #   environment:
-  #     - KX_KURL_DEBUG_LOG=1
   #     - KXI_LOG_FORMAT=text # Optional
   #     - KXI_LOG_LEVELS=default:debug # Optional
   #   ports:
@@ -273,7 +275,6 @@ services:
   #   depends_on:
   #     - tp    
   #   environment:
-  #     - KX_KURL_DEBUG_LOG=1
   #     - KXI_LOG_FORMAT=text # Optional
   #     - KXI_LOG_LEVELS=default:debug # Optional
   #   ports:
