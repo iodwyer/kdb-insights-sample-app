@@ -59,62 +59,62 @@ tables:
         description: bid price
         type: long                  
 
-  ohlcv:
-    description: ohlcv aggregation
-    type: partitioned
-    blockSize: 10000
-    prtnCol: time
-    sortColsOrd: sym
-    sortColsDisk: sym
-    columns:
-      - name: time
-        description: Time
-        type: timestamp   
-      - name: sym
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted 
-      - name: open
-        description: open price
-        type: float    
-      - name: high
-        description: high price
-        type: float   
-      - name: low
-        description: low price
-        type: float  
-      - name: close
-        description: close price
-        type: float  
-      - name: volume
-        description: volume
-        type: long   
+  # ohlcv:
+  #   description: ohlcv aggregation
+  #   type: partitioned
+  #   blockSize: 10000
+  #   prtnCol: time
+  #   sortColsOrd: sym
+  #   sortColsDisk: sym
+  #   columns:
+  #     - name: time
+  #       description: Time
+  #       type: timestamp   
+  #     - name: sym
+  #       description: Symbol name
+  #       type: symbol
+  #       attrMem: grouped
+  #       attrDisk: parted
+  #       attrOrd: parted 
+  #     - name: open
+  #       description: open price
+  #       type: float    
+  #     - name: high
+  #       description: high price
+  #       type: float   
+  #     - name: low
+  #       description: low price
+  #       type: float  
+  #     - name: close
+  #       description: close price
+  #       type: float  
+  #     - name: volume
+  #       description: volume
+  #       type: long   
 
-  vwap:
-    description: vwap aggregation
-    type: partitioned
-    blockSize: 10000
-    prtnCol: time
-    sortColsOrd: sym
-    sortColsDisk: sym
-    columns:
-      - name: time
-        description: Time
-        type: timestamp    
-      - name: sym
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted
-      - name: vwap
-        description: vwap
-        type: float    
-      - name: accVol
-        description: volume
-        type: long 
+  # vwap:
+  #   description: vwap aggregation
+  #   type: partitioned
+  #   blockSize: 10000
+  #   prtnCol: time
+  #   sortColsOrd: sym
+  #   sortColsDisk: sym
+  #   columns:
+  #     - name: time
+  #       description: Time
+  #       type: timestamp    
+  #     - name: sym
+  #       description: Symbol name
+  #       type: symbol
+  #       attrMem: grouped
+  #       attrDisk: parted
+  #       attrOrd: parted
+  #     - name: vwap
+  #       description: vwap
+  #       type: float    
+  #     - name: accVol
+  #       description: volume
+  #       type: long 
 
 bus:
   stream:

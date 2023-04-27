@@ -5,20 +5,26 @@ version: "3"
 services:
 
   sp_feed:
-    image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    # image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+    image: ${KX_DOCKER_REG}/kxi-sp-worker:${SP_PY_VERSION}
     depends_on:
       - tp    
     environment:
       - KX_KURL_DEBUG_LOG=1
+      - KX_KURL_LOG_LEVEL=INFO
       - KXI_LOG_FORMAT=text # Optional
       - KXI_LOG_LEVELS=default:debug # Optional
-      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      - KXI_SP_BETA_FEATURES=true
+      # - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      - KXI_SP_SPEC=/opt/kx/cfg/directLoad.q
+    command: -p 5000
     ports:
       - 127.0.0.1::5000
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./sp:/sp   
       - ./cfg:/opt/kx/cfg 
+      - ./data:/data
     env_file:
       - .env 
     stdin_open: true
@@ -55,6 +61,8 @@ services:
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      - KXI_SM_SMPORT=10001
+      - KXI_SM_EOIPORT=10002
       # - KXI_PORT=10001
       - KXI_LOG_FORMAT=text
       - KXI_LOG_LEVELS=default:info      
