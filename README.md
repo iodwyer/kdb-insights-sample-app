@@ -11,7 +11,7 @@
 
 ## Quick Links
 * [Microservices](https://code.kx.com/insights/microservices)
-* 
+
 ## Prerequisites
 * Valid kdb license including feature flags
 * Access to KX Docker repo ([nexus.dl.kx.com](https://nexus.dl.kx.com) / [registry.dl.kx.com](registry.dl.kx.com))
