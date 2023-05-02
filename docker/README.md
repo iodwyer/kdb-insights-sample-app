@@ -59,6 +59,8 @@ sql_query_params = {
     'query': b"SELECT * FROM trade WHERE (date between '2022.12.19' and '2022.12.20') and (sym = 'AAPL')" 
 }
 
+empty_dict = {'':''}
+
 tab = gw(kx.SymbolAtom('.kxi.sql'), sql_query_params, 'f', empty_dict)
 data = tab[1].pd()
 
@@ -66,8 +68,6 @@ data = tab[1].pd()
 ## getData
 START_TIME = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(minutes = 36000)   ## 15 Mins ago
 END_TIME = datetime.datetime.now(tz=pytz.utc)                                           ## Now
-
-empty_dict = {'':''}
 
 get_data_query_params = {
     'table': 'trade',
