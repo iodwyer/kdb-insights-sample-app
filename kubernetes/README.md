@@ -1,7 +1,7 @@
 # Kubernetes
 
 ## Pre-reqs
-* EKS Cluster with ~~AWS Load Balancer~~ , Rook Ceph, Autoscaler provisioned
+* EKS Cluster Rook Ceph, Autoscaler provisioned
 * `kubectl` CLI
 
 
@@ -48,22 +48,4 @@ $ kubectl apply -f microservices-assembly.yaml -n kdb
 $ kubectl delete -f microservices-assembly.yaml -n kdb
 ```
 ### ceph-toolbox
-```bash
-https://rook.github.io/docs/rook/v1.5/ceph-toolbox.html
-```
-
-
-## To do 
-* Add Service Discovery microservice (remove need for `sed` command)
-* Add RT microservice
-* Add historic data to s3 bucket + add s3 tier to SM
-* consider autoscaling DAP's + Agg procs based on CPU
-* consider autoscaling on number of queries in the queue (RC? or GW?)
-* authentication (add layer in front of GW? Link to SAML; Active Directory?)
-* provision different PVC's for SP/DAP etc
-* place load balancer in front of GW (not DAPs; do auth here?)
-* issue with load balancer ( `kubectl describe svc kxi-sg-gw -n kdb` )
-* mount path of rook ceph
-* sp checkpoint mount
-* add loadbalancer and DNS entry 
-* add dashboards + pgwire integration 
+* https://rook.github.io/docs/rook/v1.5/ceph-toolbox.html
