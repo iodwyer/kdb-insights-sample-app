@@ -34,8 +34,7 @@ services:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
     environment:
       - KX_KURL_DEBUG_LOG=1
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
+      # - KX_KURL_LOG_LEVEL=TRACE
     ports:
       - 127.0.0.1::5010
     command: tick.q sym /logs -p 5010
