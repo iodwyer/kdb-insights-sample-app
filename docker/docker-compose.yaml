@@ -4,15 +4,36 @@ version: "3"
 #
 services:
 
-  sp_feed:
+  sp_feed_q:
+    image: ${KX_DOCKER_REG}/kxi-sp-worker:${SP_PY_VERSION}
+    restart: "always"
+    depends_on:
+      - tp    
+    environment:
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_SP_SPEC=/opt/kx/cfg/kafka.q
+      # - KXI_SP_BETA_FEATURES=true
+    ports:
+      - 127.0.0.1::5000
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./sp:/sp   
+      - ./cfg:/opt/kx/cfg 
+    env_file:
+      - .env 
+    stdin_open: true
+    tty: true     
+  
+  sp_feed_python:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     restart: "always"
     depends_on:
       - tp    
     environment:
       - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
-      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_SP_SPEC=/opt/kx/cfg/kafka.py
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
