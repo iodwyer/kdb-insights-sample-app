@@ -46,6 +46,27 @@ services:
     stdin_open: true
     tty: true     
 
+  sp_feed_http:
+    image: ${KX_DOCKER_REG}/kxi-sp-worker:${SP_PY_VERSION}
+    restart: "always"
+    depends_on:
+      - tp    
+    environment:
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_SP_SPEC=/opt/kx/cfg/http.q
+      # - KXI_SP_BETA_FEATURES=true
+    ports:
+      - 127.0.0.1::5000
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./sp:/sp   
+      - ./cfg:/opt/kx/cfg 
+    env_file:
+      - .env 
+    stdin_open: true
+    tty: true  
+
   tp:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
     restart: "always"
