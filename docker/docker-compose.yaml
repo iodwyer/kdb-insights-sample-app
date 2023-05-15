@@ -4,106 +4,106 @@ version: "3"
 #
 services:
 
-  sp_feed:
-    image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
-    restart: "always"
-    depends_on:
-      - tp    
-    environment:
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
-      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
-      # - KXI_SP_BETA_FEATURES=true
-    ports:
-      - 127.0.0.1::5000
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic 
-      - ./sp:/sp   
-      - ./cfg:/opt/kx/cfg 
-    env_file:
-      - .env 
-    stdin_open: true
-    tty: true     
+  # sp_feed:
+  #   image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
+  #   restart: "always"
+  #   depends_on:
+  #     - tp    
+  #   environment:
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:debug # Optional
+  #     - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+  #     # - KXI_SP_BETA_FEATURES=true
+  #   ports:
+  #     - 127.0.0.1::5000
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic 
+  #     - ./sp:/sp   
+  #     - ./cfg:/opt/kx/cfg 
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true     
 
-  tp:
-    image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
-    restart: "always"
-    environment:
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:debug # Optional
-    ports:
-      - 127.0.0.1::5010
-    command: tick.q sym /logs -p 5010
-    working_dir: /opt/kx/tick
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./tplog:/logs
-      - ./kdb-tick:/opt/kx/tick
-    env_file:
-      - .env 
-    stdin_open: true
-    tty: true    
+  # tp:
+  #   image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+  #   restart: "always"
+  #   environment:
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:debug # Optional
+  #   ports:
+  #     - 127.0.0.1::5010
+  #   command: tick.q sym /logs -p 5010
+  #   working_dir: /opt/kx/tick
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./tplog:/logs
+  #     - ./kdb-tick:/opt/kx/tick
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true    
 
-  sm:
-  #
-  # Storage Manager
-  #  
-    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
-    restart: "always"
-    depends_on:
-      - tp
-    environment:
-      - KXI_NAME=sm
-      - KXI_SC=SM
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      - KXI_SM_SMPORT=10001
-      - KXI_SM_EOIPORT=10002
-      - KXI_LOG_FORMAT=text
-      - KXI_LOG_LEVELS=default:info      
-    ports:
-      - 127.0.0.1::10001
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
-      - ./tplog:/logs
-      - ./cfg:/opt/kx/cfg 
-    env_file:
-      - .env 
-    stdin_open: true
-    tty: true      
+  # sm:
+  # #
+  # # Storage Manager
+  # #  
+  #   image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+  #   restart: "always"
+  #   depends_on:
+  #     - tp
+  #   environment:
+  #     - KXI_NAME=sm
+  #     - KXI_SC=SM
+  #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+  #     - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+  #     - KXI_SM_SMPORT=10001
+  #     - KXI_SM_EOIPORT=10002
+  #     - KXI_LOG_FORMAT=text
+  #     - KXI_LOG_LEVELS=default:info      
+  #   ports:
+  #     - 127.0.0.1::10001
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./data:/data
+  #     - ./tplog:/logs
+  #     - ./cfg:/opt/kx/cfg 
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true      
 
-  da-single:
-    image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
-    restart: "always"
-    environment:
-      - KXI_NAME=dap
-      - KXI_SC=dap
-      - KXI_PORT=5080
-      - KXI_LOG_FORMAT=text # Optional
-      - KXI_LOG_LEVELS=default:info # Optional
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_DA_RDB_THREADS=0
-      - KXI_DA_IDB_THREADS=4
-      - KXI_DA_HDB_THREADS=8
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
-      - KXI_SG_RC_ADDR=sgrc:5060
-      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
-    ports:
-      - 127.0.0.1::5080
-    volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
-      - ./data:/data
-      - ./tplog:/logs
-      - ./cfg:/opt/kx/cfg     
-    deploy:
-      mode: replicated
-      replicas: 1
-    env_file:
-      - .env    
-    stdin_open: true
-    tty: true 
+  # da-single:
+  #   image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
+  #   restart: "always"
+  #   environment:
+  #     - KXI_NAME=dap
+  #     - KXI_SC=dap
+  #     - KXI_PORT=5080
+  #     - KXI_LOG_FORMAT=text # Optional
+  #     - KXI_LOG_LEVELS=default:info # Optional
+  #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+  #     - KXI_DA_RDB_THREADS=0
+  #     - KXI_DA_IDB_THREADS=4
+  #     - KXI_DA_HDB_THREADS=8
+  #     - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+  #     - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
+  #     - KXI_SG_RC_ADDR=sgrc:5060
+  #     - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+  #   ports:
+  #     - 127.0.0.1::5080
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./data:/data
+  #     - ./tplog:/logs
+  #     - ./cfg:/opt/kx/cfg     
+  #   deploy:
+  #     mode: replicated
+  #     replicas: 1
+  #   env_file:
+  #     - .env    
+  #   stdin_open: true
+  #   tty: true 
 
 
   
@@ -218,38 +218,39 @@ services:
   #   stdin_open: true
   #   tty: true    
 
-  # hdb:
-  # #
-  # # Historical Database
-  # #
-  #   image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
-  #   command: -s 8
-  #   environment:
-  #     - KXI_NAME=hdb
-  #     - KXI_SC=HDB
-  #     - KXI_PORT=5100      
-  #     - KXI_LOG_FORMAT=text # Optional
-  #     - KXI_LOG_LEVELS=default:trace # Optional
-  #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-  #     - KX_TRACE_OBJSTR=1
-  #     # - KX_OBJSTR_INVENTORY_FILE=_inventory/all.json.gz
-  #     # - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
-  #     # - KX_S3_CACHE_SIZE=10000
-  #     # - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q      
-  #   ports:
-  #     - 127.0.0.1::5100
-  #   volumes: 
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic 
-  #     - ./cfg:/opt/kx/cfg 
-  #     - ./data:/data
-  #     - ./cache:/opt/kx/cache        
-  #   deploy:
-  #     mode: replicated
-  #     replicas: 1
-  #   env_file:
-  #     - .env       
-  #   stdin_open: true
-  #   tty: true        
+  hdb:
+  #
+  # Historical Database
+  #
+    image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+    command: -s 8
+    environment:
+      - KXI_NAME=hdb
+      - KXI_SC=HDB
+      - KXI_PORT=5100      
+      - KXI_LOG_FORMAT=text # Optional
+      - KXI_LOG_LEVELS=default:trace # Optional
+      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      - KX_TRACE_OBJSTR=1
+      - KXI_SG_RC_ADDR=sgrc:5060   
+      # - KX_OBJSTR_INVENTORY_FILE=_inventory/all.json.gz
+      # - KX_OBJSTR_CACHE_PATH=/opt/kx/cache
+      # - KX_S3_CACHE_SIZE=10000
+      - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.q      
+    ports:
+      - 127.0.0.1::5100
+    volumes: 
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./cfg:/opt/kx/cfg 
+      - ./data:/data
+      # - ./cache:/opt/kx/cache        
+    deploy:
+      mode: replicated
+      replicas: 3
+    env_file:
+      - .env       
+    stdin_open: true
+    tty: true        
 
 
   # tp:

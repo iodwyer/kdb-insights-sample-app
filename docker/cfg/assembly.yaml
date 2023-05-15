@@ -29,104 +29,17 @@ tables:
         description: Size
         type: long      
 
-  quote:
-    description: Quote data
-    type: partitioned
-    blockSize: 10000
-    prtnCol: time
-    sortColsOrd: sym
-    sortColsDisk: sym
-    columns:
-      - name: time
-        description: Time
-        type: timestamp    
-      - name: sym
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted
-      - name: bid
-        description: bid price
-        type: float    
-      - name: ask
-        description: bid price
-        type: float   
-      - name: bsize
-        description: bid price
-        type: long  
-      - name: asize
-        description: bid price
-        type: long                  
-
-  ohlcv:
-    description: ohlcv aggregation
-    type: partitioned
-    blockSize: 10000
-    prtnCol: time
-    sortColsOrd: sym
-    sortColsDisk: sym
-    columns:
-      - name: time
-        description: Time
-        type: timestamp   
-      - name: sym
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted 
-      - name: open
-        description: open price
-        type: float    
-      - name: high
-        description: high price
-        type: float   
-      - name: low
-        description: low price
-        type: float  
-      - name: close
-        description: close price
-        type: float  
-      - name: volume
-        description: volume
-        type: long   
-
-  vwap:
-    description: vwap aggregation
-    type: partitioned
-    blockSize: 10000
-    prtnCol: time
-    sortColsOrd: sym
-    sortColsDisk: sym
-    columns:
-      - name: time
-        description: Time
-        type: timestamp    
-      - name: sym
-        description: Symbol name
-        type: symbol
-        attrMem: grouped
-        attrDisk: parted
-        attrOrd: parted
-      - name: vwap
-        description: vwap
-        type: float    
-      - name: accVol
-        description: volume
-        type: long 
-
-bus:
-  stream:
-    protocol: custom
-    nodes: tp:5010
-    topic: dataStream
+# bus:
+#   stream:
+#     protocol: custom
+#     nodes: tp:5010
+#     topic: dataStream
 
 mounts:
-  rdb:
-    type: stream
-    baseURI: file://stream
-    partition: none
+  # rdb:
+  #   type: stream
+  #   baseURI: file://stream
+  #   partition: none
   idb:
     type: local
     baseURI: file:///data/idb
@@ -138,19 +51,22 @@ mounts:
 
 elements:
   dap:
-    # gwAssembly: sgrc:5060 
-    # gwEndpoints: sgrc:5060    
-    smEndpoints: sm:10001
+    gwEndpoints: sgrc:5060    
     instances:
-      dap:
-        mountList: [rdb, idb, hdb]
+      HDB:
+        mountName: hdb
+
+  rc:
+    host: sgrc 
+    port: 5060
+    timeout: 30000
 
   sm:
     description: Storage manager
-    source: stream
+    # source: stream
     tiers:
-      - name: stream
-        mount: rdb
+  #     - name: stream
+  #       mount: rdb
       - name: idb
         mount: idb
         schedule:
