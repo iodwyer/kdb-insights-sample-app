@@ -29,21 +29,7 @@ tables:
         description: Size
         type: long      
 
-# bus:
-#   stream:
-#     protocol: custom
-#     nodes: tp:5010
-#     topic: dataStream
-
 mounts:
-  # rdb:
-  #   type: stream
-  #   baseURI: file://stream
-  #   partition: none
-  idb:
-    type: local
-    baseURI: file:///data/idb
-    partition: ordinal
   hdb:
     type: local
     baseURI: file:///data/hdb
@@ -60,20 +46,3 @@ elements:
     host: sgrc 
     port: 5060
     timeout: 30000
-
-  sm:
-    description: Storage manager
-    # source: stream
-    tiers:
-  #     - name: stream
-  #       mount: rdb
-      - name: idb
-        mount: idb
-        schedule:
-          freq: 0D00:10:00      # every 10 minutes
-          snap: 0D00:00:00
-      - name: hdb
-        mount: hdb
-        retain: 
-          time: 30 days
-    disableDiscovery: true  # Disables registering with discovery
