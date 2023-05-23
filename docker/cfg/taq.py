@@ -100,8 +100,8 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
 
-sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
-
+# sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
+sp.run(trade_pipeline)
 
 #### WIP #####
 
