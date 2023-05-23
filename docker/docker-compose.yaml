@@ -60,7 +60,8 @@ services:
       - KXI_SM_SMPORT=10001
       - KXI_SM_EOIPORT=10002
       - KXI_LOG_FORMAT=text
-      - KXI_LOG_LEVELS=default:info      
+      - KXI_LOG_LEVELS=default:info  
+      # - KXI_LATE_DATA=true    
     ports:
       - 127.0.0.1::10001
     volumes:

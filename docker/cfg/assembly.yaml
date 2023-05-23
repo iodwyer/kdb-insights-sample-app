@@ -139,7 +139,8 @@ mounts:
 elements:
   dap:
     # gwAssembly: sgrc:5060 
-    # gwEndpoints: sgrc:5060    
+    # gwEndpoints: sgrc:5060  
+    # lateData: true  
     smEndpoints: sm:10001
     instances:
       dap:
