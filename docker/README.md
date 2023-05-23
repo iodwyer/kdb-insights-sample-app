@@ -29,14 +29,14 @@ $ docker compose logs -f
 ```q
 // getData API
 q)gw:hopen "J"$last ":" vs first system"docker port docker-sggw-1"
-q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`f;(0#`)!())
-q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`f;(0#`)!())
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!())
+q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`;(0#`)!())
 
 // Custom API
-q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`trade;"p"$.z.d-1;"p"$.z.d+1;`size);`f;(0#`)!())
+q)gw(`.custom.countBy;(`table`startTS`endTS`byCols)!(`trade;"p"$.z.d-1;"p"$.z.d+1;`size);`;(0#`)!())
 
 // SQL API
-q)gw(`.kxi.sql;enlist[`query]!enlist"SELECT * FROM trade WHERE (date between '2022.12.19' and '2022.12.20') and (sym = 'AAPL')";`f;(0#`)!())
+q)gw(`.kxi.sql;enlist[`query]!enlist"SELECT * FROM trade WHERE (date between '2022.12.19' and '2022.12.20') and (sym = 'AAPL')";`;(0#`)!())
   
 // getMeta API
 q)args:`region`startTS`endTS!(`nyc;-0Wp;0Wp)
@@ -61,7 +61,7 @@ sql_query_params = {
 
 empty_dict = {'':''}
 
-tab = gw(kx.SymbolAtom('.kxi.sql'), sql_query_params, 'f', empty_dict)
+tab = gw(kx.SymbolAtom('.kxi.sql'), sql_query_params, '', empty_dict)
 data = tab[1].pd()
 
 
@@ -75,7 +75,7 @@ get_data_query_params = {
     'endTS': END_TIME
 }
 
-tab = gw(kx.SymbolAtom('.kxi.getData'), get_data_query_params, 'f', empty_dict)
+tab = gw(kx.SymbolAtom('.kxi.getData'), get_data_query_params, '', empty_dict)
 data = tab[1].pd()
 
 print(data)
