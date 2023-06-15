@@ -145,6 +145,13 @@ elements:
     instances:
       dap:
         mountList: [rdb, idb, hdb]
+      RDB:
+        mountName: rdb
+      IDB:
+        mountName: idb
+      HDB:
+        mountName: hdb
+
 
   sm:
     description: Storage manager
