@@ -75,6 +75,8 @@ services:
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
     restart: "always"
+    depends_on:
+      - tp
     environment:
       - KXI_NAME=dap
       - KXI_SC=dap
@@ -191,7 +193,7 @@ services:
   #     - KXI_NAME=rdb
   #     - KXI_SC=RDB
   #     - KXI_PORT=5090
-  #     - KXI_LOG_LEVELS=default:trace # Override
+  #     # - KXI_LOG_LEVELS=default:trace # Override
   #     - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
   #     - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q  
   #     - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
@@ -201,7 +203,8 @@ services:
   #   volumes:
   #     - ${HOME}/.qp.licenses:/opt/kx/lic    
   #     - ./data:/data
-  #     - ./cfg:/opt/kx/cfg       
+  #     - ./cfg:/opt/kx/cfg   
+  #     - ./tplog:/logs    
   #   deploy:
   #     mode: replicated
   #     replicas: 1
