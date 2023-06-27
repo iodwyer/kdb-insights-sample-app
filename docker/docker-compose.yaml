@@ -167,6 +167,10 @@ services:
       - KXI_AUTH_DISABLED=1
       - KXI_LOG_LEVELS=default:trace # Override  
       - KXI_SG_RC_ADDR=sgrc:5060   
+      - KXI_SG_AUTH_IPC_HOST="auth"
+      - KXI_SG_AUTH_IPC_PORT="5555"
+      - KXI_SG_AUTH_IPC_USE_TLS="false"
+      - KXI_SG_AUTH_IPC_AUTH_API="authorize"
     ports:
       - 5040:5040
       - 8080:8080
@@ -182,6 +186,19 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg         
 
+  auth:
+    image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+    restart: "always"
+    command: /opt/kx/cfg/auth.q -p 5555
+    ports:
+      - 5555:5555
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./cfg:/opt/kx/cfg    
+    env_file:
+      - .env 
+    stdin_open: true
+    tty: true  
 
   # rdb:
   # #
