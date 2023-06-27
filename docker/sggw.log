@@ -1,0 +1,238 @@
+18:04:18.500 [main] INFO com.kx.sg.MainLoader - Starting with min heap = 498597888 (bytes), and max heap = 7378305024 (bytes). Set JAVA_OPTS to edit heap sizes. Example: JAVA_OPTS="-Xms512m -Xmx2g" for 512Mb to 2Gb range
+18:04:18.615 [main] INFO ConfigurationEntity - Log level has been set to TRACE
+18:04:18.615 [main] INFO com.kx.sg.MainLoader - Configuring Service Gateway
+18:04:18.680 [main] DEBUG io.netty.util.internal.logging.InternalLoggerFactory - Using SLF4J as the default logging framework
+18:04:18.686 [main] DEBUG io.netty.util.internal.PlatformDependent0 - -Dio.netty.noUnsafe: false
+18:04:18.686 [main] DEBUG io.netty.util.internal.PlatformDependent0 - Java version: 8
+18:04:18.688 [main] DEBUG io.netty.util.internal.PlatformDependent0 - sun.misc.Unsafe.theUnsafe: available
+18:04:18.689 [main] DEBUG io.netty.util.internal.PlatformDependent0 - sun.misc.Unsafe.copyMemory: available
+18:04:18.689 [main] DEBUG io.netty.util.internal.PlatformDependent0 - sun.misc.Unsafe.storeFence: available
+18:04:18.690 [main] DEBUG io.netty.util.internal.PlatformDependent0 - java.nio.Buffer.address: available
+18:04:18.691 [main] DEBUG io.netty.util.internal.PlatformDependent0 - direct buffer constructor: available
+18:04:18.692 [main] DEBUG io.netty.util.internal.PlatformDependent0 - java.nio.Bits.unaligned: available, true
+18:04:18.692 [main] DEBUG io.netty.util.internal.PlatformDependent0 - jdk.internal.misc.Unsafe.allocateUninitializedArray(int): unavailable prior to Java9
+18:04:18.692 [main] DEBUG io.netty.util.internal.PlatformDependent0 - java.nio.DirectByteBuffer.<init>(long, int): available
+18:04:18.692 [main] DEBUG io.netty.util.internal.PlatformDependent - sun.misc.Unsafe: available
+18:04:18.693 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.tmpdir: /tmp (java.io.tmpdir)
+18:04:18.693 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.bitMode: 64 (sun.arch.data.model)
+18:04:18.699 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.maxDirectMemory: 7378305024 bytes
+18:04:18.699 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.uninitializedArrayAllocationThreshold: -1
+18:04:18.700 [main] DEBUG io.netty.util.internal.CleanerJava6 - java.nio.ByteBuffer.cleaner(): available
+18:04:18.700 [main] DEBUG io.netty.util.internal.PlatformDependent - -Dio.netty.noPreferDirect: false
+18:04:18.723 [main] DEBUG com.kx.sg.MainLoader - Authorization is configured to use Custom IPC
+18:04:18.729 [main] INFO com.kx.sg.kxi.CustomIPCAuthorizer - Custom authorization is configured to use auth:5555 with tls=false and call out to a function named 'authorize'
+18:04:18.899 [main] WARN com.kx.sg.kxi.IPCService - GATEWAY_POOL_MIN is undefined, defaulted to 16 idle threads
+18:04:18.916 [main] INFO com.kx.sg.kxi.IPCService - Bound to port: 5040
+18:04:18.921 [main] INFO com.kx.sg.kxi.IPCService - Set minimum idle thread count of: 16
+18:04:18.922 [main] INFO com.kx.sg.kxi.IPCService - Default timeout is configured as 60000 milliseconds
+18:04:18.925 [main] INFO com.kx.sg.kxi.IPCService - Initializing response capacity per connected aggregator/coordinator to 5000000 bytes. Set KXI_SG_BUFFER_INITIAL to override
+18:04:18.925 [main] INFO com.kx.sg.kxi.IPCService - Streaming messages will be sent in chunks of up to 5000000 bytes. Set KXI_SG_BUFFER_INITIAL to override. Aggregators will stream responses if their KXI_SG_STREAM_THRESHOLD is met.
+18:04:18.925 [main] INFO com.kx.sg.kxi.IPCService - Non-streaming messages will retain up to 5000000 bytes for re-use. Set KXI_SG_BUFFER_RETAIN to override. Max message size is 2Gb for non-streaming responses
+18:04:18.925 [main] INFO com.kx.sg.kxi.IPCService - Delay to wait before retrying RC connections set to 5 seconds. Set KXI_SG_RC_RETRY_DELAY to override
+18:04:18.925 [main] INFO com.kx.sg.kxi.IPCService - Our service handle is: :172.29.0.3:5040
+18:04:18.926 [main] INFO com.kx.sg.kxi.IPCService - Connecting to resource coordinator KXI_SG_RC_ADDR=sgrc:5060
+18:04:18.926 [main] INFO com.kx.sg.kxi.IPCService - Connecting to coordinator sgrc:5060
+18:04:18.940 [main] WARN com.kx.sg.kxi.IPCService - Coordinator connection establish error: java.net.ConnectException: Connection refused (Connection refused). Will try again in 5 seconds...
+18:04:23.941 [main] INFO com.kx.sg.kxi.IPCService - Connected to coordinator sgrc:5060
+18:04:23.946 [pool-2-thread-1] DEBUG com.kx.sg.tasks.CoordinatorTask - Checking if coordinator=sgrc:5060 is ready for service
+18:04:23.949 [pool-2-thread-1] DEBUG com.kx.sg.tasks.CoordinatorTask - Coordinator sgrc:5060 is ready for service
+18:04:23.963 [HTTP thread] INFO com.kx.sg.HTTPService - Starting HTTP Service on port GATEWAY_HTTP_PORT=8080 with KXI_SG_HTTP_THREADS=8 worker threads...
+18:04:23.985 [HTTP thread] DEBUG io.netty.channel.MultithreadEventLoopGroup - -Dio.netty.eventLoopThreads: 16
+18:04:24.018 [HTTP thread] DEBUG io.netty.util.internal.InternalThreadLocalMap - -Dio.netty.threadLocalMap.stringBuilder.initialSize: 1024
+18:04:24.019 [HTTP thread] DEBUG io.netty.util.internal.InternalThreadLocalMap - -Dio.netty.threadLocalMap.stringBuilder.maxSize: 4096
+18:04:24.031 [HTTP thread] DEBUG io.netty.channel.nio.NioEventLoop - -Dio.netty.noKeySetOptimization: false
+18:04:24.031 [HTTP thread] DEBUG io.netty.channel.nio.NioEventLoop - -Dio.netty.selectorAutoRebuildThreshold: 512
+18:04:24.051 [HTTP thread] DEBUG io.netty.util.internal.PlatformDependent - org.jctools-core.MpscChunkedArrayQueue: available
+18:04:24.057 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@1cede987
+18:04:24.060 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@7d55fc76
+18:04:24.061 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@66f417a8
+18:04:24.061 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@5ef2f0ee
+18:04:24.062 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@2dd550b6
+18:04:24.062 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@7fb1bf36
+18:04:24.063 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@393eae3f
+18:04:24.063 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@70824c76
+18:04:24.063 [HTTP thread] TRACE io.netty.channel.nio.NioEventLoop - instrumented a special java.util.Set into: sun.nio.ch.EPollSelectorImpl@77d5f230
+18:04:24.159 [HTTP thread] DEBUG io.netty.channel.DefaultChannelId - -Dio.netty.processId: 1 (auto-detected)
+18:04:24.164 [HTTP thread] DEBUG io.netty.util.NetUtil - -Djava.net.preferIPv4Stack: false
+18:04:24.164 [HTTP thread] DEBUG io.netty.util.NetUtil - -Djava.net.preferIPv6Addresses: false
+18:04:24.167 [HTTP thread] DEBUG io.netty.util.NetUtilInitializations - Loopback interface: lo (lo, 127.0.0.1)
+18:04:24.169 [HTTP thread] DEBUG io.netty.util.NetUtil - /proc/sys/net/core/somaxconn: 128
+18:04:24.171 [HTTP thread] DEBUG io.netty.channel.DefaultChannelId - -Dio.netty.machineId: 02:42:ac:ff:fe:1d:00:03 (auto-detected)
+18:04:24.207 [HTTP thread] DEBUG io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.level: simple
+18:04:24.207 [HTTP thread] DEBUG io.netty.util.ResourceLeakDetector - -Dio.netty.leakDetection.targetRecords: 4
+18:04:24.262 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numHeapArenas: 16
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.numDirectArenas: 16
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.pageSize: 8192
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxOrder: 9
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.chunkSize: 4194304
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.smallCacheSize: 256
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.normalCacheSize: 64
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedBufferCapacity: 32768
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimInterval: 8192
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.cacheTrimIntervalMillis: 0
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.useCacheForAllThreads: false
+18:04:24.263 [HTTP thread] DEBUG io.netty.buffer.PooledByteBufAllocator - -Dio.netty.allocator.maxCachedByteBuffersPerChunk: 1023
+18:04:24.279 [HTTP thread] DEBUG io.netty.buffer.ByteBufUtil - -Dio.netty.allocator.type: pooled
+18:04:24.279 [HTTP thread] DEBUG io.netty.buffer.ByteBufUtil - -Dio.netty.threadLocalDirectBufferSize: 0
+18:04:24.279 [HTTP thread] DEBUG io.netty.buffer.ByteBufUtil - -Dio.netty.maxThreadLocalCharBufferSize: 16384
+18:04:24.330 [nioEventLoopGroup-2-1] TRACE io.netty.handler.logging.LoggingHandler - [id: 0x30af0e55] REGISTERED
+18:04:24.333 [nioEventLoopGroup-2-1] TRACE io.netty.handler.logging.LoggingHandler - [id: 0x30af0e55] BIND: 0.0.0.0/0.0.0.0:8080
+18:04:24.342 [nioEventLoopGroup-2-1] TRACE io.netty.handler.logging.LoggingHandler - [id: 0x30af0e55, L:/0.0.0.0:8080] ACTIVE
+18:04:51.730 [IPC thread] TRACE com.kx.sg.kxi.IPCService - Accepted new connection 172.29.0.1 (5040=>42412)
+18:04:51.733 [IPC thread] TRACE com.kx.sg.kxi.IPCService - New connection handshake to negotiate IPC capability 172.29.0.1 (5040=>42412)
+18:04:51.734 [IPC thread] TRACE com.kx.sg.kxi.IPCService - Connection established with 6.0 capability 172.29.0.1 (5040=>42412)
+18:05:00.901 [IPC thread] TRACE com.kx.sg.kxi.IPCService - Connection is a client 172.29.0.1 (5040=>42412)
+18:05:00.911 [pool-2-thread-2] DEBUG com.kx.sg.tasks.RCRequestBuilder - Requesting .kxi.getData, request=62022301-45ed-4a7a-be00-bb1e6f609ef5
+18:05:01.364 [IPC thread] TRACE com.kx.sg.kxi.IPCService - Accepted new connection 172.29.0.5 (5040=>48814)
+18:05:01.364 [IPC thread] TRACE com.kx.sg.kxi.IPCService - New connection handshake to negotiate IPC capability 172.29.0.5 (5040=>48814)
+18:05:01.365 [IPC thread] TRACE com.kx.sg.kxi.IPCService - Connection established with 6.0 capability 172.29.0.5 (5040=>48814)
+18:05:01.507 [IPC thread] TRACE com.kx.sg.kxi.IPCService - Connection is an aggregator 172.29.0.5 (5040=>48814)
+18:05:01.535 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Response for request=62022301-45ed-4a7a-be00-bb1e6f609ef5 will be streamed
+18:05:01.536 [pool-2-thread-3] DEBUG com.kx.sg.tasks.IPCMessageStreamer - Streaming response for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, total size=10757637
+18:05:01.536 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 247608 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=10510029
+18:05:01.546 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Starting qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, initial data size=247608 of 10757637
+18:05:01.552 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 63712 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=10446317
+18:05:01.554 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=63712 of 10757637
+18:05:01.554 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 521280 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=9925037
+18:05:01.557 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=521280 of 10757637
+18:05:01.557 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 231680 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=9693357
+18:05:01.560 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=231680 of 10757637
+18:05:01.563 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 922376 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=8770981
+18:05:01.572 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=922376 of 10757637
+18:05:01.573 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 260640 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=8510341
+18:05:01.575 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=260640 of 10757637
+18:05:01.577 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 456120 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=8054221
+18:05:01.577 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=456120 of 10757637
+18:05:01.578 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 241816 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7812405
+18:05:01.583 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=241816 of 10757637
+18:05:01.584 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 83984 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7728421
+18:05:01.587 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=83984 of 10757637
+18:05:01.587 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 111496 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7616925
+18:05:01.590 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=111496 of 10757637
+18:05:01.592 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 83984 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7532941
+18:05:01.595 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=83984 of 10757637
+18:05:01.599 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 112944 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7419997
+18:05:01.602 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=112944 of 10757637
+18:05:01.605 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 131768 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7288229
+18:05:01.605 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=131768 of 10757637
+18:05:01.610 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 81088 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7207141
+18:05:01.611 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=81088 of 10757637
+18:05:01.611 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 115840 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=7091301
+18:05:01.611 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=115840 of 10757637
+18:05:01.611 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 131768 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6959533
+18:05:01.612 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=131768 of 10757637
+18:05:01.612 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 117288 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6842245
+18:05:01.613 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=117288 of 10757637
+18:05:01.614 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 91224 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6751021
+18:05:01.614 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=91224 of 10757637
+18:05:01.615 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 118736 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6632285
+18:05:01.616 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=118736 of 10757637
+18:05:01.616 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 120184 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6512101
+18:05:01.617 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=120184 of 10757637
+18:05:01.617 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 86880 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6425221
+18:05:01.618 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=86880 of 10757637
+18:05:01.618 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 121632 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6303589
+18:05:01.620 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=121632 of 10757637
+18:05:01.620 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 121632 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6181957
+18:05:01.621 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=121632 of 10757637
+18:05:01.621 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 82536 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=6099421
+18:05:01.622 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=82536 of 10757637
+18:05:01.622 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 123080 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5976341
+18:05:01.622 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=123080 of 10757637
+18:05:01.623 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 124528 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5851813
+18:05:01.623 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=124528 of 10757637
+18:05:01.623 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 124528 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5727285
+18:05:01.624 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=124528 of 10757637
+18:05:01.626 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 125976 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5601309
+18:05:01.626 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=125976 of 10757637
+18:05:01.626 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 88328 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5512981
+18:05:01.627 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=88328 of 10757637
+18:05:01.627 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 127424 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5385557
+18:05:01.627 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=127424 of 10757637
+18:05:01.627 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 127424 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5258133
+18:05:01.627 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=127424 of 10757637
+18:05:01.627 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 128872 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5129261
+18:05:01.628 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=128872 of 10757637
+18:05:01.628 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 128872 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=5000389
+18:05:01.628 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=128872 of 10757637
+18:05:01.628 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4870069
+18:05:01.629 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.629 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4739749
+18:05:01.630 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.630 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 131768 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4607981
+18:05:01.630 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=131768 of 10757637
+18:05:01.633 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 131768 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4476213
+18:05:01.634 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=131768 of 10757637
+18:05:01.634 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 133216 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4342997
+18:05:01.635 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=133216 of 10757637
+18:05:01.635 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 133216 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4209781
+18:05:01.635 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=133216 of 10757637
+18:05:01.636 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=4079461
+18:05:01.636 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.636 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3949141
+18:05:01.636 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.637 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3818821
+18:05:01.638 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.639 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3688501
+18:05:01.639 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.639 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3558181
+18:05:01.640 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.641 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3427861
+18:05:01.641 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.641 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3297541
+18:05:01.641 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.641 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3167221
+18:05:01.642 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.643 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=3036901
+18:05:01.645 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.645 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2906581
+18:05:01.645 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.646 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2776261
+18:05:01.648 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.648 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2645941
+18:05:01.650 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.652 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2515621
+18:05:01.653 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.653 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2385301
+18:05:01.654 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.657 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2254981
+18:05:01.658 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.658 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=2124661
+18:05:01.658 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.658 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1994341
+18:05:01.659 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.659 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1864021
+18:05:01.659 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.659 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1733701
+18:05:01.660 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.660 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1603381
+18:05:01.661 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.661 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1473061
+18:05:01.662 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.664 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1342741
+18:05:01.664 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.664 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1212421
+18:05:01.669 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.670 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=1082101
+18:05:01.674 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.675 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=951781
+18:05:01.676 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.677 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=821461
+18:05:01.677 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.677 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=691141
+18:05:01.678 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.678 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=560821
+18:05:01.678 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.679 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=430501
+18:05:01.679 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.679 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=300181
+18:05:01.679 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.679 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=169861
+18:05:01.680 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.680 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 130320 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=39541
+18:05:01.680 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Progressing qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, data size=130320 of 10757637
+18:05:01.680 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Feeding 39541 bytes of 10757637 total for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, remaining=0
+18:05:01.681 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Ending qipc response stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5, last data size=39541 of 10757637
+18:05:01.681 [pool-2-thread-3] DEBUG com.kx.sg.tasks.IPCMessageStreamer - Responded to request=62022301-45ed-4a7a-be00-bb1e6f609ef5
+18:05:01.681 [pool-2-thread-3] TRACE com.kx.sg.tasks.IPCMessageStreamer - Stream for request=62022301-45ed-4a7a-be00-bb1e6f609ef5 is finished
+18:05:03.815 [pool-2-thread-4] DEBUG com.kx.sg.tasks.ClientTask - Client has closed connection
