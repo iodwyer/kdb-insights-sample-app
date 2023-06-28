@@ -96,7 +96,7 @@ print('HELLO')
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     # | sp.map(transform_trade))
-    | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
+    | sp.map('{[data] show "parsing data";(enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
 
 print('HELLO 2')
 

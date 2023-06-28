@@ -1,27 +1,14 @@
 version: "3"
 
 # Volumes required by the three rt nodes, publisher and susbcriber
-volumes:
-  rt-data-0:        # persistent volume for rt-data-0
-  rt-data-session:  # shared volume across all three rt containers, used to orchestrate hard reset
-  subscriber-1:     # persistent volume for simple subscriber
-  publisher-1:      # persistent volume for python publisher
-  sm-logs:
-  da-logs:
-  data:
-
-# Intra-RT ports, used for comms within the rt cluster:
-#      - 127.0.0.1:4000:4000/tcp
-#      - 127.0.0.1:5009:5009/tcp
-#      - 127.0.0.1:7000:7000/udp
-#      - 127.0.0.1:7100:7100/tcp
-#      - 127.0.0.1:8000:8000/udp
-#      - 127.0.0.1:9000:9000/udp
-# Internal ports, used for comms between the internal publishers/subscribers and the rt cluster:
-#      - 127.0.0.1:5001:5001/tcp
-#      - 127.0.0.1:5002:5002/tcp
-# External ports, used for comms between the external publishers and the rt cluster:
-#      - 127.0.0.1:5000:5000/tcp
+# volumes:
+  # rt-data-0:        # persistent volume for rt-data-0
+  # rt-data-session:  # shared volume across all three rt containers, used to orchestrate hard reset
+  # subscriber-1:     # persistent volume for simple subscriber
+  # publisher-1:      # persistent volume for python publisher
+  # sm-logs:
+  # da-logs:
+  # data:
 
 # Environment variables common to all RT sequencers
 x-rt-env:
@@ -62,10 +49,6 @@ x-rt-command:
       ]
 
 
-
-
-
-
 #
 # Services.
 #
@@ -75,12 +58,15 @@ services:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     command: -p 5000
     restart: "always"
-    container_name: rt-sp-feed
-    # depends_on:
-    #   - tp    
+    container_name: rt-sp-feed 
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
       - KXI_SP_SPEC=/opt/kx/cfg/taq_rt.py
+      - RT_TOPIC_PREFIX
+      - RT_LOG_PATH
+      - RT_STREAM
+      - RT_REPLICAS
+      - KXI_SP_CHECKPOINT_DIR=${RT_LOG_PATH}
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
@@ -139,9 +125,7 @@ services:
   #  
     image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
     restart: "always"
-    # depends_on:
-    #   - tp
-    # user: root
+    user: root
     container_name: sm-single
     environment:
       - KXI_NAME=sm
@@ -153,6 +137,9 @@ services:
       - KXI_LOG_LEVELS=default:info  
       # - KXI_LATE_DATA=true    
       - RT_LOG_PATH
+      - RT_STREAM
+      - RT_REPLICAS
+      - RT_TOPIC_PREFIX
     ports:
       - 127.0.0.1::10001
     volumes:
@@ -171,15 +158,13 @@ services:
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
     restart: "always"
-    # depends_on:
-    #   - tp
-    # user: root
+    user: root
     container_name: da-single
     environment:
       - KXI_NAME=dap
       - KXI_SC=dap
       - KXI_PORT=5080
-      - KXI_LOG_LEVELS=default:info # Override
+      - KXI_LOG_LEVELS=default:trace # Override
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_DA_RDB_THREADS=0
       - KXI_DA_IDB_THREADS=4
@@ -189,14 +174,18 @@ services:
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
       - RT_LOG_PATH
+      - RT_STREAM
+      - RT_REPLICAS
+      - RT_TOPIC_PREFIX
     ports:
       - 127.0.0.1::5080
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
       # - ./data:/data
       - ./data:/data
-      # - ./tplog:/logs
+      - ./tplog:/logs
       - ./da-logs:/logs/rdb
+      # - ./da-logs:/logs
       - ./cfg:/opt/kx/cfg     
       - ./subscriber-1:/s
     deploy:
