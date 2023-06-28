@@ -18,13 +18,13 @@ quote_schema_types = {
 
 def transform_quote(data):
     dict = data.pd()
-    dict['sym'] = dict['sym'].decode()
-    dict['time'] = dict.pop('timestamp')
+    dict['sym'] = dict['sym'].decode()     ## convert to object - > symbol type
+    dict['time'] = dict.pop('timestamp')   ## rename timestamp column
     return dict
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
-    | sp.transform.schema(table = quote_schema_types, parse = 'auto', input_type = 'table')
+    | sp.transform.schema(table = quote_schema_types)
     | sp.map(transform_quote)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
