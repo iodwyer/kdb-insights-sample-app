@@ -1,5 +1,6 @@
 
 docker compose -f docker-compose-rt.yaml down --remove-orphans
+docker compose down --remove-orphans
 
 FOLDERS="rt-log sp-log sm-logs da-logs data rt-session sp"
 
@@ -12,4 +13,4 @@ ls -larth
 
 chmod -R 777 $FOLDERS
 
-docker compose -f docker-compose-rt.yaml up -d 
+docker compose up -d 

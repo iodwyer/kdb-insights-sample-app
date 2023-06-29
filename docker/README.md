@@ -5,8 +5,9 @@
 * [Run docker commands without `sudo`](https://docs.docker.com/engine/install/linux-postinstall/)
 ## Create data folders 
 ```bash
-$ mkdir -p data tplog sp/checkpoints
-$ sudo chmod 777 -R data tplog sp
+$ FOLDERS="rt-log sp-log sm-logs da-logs data rt-session sp"
+$ mkdir $FOLDERS
+$ sudo chmod 777 -R $FOLDERS
 ```
 
 ## KX License
@@ -21,6 +22,11 @@ $ cp k[4,c,x].lic $HOME/.qp.licenses
 $ docker login registry.dl.kx.com          ## enter obtained credentials
 $ docker compose up -d
 $ docker compose logs -f 
+```
+
+## Docker stop
+```bash
+$ docker compose down --remove-orphans
 ```
 
 
