@@ -5,7 +5,7 @@
 * [Run docker commands without `sudo`](https://docs.docker.com/engine/install/linux-postinstall/)
 ## Create data folders 
 ```bash
-$ FOLDERS="rt-log sp-log sm-logs da-logs data rt-session sp"
+$ FOLDERS="rt-log sm-logs da-logs data rt-session sp"
 $ mkdir $FOLDERS
 $ sudo chmod 777 -R $FOLDERS
 ```

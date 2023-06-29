@@ -20,7 +20,7 @@ services:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     command: -p 5000
     restart: "always"
-    container_name: rt-sp-feed 
+    # container_name: rt-sp-feed 
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
       - KXI_SP_SPEC=/opt/kx/cfg/taq_rt.py
@@ -30,9 +30,8 @@ services:
       - 127.0.0.1::5000
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
-      - ./sp:/sp   
+      - ./sp:/sp      ## RT log dir under sp
       - ./cfg:/opt/kx/cfg 
-      - ./sp-log:/s
     env_file:
       - .env 
     stdin_open: true
@@ -95,7 +94,7 @@ services:
   #  
     image: ${KX_DOCKER_REG}/kxi-sm-single:${SM_VERSION}
     restart: "always"
-    container_name: sm-single
+    # container_name: sm-single
     environment:
       - KXI_NAME=sm
       - KXI_SC=SM
@@ -120,7 +119,7 @@ services:
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
     restart: "always"
-    container_name: da-single
+    # container_name: da-single
     environment:
       - KXI_NAME=dap
       - KXI_SC=dap
