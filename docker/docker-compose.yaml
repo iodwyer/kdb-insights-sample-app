@@ -12,7 +12,7 @@ services:
       - tp    
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
-      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      - KXI_SP_SPEC=/opt/kx/cfg/state.py
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
@@ -24,6 +24,27 @@ services:
       - .env 
     stdin_open: true
     tty: true     
+
+  # sp_feed:
+  #   image: ${KX_DOCKER_REG}/kxi-sp-worker:${SP_PY_VERSION}
+  #   command: -p 5000
+  #   restart: "always"
+  #   depends_on:
+  #     - tp    
+  #   environment:
+  #     - KXI_LOG_LEVELS=default:debug # Override
+  #     - KXI_SP_SPEC=/opt/kx/cfg/state.q
+  #     # - KXI_SP_BETA_FEATURES=true
+  #   ports:
+  #     - 127.0.0.1::5000
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic 
+  #     - ./sp:/sp   
+  #     - ./cfg:/opt/kx/cfg 
+  #   env_file:
+  #     - .env 
+  #   stdin_open: true
+  #   tty: true     
 
   tp:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
