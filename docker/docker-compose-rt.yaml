@@ -158,7 +158,7 @@ services:
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
     restart: "always"
-    user: root
+    # user: root
     container_name: da-single
     environment:
       - KXI_NAME=dap
@@ -169,7 +169,7 @@ services:
       - KXI_DA_RDB_THREADS=0
       - KXI_DA_IDB_THREADS=4
       - KXI_DA_HDB_THREADS=8
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
@@ -183,7 +183,7 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic    
       # - ./data:/data
       - ./data:/data
-      - ./tplog:/logs
+      # - ./tplog:/logs
       - ./da-logs:/logs/rdb
       # - ./da-logs:/logs
       - ./cfg:/opt/kx/cfg     

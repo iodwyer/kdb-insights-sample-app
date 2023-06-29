@@ -96,12 +96,13 @@ print('HELLO')
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     # | sp.map(transform_trade))
-    | sp.map('{[data] show "parsing data";(enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
+    | sp.map('{[data](enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
 
 print('HELLO 2')
 
 trade_pipeline = (trade_source
     # | sp.map(lambda x: ('trade', x))
+    # | sp.map('{[x] show "parsing trade";show x;x}')
     # | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
     | sp.write.to_stream(table='trade', stream="data", prefix="rt-"))
 
@@ -122,6 +123,7 @@ print('HELLO 3')
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map(transform_quote)
+    | sp.map('{[x] enlist x}')
     # | sp.map(lambda x: ('quote', x))
     # | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
     | sp.write.to_stream(table='quote', stream="data", prefix="rt-"))
