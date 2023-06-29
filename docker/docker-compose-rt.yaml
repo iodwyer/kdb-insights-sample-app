@@ -96,7 +96,7 @@ services:
   #  
     image: ${KX_DOCKER_REG}/kxi-sm-single:${SM_VERSION}
     restart: "always"
-    user: root
+    # user: root
     container_name: sm-single
     environment:
       - KXI_NAME=sm

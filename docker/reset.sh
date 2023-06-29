@@ -4,7 +4,7 @@ docker compose -f docker-compose-rt.yaml down --remove-orphans
 FOLDERS="rt-data-0 sp-log sm-logs da-logs data rt-data-session sp"
 
 
-sudo rm -rf 
+sudo rm -rf $FOLDERS
 ls -alrth 
 
 mkdir $FOLDERS
