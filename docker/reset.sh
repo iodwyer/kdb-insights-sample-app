@@ -1,16 +1,16 @@
-source rt-env.env && docker compose -f docker-compose-rt.yaml down --remove-orphans
 
-sudo rm -rf rt-data-0 publisher-1 sm-logs da-logs subscriber-1 data rt-data-session sp tplog
+docker compose -f docker-compose-rt.yaml down --remove-orphans
+
+FOLDERS="rt-data-0 sp-log sm-logs da-logs data rt-data-session sp"
+
+
+sudo rm -rf 
 ls -alrth 
 
-mkdir rt-data-0 publisher-1 sm-logs da-logs subscriber-1 data rt-data-session sp tplog
+mkdir $FOLDERS
 
 ls -larth 
 
-chmod -R 777 rt-data-0 publisher-1 sm-logs da-logs subscriber-1 data rt-data-session sp tplog
+chmod -R 777 $FOLDERS
 
-source rt-env.env && docker compose -f docker-compose-rt.yaml up -d 
-
-
-
-
+docker compose -f docker-compose-rt.yaml up -d 

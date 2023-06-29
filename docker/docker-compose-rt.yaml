@@ -32,7 +32,7 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./sp:/sp   
       - ./cfg:/opt/kx/cfg 
-      - ./publisher-1:/s
+      - ./sp-log:/s
     env_file:
       - .env 
     stdin_open: true
@@ -107,10 +107,6 @@ services:
       - KXI_SM_EOIPORT=10002
       - KXI_LOG_LEVELS=default:info  
       # - KXI_LATE_DATA=true    
-      - RT_LOG_PATH
-      - RT_STREAM
-      - RT_REPLICAS
-      - RT_TOPIC_PREFIX
     ports:
       - 127.0.0.1::10001
     volumes:
@@ -120,7 +116,7 @@ services:
       # - ./tplog:/logs
       - ./sm-logs:/logs
       - ./cfg:/opt/kx/cfg 
-      - ./subscriber-1:/s
+      # - ./subscriber-1:/s
     env_file:
       - .env 
     stdin_open: true
@@ -144,10 +140,6 @@ services:
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
-      - RT_LOG_PATH=/s/
-      - RT_STREAM
-      - RT_REPLICAS
-      - RT_TOPIC_PREFIX
     ports:
       - 127.0.0.1::5080
     volumes:
@@ -155,10 +147,10 @@ services:
       # - ./data:/data
       - ./data:/data
       # - ./tplog:/logs
-      - ./da-logs:/logs/rdb
+      # - ./da-logs:/logs/rdb
       # - ./da-logs:/logs
       - ./cfg:/opt/kx/cfg     
-      - ./subscriber-1:/s
+      - ./da-logs:/s
     deploy:
       mode: replicated
       replicas: 1
