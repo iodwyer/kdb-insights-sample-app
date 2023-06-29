@@ -10,44 +10,6 @@ version: "3"
   # da-logs:
   # data:
 
-# Environment variables common to all RT sequencers
-# x-rt-env:
-#   &rt-env
-#     environment:
-#       - RT_TOPIC_PREFIX
-#       - RT_SINK
-#       - RAFT_HEARTBEAT
-#       - RAFT_LOG_SIZE
-#       - RAFT_CHUNK_SIZE
-#       - RT_LOGLEVEL_CONSOLE
-#       - RT_SEQ_SESSION_PATH
-#       - RT_EXTERN_PREFIX
-#       - RT_QURAFT_LOG_LEVEL
-#       - RT_LOG_LEADER
-
-# # Startup command line common to all RT sequencers
-# x-rt-command:
-#   &rt-command
-#     command:
-#       [
-#         '-p',
-#         '6000',
-#         '-in',
-#         '$in_dir',
-#         '-out',
-#         '$out_dir',
-#         '-cp',
-#         '$state_dir',
-#         '-size',
-#         '$size',
-#         '-limit',
-#         '$limit',
-#         '-time',
-#         '$time',
-#         '-disk',
-#         '$disk'
-#       ]
-
 
 #
 # Services.
@@ -62,11 +24,7 @@ services:
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
       - KXI_SP_SPEC=/opt/kx/cfg/taq_rt.py
-      - RT_TOPIC_PREFIX
-      - RT_LOG_PATH
-      - RT_STREAM
-      - RT_REPLICAS
-      - KXI_SP_CHECKPOINT_DIR=${RT_LOG_PATH}
+      # - KXI_SP_CHECKPOINT_DIR=/sp
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
@@ -100,26 +58,28 @@ services:
 
   # RT services - these are different services (not replicas), each with its own volume
   rt-data-0:
-    image: ${KX_DOCKER_REG}/kxi-rt:${rt_sequencer_ver}
+    image: ${KX_DOCKER_REG}/kxi-rt:${RT_VERSION}
     # Need to set hostname so rt nodes/publishers/subcribers can find each other
     hostname: rt-data-0
     container_name: rt-data-0
     # <<: [*rt-command, *rt-env]
-    command: ['-p','6000','-in','$in_dir','-out','$out_dir','-cp','$state_dir','-size','$size','-limit','$limit','-time','$time','-disk','$disk']
+    command: ['-p','6000','-in','$in_dir','-out','$out_dir','-cp','$state_dir','-size','$RT_REPLICAS','-limit','$limit','-time','$time','-disk','$disk']
     # Have to run as root (default is nobody) in order to write to docker volume
     user: root
     restart: unless-stopped
-    environment:
-      - RT_TOPIC_PREFIX
-      - RT_SINK
-      - RAFT_HEARTBEAT
-      - RAFT_LOG_SIZE
-      - RAFT_CHUNK_SIZE
-      - RT_LOGLEVEL_CONSOLE
-      - RT_SEQ_SESSION_PATH
-      - RT_EXTERN_PREFIX
-      - RT_QURAFT_LOG_LEVEL
-      - RT_LOG_LEADER
+    # environment:
+    #   - RT_TOPIC_PREFIX
+    #   - RT_SINK
+    #   - RAFT_HEARTBEAT
+    #   - RAFT_LOG_SIZE
+    #   - RAFT_CHUNK_SIZE
+    #   - RT_LOGLEVEL_CONSOLE
+    #   - RT_SEQ_SESSION_PATH
+    #   - RT_EXTERN_PREFIX
+    #   - RT_QURAFT_LOG_LEVEL
+    #   - RT_LOG_LEADER
+    env_file:
+      - .env 
     ports:
       - 127.0.0.1:5000:5000/tcp
       - 127.0.0.1:5001:5001/tcp
