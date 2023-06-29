@@ -62,10 +62,9 @@ services:
     # Need to set hostname so rt nodes/publishers/subcribers can find each other
     hostname: rt-data-0
     container_name: rt-data-0
-    # <<: [*rt-command, *rt-env]
     command: ['-p','6000','-in','$in_dir','-out','$out_dir','-cp','$state_dir','-size','$RT_REPLICAS','-limit','$limit','-time','$time','-disk','$disk']
     # Have to run as root (default is nobody) in order to write to docker volume
-    user: root
+    # user: root
     restart: unless-stopped
     # environment:
     #   - RT_TOPIC_PREFIX
@@ -85,8 +84,8 @@ services:
       - 127.0.0.1:5001:5001/tcp
       - 127.0.0.1:5002:5002/tcp
     volumes:
-      - ./rt-data-0:/s
-      - ./rt-data-session:/rt-session
+      - ./rt-log:/s
+      - ./rt-session:/rt-session
       - ${HOME}/.qp.licenses:/opt/kx/lic 
 
 

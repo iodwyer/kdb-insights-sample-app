@@ -2,8 +2,8 @@ data/
 tplog/
 sp/
 cfg/__pycache__/
-rt-data-0/
-rt-data-session/
+rt-log/
+rt-session/
 sm-logs/
-subscriber-1/
+sp-log/
 da-logs/
