@@ -11,42 +11,42 @@ version: "3"
   # data:
 
 # Environment variables common to all RT sequencers
-x-rt-env:
-  &rt-env
-    environment:
-      - RT_TOPIC_PREFIX
-      - RT_SINK
-      - RAFT_HEARTBEAT
-      - RAFT_LOG_SIZE
-      - RAFT_CHUNK_SIZE
-      - RT_LOGLEVEL_CONSOLE
-      - RT_SEQ_SESSION_PATH
-      - RT_EXTERN_PREFIX
-      - RT_QURAFT_LOG_LEVEL
-      - RT_LOG_LEADER
+# x-rt-env:
+#   &rt-env
+#     environment:
+#       - RT_TOPIC_PREFIX
+#       - RT_SINK
+#       - RAFT_HEARTBEAT
+#       - RAFT_LOG_SIZE
+#       - RAFT_CHUNK_SIZE
+#       - RT_LOGLEVEL_CONSOLE
+#       - RT_SEQ_SESSION_PATH
+#       - RT_EXTERN_PREFIX
+#       - RT_QURAFT_LOG_LEVEL
+#       - RT_LOG_LEADER
 
-# Startup command line common to all RT sequencers
-x-rt-command:
-  &rt-command
-    command:
-      [
-        '-p',
-        '6000',
-        '-in',
-        '$in_dir',
-        '-out',
-        '$out_dir',
-        '-cp',
-        '$state_dir',
-        '-size',
-        '$size',
-        '-limit',
-        '$limit',
-        '-time',
-        '$time',
-        '-disk',
-        '$disk'
-      ]
+# # Startup command line common to all RT sequencers
+# x-rt-command:
+#   &rt-command
+#     command:
+#       [
+#         '-p',
+#         '6000',
+#         '-in',
+#         '$in_dir',
+#         '-out',
+#         '$out_dir',
+#         '-cp',
+#         '$state_dir',
+#         '-size',
+#         '$size',
+#         '-limit',
+#         '$limit',
+#         '-time',
+#         '$time',
+#         '-disk',
+#         '$disk'
+#       ]
 
 
 #
@@ -100,14 +100,26 @@ services:
 
   # RT services - these are different services (not replicas), each with its own volume
   rt-data-0:
-    image: ${rt_sequencer}:${rt_sequencer_ver}
+    image: ${KX_DOCKER_REG}/kxi-rt:${rt_sequencer_ver}
     # Need to set hostname so rt nodes/publishers/subcribers can find each other
     hostname: rt-data-0
     container_name: rt-data-0
-    <<: [*rt-command, *rt-env]
+    # <<: [*rt-command, *rt-env]
+    command: ['-p','6000','-in','$in_dir','-out','$out_dir','-cp','$state_dir','-size','$size','-limit','$limit','-time','$time','-disk','$disk']
     # Have to run as root (default is nobody) in order to write to docker volume
     user: root
     restart: unless-stopped
+    environment:
+      - RT_TOPIC_PREFIX
+      - RT_SINK
+      - RAFT_HEARTBEAT
+      - RAFT_LOG_SIZE
+      - RAFT_CHUNK_SIZE
+      - RT_LOGLEVEL_CONSOLE
+      - RT_SEQ_SESSION_PATH
+      - RT_EXTERN_PREFIX
+      - RT_QURAFT_LOG_LEVEL
+      - RT_LOG_LEADER
     ports:
       - 127.0.0.1:5000:5000/tcp
       - 127.0.0.1:5001:5001/tcp
@@ -115,15 +127,14 @@ services:
     volumes:
       - ./rt-data-0:/s
       - ./rt-data-session:/rt-session
-      - ${kx_licence_dir}:/opt/kx/lic
-      - ${server_certs_dir}:/cert
+      - ${HOME}/.qp.licenses:/opt/kx/lic 
 
 
   sm:
   #
   # Storage Manager
   #  
-    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+    image: ${KX_DOCKER_REG}/kxi-sm-single:${SM_VERSION}
     restart: "always"
     user: root
     container_name: sm-single
@@ -173,7 +184,7 @@ services:
       - KXI_CUSTOM_FILE=/opt/kx/cfg/custom.api.q
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
-      - RT_LOG_PATH
+      - RT_LOG_PATH=/s/
       - RT_STREAM
       - RT_REPLICAS
       - RT_TOPIC_PREFIX
