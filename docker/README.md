@@ -28,7 +28,7 @@ $ docker compose logs -f
 ### Q
 ```q
 // getData API
-q)gw:hopen "J"$last ":" vs first system"docker port docker-sggw-1"
+q)gw:hopen `:localhost:5040
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`;(0#`)!())
 
