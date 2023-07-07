@@ -25,7 +25,7 @@ $ docker compose logs -f
 
 
 ## Query Data
-### Q
+### q
 ```q
 // getData API
 q)gw:hopen `:localhost:5040
@@ -85,8 +85,8 @@ plt.show()
 ```
 ### Curl
 ```bash
-curl -X POST --header "Content-Type: application/json"\
- --header "Accepted: application/json"    \
- --data '{ "table":  "trade", "startTS":"2022.02.10D00:00:00.000", "endTS":"2022.02.12D00:00:00.000"}'\
-  `docker port docker-sggw-1 | grep 8080 | cut -f3 -d " "`"/kxi/getData"
+curl -X POST --header "Content-Type: application/json" \
+    --header "Accepted: application/json" \
+    --data '{ "table":  "trade", "startTS":"2023.07.07D00:00:00.000", "endTS":"2023.07.08D00:00:00.000"}' \
+    localhost:8080/kxi/getData
 ```
