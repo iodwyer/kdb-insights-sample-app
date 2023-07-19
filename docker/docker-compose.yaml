@@ -172,6 +172,7 @@ services:
       - KXI_SG_AUTH_IPC_PORT=5555
       - KXI_SG_AUTH_IPC_USE_TLS="false"
       - KXI_SG_AUTH_IPC_AUTH_API=authorize
+      # - KXI_SG_KEYSTORE_PASS="pass"
     ports:
       - 5040:5040
       - 5041:5041
