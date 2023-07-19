@@ -1,5 +1,5 @@
 from kxi import sp
-import pykx 
+import pykx
 import numpy as np
 import pandas as pd 
 import datetime
@@ -101,7 +101,7 @@ trade_pipeline = (trade_source
 
 ohlcv_pipeline = (trade_source
     | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
-    | sp.map(ohlcv_agg)
+    | sp.map(ohlcv_agg, name = 'ohlcv')
     | sp.map(lambda x: ('ohlcv', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
@@ -113,7 +113,7 @@ vwap_pipeline = (trade_source
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
-    | sp.map(transform_quote)
+    | sp.map(transform_quote, name = 'transform quote')
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
