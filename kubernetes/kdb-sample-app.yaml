@@ -1,0 +1,206 @@
+apiVersion: insights.kx.com/v1
+kind: Assembly
+metadata:
+  name: kdb-sample-app
+  labels:
+    insights.kx.com/databaseID: ad2efcee-cb29-15d2-429e-6c811a8cce4b
+spec:
+  labels:
+    kxname: kdb-sample-app
+  tables:
+    trade:
+      name: trade
+      type: partitioned
+      primaryKeys: []
+      prtnCol: time
+      sortColsDisk: []
+      sortColsMem: []
+      sortColsOrd: []
+      columns:
+        - type: timestamp
+          name: time
+        - name: sym
+          type: symbol
+          attrMem: grouped
+          attrOrd: parted
+          attrDisk: parted
+        - name: price
+          type: float
+        - name: size
+          type: long
+  mounts:
+    rdb:
+      type: stream
+      baseURI: none
+      partition: none
+      dependency:
+        - idb
+      volume: {}
+    idb:
+      type: local
+      baseURI: file:///data/db/idb
+      partition: ordinal
+      volume:
+        size: 250G
+    hdb:
+      type: local
+      baseURI: file:///data/db/hdb
+      partition: date
+      dependency:
+        - idb
+      volume:
+        size: 2T
+  elements:
+    dap:
+      instances:
+        da:
+          rtLogVolume: {}
+          size: 1
+          source: kdb-sample-app
+          env: []
+          k8sPolicy:
+            resources:
+              requests:
+                cpu: 1500m
+                memory: 7Gi
+              limits:
+                cpu: 3000m
+                memory: 15Gi
+          mountList:
+            - rdb
+            - idb
+            - hdb
+    sm:
+      source: kdb-sample-app
+      stream: ""
+      eodPeachLevel: part
+      size: 1
+      env: []
+      rtLogVolume:
+        size: 20Gi
+      tiers:
+        - mount: rdb
+          name: rdb
+          retain: {}
+        - compression:
+            algorithm: qipc
+            block: 14
+          mount: idb
+          name: idb
+          schedule:
+            freq: 0D00:10:00
+          retain: {}
+        - compression:
+            algorithm: qipc
+            block: 14
+          mount: hdb
+          name: hdb
+          retain:
+            time: 30 days
+          schedule:
+            freq: 1D00:00:00
+      k8sPolicy:
+        resources:
+          requests:
+            cpu: 1000m
+            memory: 8Gi
+          limits:
+            cpu: 8000m
+            memory: 17Gi
+    sp:
+      pipelines:
+        trade-kafka-pipeline:
+          base: q
+          maxWorkers: 10
+          minWorkers: 1
+          monitoring: true
+          persistence:
+            controller:
+              disabled: false
+              class: ""
+              size: 20Gi
+              checkpointFreq: 5000
+            worker:
+              disabled: false
+              class: ""
+              size: 20Gi
+              checkpointFreq: 5000
+          protectedExecution: true
+          imagePullSecrets: []
+          secrets: []
+          env:
+            - name: KXI_ERROR_MODE
+              value: "0"
+            - name: KXI_PROTECTED_EXECUTION
+              value: "false"
+            - name: KXI_LOG_FORMAT
+              value: json
+            - name: KXI_LOG_LEVELS
+              value: "DEFAULT: INFO"
+          spec: '{"vertices":[{"id":"Kafka","function":null,"inputs":{"":"*"},"outputs":{"e1689161151845":"*"},"config":{"offset":"end","brokers":"104.198.219.51:9091","topic":"trade"},"metadata":{"type":"reader","plugin":"kafka.reader","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":100,"y":100},"color":"#0061ff","type":"kafka.reader","data":{"id":"Kafka","function":null,"inputs":{"":"*"},"outputs":{"e1689161151845":"*"},"config":{"offset":"end","brokers":"104.198.219.51:9091","topic":"trade"},"metadata":{"type":"reader","plugin":"kafka.reader","params":[],"initialState":null,"stateful":false}},"id":"Kafka"}}},{"id":"JSON","function":null,"inputs":{"e1689161151845":"*"},"outputs":{"e1689164045826":"*"},"config":{},"metadata":{"type":"decoder","plugin":"json.decode","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":349,"y":101},"color":"#76c398","type":"json.decode","data":{"id":"JSON","function":null,"inputs":{"e1689161151845":"*"},"outputs":{"e1689164045826":"*"},"config":{},"metadata":{"type":"decoder","plugin":"json.decode","params":[],"initialState":null,"stateful":false}},"id":"JSON"}}},{"id":"Apply
+            Schema","function":null,"inputs":{"e1689164051144":"*"},"outputs":{"e1689165323821":"*"},"config":{"inputType":"auto","schemaType":"schema","schema":[{"name":"time","datatype":"timestamp","tokenize":"on"},{"name":"sym","datatype":"symbol","tokenize":"auto"},{"name":"price","datatype":"float","tokenize":"auto"},{"name":"size","datatype":"long","tokenize":"auto"}]},"metadata":{"type":"transform","plugin":"schema","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":849,"y":99},"color":"#85b6ff","type":"schema","data":{"id":"Apply
+            Schema","function":null,"inputs":{"e1689164051144":"*"},"outputs":{"e1689165323821":"*"},"config":{"inputType":"auto","schemaType":"schema","schema":[{"name":"time","datatype":"timestamp","tokenize":"on"},{"name":"sym","datatype":"symbol","tokenize":"auto"},{"name":"price","datatype":"float","tokenize":"auto"},{"name":"size","datatype":"long","tokenize":"auto"}]},"metadata":{"type":"transform","plugin":"schema","params":[],"initialState":null,"stateful":false}},"id":"Apply
+            Schema"}}},{"id":"Map","function":{"format":"q","function":"//
+            @param data {any} data from the previous node\n// @return {any} data
+            to pass to the next node\n{[data]\n    (enlist[`timestamp]!enlist
+            `time) xcol enlist
+            data\n    }"},"inputs":{"e1689164045826":"*"},"outputs":{"e1689164051144":"*"},"config":{"allowPartials":true},"metadata":{"type":"operator","plugin":"map","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":600,"y":100},"color":"#ffae72","type":"map","data":{"id":"Map","function":{"format":"q","function":"//
+            @param data {any} data from the previous node\n// @return {any} data
+            to pass to the next node\n{[data]\n    (enlist[`timestamp]!enlist
+            `time) xcol enlist
+            data\n    }"},"inputs":{"e1689164045826":"*"},"outputs":{"e1689164051144":"*"},"config":{"allowPartials":true},"metadata":{"type":"operator","plugin":"map","params":[],"initialState":null,"stateful":false}},"id":"Map"}}},{"id":"kdb
+            Insights
+            Database","function":null,"inputs":{"e1689165323821":"*"},"outputs":{"":"*"},"config":{"directWrite":false,"deduplicate":true,"assembly":"kdb-sample-app","table":"trade"},"metadata":{"type":"writer","plugin":"database.writer","params":[],"initialState":null,"stateful":false,"ui":{"color":"#f23a65","type":"database.writer","data":{"id":"kdb
+            Insights
+            Database","function":null,"inputs":{"e1689165323821":"*"},"outputs":{"":"*"},"config":{"directWrite":false,"deduplicate":true,"assembly":"kdb-sample-app","table":"trade"},"metadata":{"type":"writer","plugin":"database.writer","params":[],"initialState":null,"stateful":false}},"id":"kdb
+            Insights
+            Database","position":{"x":1101,"y":100}}}}],"edges":[{"destination":"JSON","source":"Kafka","edge":"e1689161151845","metadata":{"ui":{"id":"e1689161151845","source":"Kafka","target":"JSON","sourceHandle":"0","targetHandle":"0","animated":true,"type":"wideBezier"}},"valid":true},{"destination":"Map","source":"JSON","edge":"e1689164045826","metadata":{"ui":{"id":"e1689164045826","source":"JSON","target":"Map","sourceHandle":"0","targetHandle":"0","animated":true,"type":"wideBezier"}},"valid":true},{"destination":"Apply
+            Schema","source":"Map","edge":"e1689164051144","metadata":{"ui":{"id":"e1689164051144","source":"Map","target":"Apply
+            Schema","sourceHandle":"0","targetHandle":"0","animated":true,"type":"wideBezier"}},"valid":true},{"destination":"kdb
+            Insights Database","source":"Apply
+            Schema","edge":"e1689165323821","metadata":{"ui":{"id":"e1689165323821","source":"Apply
+            Schema","target":"kdb Insights
+            Database","sourceHandle":"0","targetHandle":"0","animated":true}},"valid":true}],"code":{"format":"q","function":""}}'
+          type: graph
+          workerThreads: 1
+          controllerK8sPolicy:
+            resources:
+              requests:
+                memory: 128Mi
+                cpu: 250m
+              limits:
+                memory: 256Mi
+                cpu: 500m
+          workerK8sPolicy:
+            resources:
+              requests:
+                memory: 256Mi
+                cpu: 500m
+              limits:
+                memory: 512Mi
+                cpu: 1000m
+          labels: {}
+          workerImage:
+            repo: ""
+            component: ""
+            tag: ""
+          controllerImage:
+            repo: ""
+            component: ""
+            tag: ""
+    sequencer:
+      kdb-sample-app:
+        external: false
+        volume:
+          size: 20G
+        k8sPolicy:
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: 1000m
+            requests:
+              memory: 256Mi
+              cpu: 100m
+  queryEnvironment:
+    enabled: true
+    size: 1
