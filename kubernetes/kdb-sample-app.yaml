@@ -25,7 +25,7 @@ spec:
           attrOrd: parted
           attrDisk: parted
         - name: price
-          type: float
+          type: long
         - name: size
           type: long
   mounts:
@@ -110,7 +110,7 @@ spec:
     sp:
       pipelines:
         trade-kafka-pipeline:
-          base: q
+          base: py
           maxWorkers: 10
           minWorkers: 1
           monitoring: true
@@ -137,31 +137,26 @@ spec:
               value: json
             - name: KXI_LOG_LEVELS
               value: "DEFAULT: INFO"
-          spec: '{"vertices":[{"id":"Kafka","function":null,"inputs":{"":"*"},"outputs":{"e1689161151845":"*"},"config":{"offset":"end","brokers":"104.198.219.51:9091","topic":"trade"},"metadata":{"type":"reader","plugin":"kafka.reader","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":100,"y":100},"color":"#0061ff","type":"kafka.reader","data":{"id":"Kafka","function":null,"inputs":{"":"*"},"outputs":{"e1689161151845":"*"},"config":{"offset":"end","brokers":"104.198.219.51:9091","topic":"trade"},"metadata":{"type":"reader","plugin":"kafka.reader","params":[],"initialState":null,"stateful":false}},"id":"Kafka"}}},{"id":"JSON","function":null,"inputs":{"e1689161151845":"*"},"outputs":{"e1689164045826":"*"},"config":{},"metadata":{"type":"decoder","plugin":"json.decode","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":349,"y":101},"color":"#76c398","type":"json.decode","data":{"id":"JSON","function":null,"inputs":{"e1689161151845":"*"},"outputs":{"e1689164045826":"*"},"config":{},"metadata":{"type":"decoder","plugin":"json.decode","params":[],"initialState":null,"stateful":false}},"id":"JSON"}}},{"id":"Apply
-            Schema","function":null,"inputs":{"e1689164051144":"*"},"outputs":{"e1689165323821":"*"},"config":{"inputType":"auto","schemaType":"schema","schema":[{"name":"time","datatype":"timestamp","tokenize":"on"},{"name":"sym","datatype":"symbol","tokenize":"auto"},{"name":"price","datatype":"float","tokenize":"auto"},{"name":"size","datatype":"long","tokenize":"auto"}]},"metadata":{"type":"transform","plugin":"schema","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":849,"y":99},"color":"#85b6ff","type":"schema","data":{"id":"Apply
-            Schema","function":null,"inputs":{"e1689164051144":"*"},"outputs":{"e1689165323821":"*"},"config":{"inputType":"auto","schemaType":"schema","schema":[{"name":"time","datatype":"timestamp","tokenize":"on"},{"name":"sym","datatype":"symbol","tokenize":"auto"},{"name":"price","datatype":"float","tokenize":"auto"},{"name":"size","datatype":"long","tokenize":"auto"}]},"metadata":{"type":"transform","plugin":"schema","params":[],"initialState":null,"stateful":false}},"id":"Apply
-            Schema"}}},{"id":"Map","function":{"format":"q","function":"//
-            @param data {any} data from the previous node\n// @return {any} data
-            to pass to the next node\n{[data]\n    (enlist[`timestamp]!enlist
-            `time) xcol enlist
-            data\n    }"},"inputs":{"e1689164045826":"*"},"outputs":{"e1689164051144":"*"},"config":{"allowPartials":true},"metadata":{"type":"operator","plugin":"map","params":[],"initialState":null,"stateful":false,"ui":{"position":{"x":600,"y":100},"color":"#ffae72","type":"map","data":{"id":"Map","function":{"format":"q","function":"//
-            @param data {any} data from the previous node\n// @return {any} data
-            to pass to the next node\n{[data]\n    (enlist[`timestamp]!enlist
-            `time) xcol enlist
-            data\n    }"},"inputs":{"e1689164045826":"*"},"outputs":{"e1689164051144":"*"},"config":{"allowPartials":true},"metadata":{"type":"operator","plugin":"map","params":[],"initialState":null,"stateful":false}},"id":"Map"}}},{"id":"kdb
-            Insights
-            Database","function":null,"inputs":{"e1689165323821":"*"},"outputs":{"":"*"},"config":{"directWrite":false,"deduplicate":true,"assembly":"kdb-sample-app","table":"trade"},"metadata":{"type":"writer","plugin":"database.writer","params":[],"initialState":null,"stateful":false,"ui":{"color":"#f23a65","type":"database.writer","data":{"id":"kdb
-            Insights
-            Database","function":null,"inputs":{"e1689165323821":"*"},"outputs":{"":"*"},"config":{"directWrite":false,"deduplicate":true,"assembly":"kdb-sample-app","table":"trade"},"metadata":{"type":"writer","plugin":"database.writer","params":[],"initialState":null,"stateful":false}},"id":"kdb
-            Insights
-            Database","position":{"x":1101,"y":100}}}}],"edges":[{"destination":"JSON","source":"Kafka","edge":"e1689161151845","metadata":{"ui":{"id":"e1689161151845","source":"Kafka","target":"JSON","sourceHandle":"0","targetHandle":"0","animated":true,"type":"wideBezier"}},"valid":true},{"destination":"Map","source":"JSON","edge":"e1689164045826","metadata":{"ui":{"id":"e1689164045826","source":"JSON","target":"Map","sourceHandle":"0","targetHandle":"0","animated":true,"type":"wideBezier"}},"valid":true},{"destination":"Apply
-            Schema","source":"Map","edge":"e1689164051144","metadata":{"ui":{"id":"e1689164051144","source":"Map","target":"Apply
-            Schema","sourceHandle":"0","targetHandle":"0","animated":true,"type":"wideBezier"}},"valid":true},{"destination":"kdb
-            Insights Database","source":"Apply
-            Schema","edge":"e1689165323821","metadata":{"ui":{"id":"e1689165323821","source":"Apply
-            Schema","target":"kdb Insights
-            Database","sourceHandle":"0","targetHandle":"0","animated":true}},"valid":true}],"code":{"format":"q","function":""}}'
-          type: graph
+          spec: |-
+            from kxi import sp
+            import pykx
+            import numpy as np
+            import pandas as pd 
+            import datetime
+
+            kfk_broker  = '104.198.219.51:9091'
+
+            def dbg(data):
+              print(data)
+              return(data)
+
+            trade_pipeline = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
+                | sp.decode.json()
+                | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }')
+                | sp.map(dbg)
+                | sp.write.to_stream(table = 'trade'))
+
+            sp.run(trade_pipeline)
           workerThreads: 1
           controllerK8sPolicy:
             resources:
