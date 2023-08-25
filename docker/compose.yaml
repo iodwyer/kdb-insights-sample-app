@@ -12,7 +12,7 @@ services:
       - tp    
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
-      - KXI_SP_SPEC=/opt/kx/cfg/taq.py
+      - KXI_SP_SPEC=/opt/kx/cfg/sp/taq.py
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
