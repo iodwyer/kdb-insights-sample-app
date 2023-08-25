@@ -18,7 +18,7 @@ services:
       - 127.0.0.1::5000
     volumes:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
-      - ./sp:/sp   
+      - ./data/sp:/sp   
       - ./cfg:/opt/kx/cfg 
     env_file:
       - .env 

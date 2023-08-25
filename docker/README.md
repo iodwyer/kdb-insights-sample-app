@@ -5,8 +5,8 @@
 * [Run docker commands without `sudo`](https://docs.docker.com/engine/install/linux-postinstall/)
 ## Create data folders 
 ```bash
-$ mkdir -p data tplog sp/checkpoints
-$ sudo chmod 777 -R data tplog sp
+$ mkdir -p data/sp/checkpoints tplog
+$ sudo chmod 777 -R data tplog
 ```
 
 ## KX License
