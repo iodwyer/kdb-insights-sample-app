@@ -47,7 +47,7 @@ services:
   #
   # Storage Manager
   #  
-    image: "registry.dl.kx.com/kxi-sm-single:${SM_VERSION}"
+    image: ${KX_DOCKER_REG}/kxi-sm-single:${SM_VERSION}
     restart: "always"
     depends_on:
       - tp
@@ -71,7 +71,15 @@ services:
       - .env 
     stdin_open: true
     tty: true      
-
+  sm-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/sm/config.json
+      # - KXI_LOG_CONFIG=${cfg_dir}/qlog.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     ## generalise/create env var
+    command: -p 8080
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
     restart: "always"
