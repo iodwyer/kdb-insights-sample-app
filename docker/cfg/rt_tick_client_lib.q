@@ -1,5 +1,6 @@
 // === internal tables without time/sym columns ===
-.rt.NO_TIME_SYM:`$("_prtnEnd";"_reload")
+.rt.NO_TIME_SYM:`$("_prtnEnd";"_reload";"_batchIngest";"_batchDelete")
+.rt.IS_DICT:`$("_batchIngest";"_batchDelete")
 
 // === rt publish and push functions ===
 .rt.push:{'"cannot push unless you have called .rt.pub first"}; // will be overridden
@@ -8,7 +9,7 @@
   if[not 10h=type topic;'"topic must be a string"];
   h:neg hopen hsym`$getenv `KXI_RT_NODES;
   .rt.push:{[nph;payload]
-    if[type x:last payload; x:value flip x];
+    x:$[98h=type x:last payload; value flip x;99h=type x;enlist each value x;x];
     if[(t:first payload)in .rt.NO_TIME_SYM; x:(count[first x]#'(0Nn;`)),x];
     nph(`.u.upd;t;x);}[h;];
     .rt.push }
@@ -31,9 +32,10 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
 
   // === tick.q will call back to these ===
   upd::{[uf;t;x]
-    if[not type x; x:flip(cols .rt.schema t)!x]; // for log replay 
-    if[t in .rt.NO_TIME_SYM; x:`time`sym _x]; 
-    uf[(t;x);.rt.idx]; 
+    if[not type x; x:flip(cols .rt.schema t)!x]; // for log replay
+    if[t in .rt.NO_TIME_SYM; x:`time`sym _x];
+    if[t in .rt.IS_DICT; x:first x];
+    uf[(t;x);.rt.idx];
     .rt.idx+:1; }[uf];
 
   .u.end:{.rt.idx:.rt.date2startIdx x+1};
@@ -46,7 +48,7 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
   .rt.schema:(!/)flip res 0; // used to convert arrays to tables during log replay
 
   //if start index is less than current index, then recover
-  if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0]; 
+  if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0];
      .rt.recoverMultiDay[res[1];startIdx]]; }
 
 //100 billion records per day
@@ -58,7 +60,7 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
   //iL - index and Log (as can be fed into -11!)
   i:first iL; L:last iL;
   //get all files in the same folder as the tp log file
-  files:key dir:first pf:` vs last L; 
+  files:key dir:first pf:` vs last L;
   //get the name of the logfile itself
   fileName:last pf;
   //get all the lognameXXXX.XX.XX files (logname is sym by default - so usually the files are of the form sym2021.01.01, sym2021.01.02, sym2021.01.03, etc)
@@ -70,5 +72,5 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
   //read all of all the log files except the last, where you read up to 'i'
   files:0W,/:files; files[(count files)-1;0]:i;
   //reset .rt.idx for each new day and replay the log file
-  {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files; 
+  {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files;
   };
