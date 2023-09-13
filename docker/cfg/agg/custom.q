@@ -26,7 +26,7 @@ pingAggOverride:{[res]
 // @return      {table}     Plus join.
 //
 pjAgg:{[tbls]
-    .sapi.ok (pj/)tbls
+    .sapi.ok (+/)tbls
     }
 
 
@@ -65,7 +65,7 @@ avAgg:{[tbls]
     .sapi.metaDescription["Plus join aggregation"],
     .sapi.metaParam[`name`type`description!(`tbls;0h;"Tables received from DAPs")],
     .sapi.metaReturn`type`description!(98h;"The plus join (over) of the tables");
-    `countBy]; // Register as default aggregation function for this API
+    `.custom.countBy];   // Register as default aggregation function for this API
 
 .sgagg.registerAggFn[`avAgg;
     .sapi.metaDescription["Average join aggregation"],

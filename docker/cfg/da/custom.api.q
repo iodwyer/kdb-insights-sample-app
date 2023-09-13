@@ -15,12 +15,12 @@
 //
 // @return          {table}             Count by specified columns.
 //
-countBy:{[table;startTS;endTS;byCols]
-    ?[table;enlist(within;`realTime;(startTS;endTS-1));{x!x,:()}byCols;enlist[`cnt]!enlist(count;`i)]
+.custom.countBy:{[table;startTS;endTS;byCols]
+    ?[table;enlist(within;`time;(startTS;endTS-1));{x!x,:()}byCols;enlist[`cnt]!enlist(count;`i)]
     }
 
 // Register with the DA process.
-.da.registerAPI[`countBy;
+.da.registerAPI[`.custom.countBy;
     .sapi.metaDescription["Define a new API. Counts number of entries by specified columns."],
     .sapi.metaParam[`name`type`isReq`description!(`table;-11h;1b;"Table name.")],
     .sapi.metaParam[`name`type`isReq`description!(`byCols;-11 11h;1b;"Column(s) to count by.")],
