@@ -118,7 +118,7 @@ tables:
 
 bus:
   stream:
-    protocol: custom
+    protocol: tp
     nodes: tp:5010
     topic: dataStream
 
