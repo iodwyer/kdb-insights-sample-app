@@ -165,8 +165,8 @@ elements:
           freq: 00:10:00      # every 10 minutes
       - name: hdb
         mount: hdb
-        retain: 
         schedule:
           snap: 00:00:00      # EOD at midnight     
+        retain: 
           time: 30 days
     disableDiscovery: true    # Disables registering with discovery
