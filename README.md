@@ -9,6 +9,7 @@
 ## Architecture
 ![Architecture](img/arch_diagram.png)
 
+
 ## Quick Links
 * [Microservices](https://code.kx.com/insights/microservices)
 
