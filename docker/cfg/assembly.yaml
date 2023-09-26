@@ -152,7 +152,6 @@ elements:
       HDB:
         mountName: hdb
 
-
   sm:
     description: Storage manager
     source: stream
