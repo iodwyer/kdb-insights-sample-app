@@ -1,5 +1,5 @@
 from kxi import sp
-import pykx
+import pykx as kx
 import numpy as np
 import pandas as pd 
 import datetime
@@ -7,21 +7,6 @@ import datetime
 tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
-# trade_schema_types = {
-#     'timestamp':    pykx.TimestampAtom,
-#     'sym':          pykx.SymbolAtom,
-#     'price':        pykx.FloatAtom,
-#     'size':         pykx.LongAtom
-# }
-
-quote_schema_types = {
-    # 'time':       'timestamp',
-    # 'sym':        'symbol',
-    'bid':        'float',
-    'ask':        'float',
-    'bsize':      'int64',
-    'asize':      'int64'
-}
 
 def transform_quote(data):
     dict = data.pd()
@@ -31,27 +16,6 @@ def transform_quote(data):
     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
     dict['sym']   = dict['sym'].decode("utf-8")
     return dict
-
-# def transform_trade(data):
-#     dict = data.pd()
-#     # dict['price'] = int(dict['bsize'])
-#     dict['size']  = int(dict['size'])
-#     dict['time']  = dict.pop('timestamp')
-#     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
-#     dict['sym']   = dict['sym'].decode("utf-8")
-#     # print(dict)
-#     return dict
-
-# def transform_quote(data):
-#     df = data.pd()
-#     print(df)
-#     print(type(df))
-#     df['time']  = df.pop('timestamp')
-#     # df.rename(columns={'timestamp':'time'}, inplace=True)
-#     # df.astype(quote_schema_types)
-#     df['time']  = pd.to_datetime(df['time'].decode("utf-8"))
-#     df['sym']   = df['sym'].decode("utf-8")
-#     return df
 
 def ohlcv_agg(data):
     df = data.pd()
@@ -70,8 +34,6 @@ def ohlcv_agg(data):
     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
     # print(ohlcv)
     return ohlcv
-
-
 
 def vwap_agg(data):
     df = data.pd()
@@ -128,8 +90,7 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
 
 
 sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
-# sp.run(test_byte_stream)
-# sp.run(quote_pipeline)
+
 
 #### WIP #####
 
@@ -154,16 +115,36 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #         df.rename(columns={'o':'open', 'h':'high', 'l':'low', 'c':'close', 'v':'volume'}, inplace=True, errors='raise')
 #     return df
 
-# trade_schema_types = {
-#     'timestamp':  'timestamp',
-#     'sym':        'symbol',
-#     'price':      'float',
-#     'size':       'long'
+# def transform_trade(data):
+#     dict = data.pd()
+#     # dict['price'] = int(dict['bsize'])
+#     dict['size']  = int(dict['size'])
+#     dict['time']  = dict.pop('timestamp')
+#     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
+#     dict['sym']   = dict['sym'].decode("utf-8")
+#     # print(dict)
+#     return dict
+
+
+# quote_schema_types = {
+#     # 'time':       'timestamp',
+#     # 'sym':        'symbol',
+#     'bid':        'float',
+#     'ask':        'float',
+#     'bsize':      'int64',
+#     'asize':      'int64'
 # }
 
-# trade_schema_columns = {
-#     'timestamp':  'time',
-#     'sym':        'sym',
-#     'price':      'price',
-#     'size':       'size'
+# trade_schema_types = kx.schema.builder({
+#         'timestamp':    kx.TimestampAtom,
+#         'sym':          kx.SymbolAtom,
+#         'price':        kx.FloatAtom,
+#         'size':         kx.LongAtom
+#         })
+
+# trade_schema_types = {
+#     'timestamp':    pykx.TimestampAtom,
+#     'sym':          pykx.SymbolAtom,
+#     'price':        pykx.FloatAtom,
+#     'size':         pykx.LongAtom
 # }
