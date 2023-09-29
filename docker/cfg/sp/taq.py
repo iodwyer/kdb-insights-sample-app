@@ -7,6 +7,13 @@ import datetime
 tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
+# trade_schema_types = {
+#     'timestamp':    pykx.TimestampAtom,
+#     'sym':          pykx.SymbolAtom,
+#     'price':        pykx.FloatAtom,
+#     'size':         pykx.LongAtom
+# }
+
 quote_schema_types = {
     # 'time':       'timestamp',
     # 'sym':        'symbol',
@@ -93,6 +100,7 @@ def vwap_agg(data):
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     # | sp.map(transform_trade))
+    # | sp.transform.schema(trade_schema_types)
     | sp.map('{[data] enlist "PS*j"$data }') 
     | sp.transform.rename_columns({'timestamp': 'time'}))  ## rename incoming column 'timestamp' to 'time' 
 
