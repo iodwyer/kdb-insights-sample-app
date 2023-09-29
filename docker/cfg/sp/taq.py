@@ -93,7 +93,8 @@ def vwap_agg(data):
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
     # | sp.map(transform_trade))
-    | sp.map('{[data] (enlist[`timestamp]!enlist `time) xcol enlist "PS*j"$data }'))
+    | sp.map('{[data] enlist "PS*j"$data }') 
+    | sp.transform.rename_columns({'timestamp': 'time'}))  ## rename incoming column 'timestamp' to 'time' 
 
 trade_pipeline = (trade_source
     | sp.map(lambda x: ('trade', x))
