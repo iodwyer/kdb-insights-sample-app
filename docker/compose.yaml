@@ -47,7 +47,7 @@ services:
   #
   # Storage Manager
   #  
-    image: ${KX_DOCKER_REG}/kxi-sm-single:${SM_VERSION}
+    image: ${KX_DOCKER_REG}/kxi-sm-single:${DATABASE_VERSION}
     restart: "always"
     depends_on:
       - tp
@@ -80,7 +80,7 @@ services:
   #     - ./cfg:/opt/kx/cfg     ## generalise/create env var
   #   command: -p 8080   ## needed?
   da-single:
-    image: ${KX_DOCKER_REG}/kxi-da-single:${DA_VERSION}
+    image: ${KX_DOCKER_REG}/kxi-da-single:${DATABASE_VERSION}
     restart: "always"
     depends_on:
       - tp
@@ -151,7 +151,7 @@ services:
   # Resource Coordinator -- 1 per assembly.
   #
   sgrc:
-    image: ${KX_DOCKER_REG}/kxi-sg-rc:${SG_VERSION}
+    image: ${KX_DOCKER_REG}/kxi-sg-rc:${DATABASE_VERSION}
     restart: "always"
     environment:
       - KXI_NAME=sg_rc
@@ -174,7 +174,7 @@ services:
   # Aggregator. Note we only have one here, but multiple can be configured.
   #
   sgagg:
-    image: ${KX_DOCKER_REG}/kxi-sg-agg:${SG_VERSION}
+    image: ${KX_DOCKER_REG}/kxi-sg-agg:${DATABASE_VERSION}
     restart: "always"
     environment:
       - KXI_NAME=sg_agg
@@ -201,7 +201,7 @@ services:
   # Gateway.
   #
   sggw:
-    image: ${KX_DOCKER_REG}/kxi-sg-gw:${SG_VERSION}
+    image: ${KX_DOCKER_REG}/kxi-sg-gw:${DATABASE_VERSION}
     restart: "always"
     environment:
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
@@ -255,7 +255,7 @@ services:
   # #
   # # Intraday Database
   # #
-  #   image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+  #   image: ${KX_DOCKER_REG}/kxi-da:${DATABASE_VERSION}
   #   restart: "always"
   #   environment:
   #     - KXI_NAME=rdb
@@ -285,7 +285,7 @@ services:
   # #
   # # Intraday Database
   # #
-  #   image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+  #   image: ${KX_DOCKER_REG}/kxi-da:${DATABASE_VERSION}
   #   restart: "always"
   #   command: -s 4
   #   environment:
@@ -315,7 +315,7 @@ services:
   # #
   # # Historical Database
   # #
-  #   image: ${KX_DOCKER_REG}/kxi-da:${DA_VERSION}
+  #   image: ${KX_DOCKER_REG}/kxi-da:${DATABASE_VERSION}
   #   restart: "always"
   #   command: -s 8
   #   environment:
