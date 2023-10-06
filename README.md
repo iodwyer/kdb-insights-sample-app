@@ -1,6 +1,7 @@
 # kdb Insights Sample Application
 - [kdb Insights Sample Application](#kdb-insights-sample-application)
   - [Architecture](#architecture)
+  - [Monitoring](#monitoring)
   - [Quick Links](#quick-links)
   - [Prerequisites](#prerequisites)
   - [Features](#features)
@@ -9,6 +10,8 @@
 ## Architecture
 ![Architecture](img/arch_diagram.png)
 
+## Monitoring
+![Monitoring](img/grafana.png)
 
 ## Quick Links
 * [Microservices](https://code.kx.com/insights/microservices)

@@ -261,11 +261,10 @@ services:
       # - GF_SECURITY_ADMIN_USER=admin
       # - GF_SECURITY_ADMIN_PASSWORD=grafana
       - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/kdb-sample-metrics.json
     volumes:
       - ./cfg/grafana/provisioning:/etc/grafana/provisioning
       - ./cfg/grafana/dashboards:/var/lib/grafana/dashboards
-      # - ./cfg/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      # - ./cfg/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
 
 volumes:
   prom_data:
