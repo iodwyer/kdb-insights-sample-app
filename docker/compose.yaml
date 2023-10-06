@@ -59,6 +59,7 @@ services:
       - KXI_SM_SMPORT=10001
       - KXI_SM_EOIPORT=10002
       - KXI_LOG_LEVELS=default:info  
+      - KXI_CONFIG_FILE=/opt/kx/cfg/sm/config.json
       # - KXI_LATE_DATA=true    
     ports:
       - 127.0.0.1::10001
@@ -71,14 +72,15 @@ services:
       - .env 
     stdin_open: true
     tty: true      
-  # sm-sidecar:
-  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-  #   environment:
-  #     - KXI_CONFIG_FILE=/opt/kx/cfg/sm/config.json
-  #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
-  #     - ./cfg:/opt/kx/cfg     ## generalise/create env var
-  #   command: -p 8080   ## needed?
+  sm-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/sm/config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080   
+  
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DATABASE_VERSION}
     restart: "always"
@@ -97,6 +99,7 @@ services:
       - KXI_CUSTOM_FILE=/opt/kx/cfg/da/custom.api.q
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+      - KXI_CONFIG_FILE=/opt/kx/cfg/da/config.json
     ports:
       - 127.0.0.1::5080
       - 127.0.0.1::5081
@@ -114,38 +117,48 @@ services:
       - .env    
     stdin_open: true
     tty: true 
-  # dap-sidecar:
-  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-  #   environment:
-  #     - KXI_CONFIG_FILE=/opt/kx/cfg/da/config.json
-  #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
-  #     - ./cfg:/opt/kx/cfg     
-  #   command: -p 8080   
-  # rdb-sidecar:
-  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-  #   environment:
-  #     - KXI_CONFIG_FILE=/opt/kx/cfg/da/rdb-config.json
-  #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
-  #     - ./cfg:/opt/kx/cfg     
-  #   command: -p 8080   
-  # idb-sidecar:
-  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-  #   environment:
-  #     - KXI_CONFIG_FILE=/opt/kx/cfg/da/idb-config.json
-  #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
-  #     - ./cfg:/opt/kx/cfg     
-  #   command: -p 8080   
-  # hdb-sidecar:
-  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-  #   environment:
-  #     - KXI_CONFIG_FILE=/opt/kx/cfg/da/hdb-config.json
-  #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
-  #     - ./cfg:/opt/kx/cfg     
-  #   command: -p 8080   
+  dap-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/da/config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080   
+    ports:
+      - 8084:8080
+  rdb-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/da/rdb-config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080   
+    ports:
+      - 8081:8080
+  idb-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/da/idb-config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080  
+    ports:
+      - 8082:8080 
+  hdb-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/da/hdb-config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080   
+    stdin_open: true
+    tty: true 
+    ports:
+      - 8083:8080
   
   #
   # Resource Coordinator -- 1 per assembly.
@@ -224,31 +237,38 @@ services:
     volumes: 
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg         
+#
+# Metrics
+#
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./cfg/prometheus:/etc/prometheus
+      - prom_data:/prometheus
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      # - GF_SECURITY_ADMIN_USER=admin
+      # - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+    volumes:
+      - ./cfg/grafana/provisioning:/etc/grafana/provisioning
+      - ./cfg/grafana/dashboards:/var/lib/grafana/dashboards
+      # - ./cfg/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      # - ./cfg/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
 
-#   prometheus:
-#     image: prom/prometheus
-#     container_name: prometheus
-#     command:
-#       - '--config.file=/etc/prometheus/prometheus.yml'
-#     ports:
-#       - 9090:9090
-#     restart: unless-stopped
-#     volumes:
-#       - ./cfg/prometheus:/etc/prometheus
-#       - prom_data:/prometheus
-#   grafana:
-#     image: grafana/grafana
-#     container_name: grafana
-#     ports:
-#       - 3000:3000
-#     restart: unless-stopped
-#     environment:
-#       - GF_SECURITY_ADMIN_USER=admin
-#       - GF_SECURITY_ADMIN_PASSWORD=grafana
-#     volumes:
-#       - ./cfg/grafana:/etc/grafana/provisioning/datasources
-# volumes:
-#   prom_data:
+volumes:
+  prom_data:
 
 
   # rdb:

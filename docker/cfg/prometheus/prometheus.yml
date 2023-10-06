@@ -31,6 +31,7 @@ global:
 
 scrape_configs:
   - job_name: 'monitoring'
+    metrics_path: /metrics
     static_configs:
       - targets:
         - dap-sidecar:8080
