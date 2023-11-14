@@ -291,7 +291,7 @@ spec:
           imagePullPolicy: IfNotPresent
           env:
             - name: KXI_LOG_LEVELS
-              value: "default:trace" 
+              value: "default:debug" 
             - name: KXI_SP_SPEC
               value: /opt/kx/cfg/taq.py 
             - name: KDB_LICENSE_B64
@@ -481,7 +481,7 @@ spec:
                   name: kdb-license-info
                   key: license
             - name: KXI_LOG_LEVELS
-              value: "default:trace"     
+              value: "default:debug"     
             - name: KXI_LOG_FORMAT
               value: "text"         
             - name: KX_KURL_DEBUG_LOG          
@@ -607,7 +607,7 @@ spec:
                   name: kdb-license-info
                   key: license
             - name: KXI_LOG_LEVELS
-              value: "default:trace"     
+              value: "default:debug"     
             - name: KXI_SM_SMPORT
               value: "10001"                  
             - name: KXI_ASSEMBLY_FILE
