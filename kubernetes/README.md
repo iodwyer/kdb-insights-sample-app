@@ -33,9 +33,9 @@ $ kubectl create secret generic kdb-license-info \
 ```
 
 ```bash
-$ kubectl create secret generic aws-access-secret \
-    --from-literal=AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
-    --from-literal=AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+# $ kubectl create secret generic aws-access-secret \
+#     --from-literal=AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID} \
+#     --from-literal=AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
 ```    
 
 ```bash
@@ -43,9 +43,17 @@ $ kubectl apply -f rook-ceph-pvc.yaml -n kdb
 $ kubectl apply -f microservices-assembly.yaml -n kdb
 ```
 
+## Port forward 
+```bash
+$ kubectl port-forward service/kxi-sg-gw 5040:5040 -n kdb    ## allows you to query localhost:5040
+```
 
+## Clean up
 ```bash
 $ kubectl delete -f microservices-assembly.yaml -n kdb
+$ kubectl delete -f rook-ceph-pvc.yaml -n kdb
 ```
+
+<!-- ## Debug tools
 ### ceph-toolbox
-* https://rook.github.io/docs/rook/v1.5/ceph-toolbox.html
+* https://rook.github.io/docs/rook/v1.5/ceph-toolbox.html -->

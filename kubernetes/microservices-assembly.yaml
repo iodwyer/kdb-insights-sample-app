@@ -42,7 +42,7 @@ spec:
         - name: resource-coordinator
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sg-rc:1.3.4      
+          image: registry.dl.kx.com/kxi-sg-rc:1.7.3 
           imagePullPolicy: IfNotPresent
           args: [ -p, "5060" ]
           env:
@@ -57,6 +57,8 @@ spec:
               value: ".kxi.sql,.kxi.qsql"  
             - name: KXI_LOG_FORMAT
               value: "text"            
+            - name: KXI_AUTH_DISABLED
+              value: "1"    
           ports:
             - name: ipc-port  
               containerPort: 5060
@@ -102,7 +104,7 @@ metadata:
     app.kubernetes.io/name: aggregator
     app.kubernetes.io/instance: kxinsights
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: aggregator
@@ -120,7 +122,7 @@ spec:
           args: [ -p, "5050" ]
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sg-agg:1.3.4    
+          image: registry.dl.kx.com/kxi-sg-agg:1.7.3   
           imagePullPolicy: IfNotPresent
           env:
             - name: KDB_LICENSE_B64
@@ -133,7 +135,9 @@ spec:
             - name: KXI_SG_RC_ADDR
               value: kxi-sg-rc.kdb.svc:5060  
             - name: KXI_LOG_FORMAT
-              value: "text"              
+              value: "text"     
+            - name: KXI_AUTH_DISABLED
+              value: "1"             
           ports:
             - name: aggregator
               containerPort: 5050
@@ -183,7 +187,7 @@ metadata:
     app.kubernetes.io/name: sg-gateway
     app.kubernetes.io/instance: kxinsights
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app.kubernetes.io/name: sg-gateway
@@ -200,7 +204,7 @@ spec:
         - name: sg-gateway
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sg-gw:1.3.4   
+          image: registry.dl.kx.com/kxi-sg-gw:1.7.3 
           imagePullPolicy: IfNotPresent
           env:
             - name: KDB_LICENSE_B64
@@ -283,13 +287,11 @@ spec:
           args: [ -p, "5000" ]
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sp-python:1.3.3    
+          image: registry.dl.kx.com/kxi-sp-python:1.7.4 
           imagePullPolicy: IfNotPresent
           env:
             - name: KXI_LOG_LEVELS
               value: "default:trace" 
-            - name: KXI_SP_CHECKPOINT_FREQ
-              value: "0"  
             - name: KXI_SP_SPEC
               value: /opt/kx/cfg/taq.py 
             - name: KDB_LICENSE_B64
@@ -298,10 +300,12 @@ spec:
                   name: kdb-license-info
                   key: license   
             - name: KXI_LOG_FORMAT
-              value: "text"           
+              value: "text"      
+            # - name: KXI_SP_CHECKPOINT_FREQ
+            #   value: "0"       
           ports:
             - name: sp-feed
-              containerPort: 5000
+              containerPort: 5000    
               protocol: TCP
           resources:
             {}
@@ -441,7 +445,7 @@ metadata:
     app.kubernetes.io/name: kxi-data-access
     app.kubernetes.io/instance: kxinsights
 spec:
-  replicas: 1
+  replicas: 2
   serviceName: kxi-da-single
   selector:
     matchLabels:
@@ -460,7 +464,7 @@ spec:
         - name: kxi-data-access
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-da-single:1.3.4         
+          image: registry.dl.kx.com/kxi-da-single:1.7.3        
           imagePullPolicy: IfNotPresent       
           tty: true   
           stdin: true 
@@ -469,6 +473,8 @@ spec:
               value: dap
             - name: KXI_SC
               value: dap
+            - name: KXI_PORT
+              value: "5080"   
             - name: KDB_LICENSE_B64
               valueFrom:
                 secretKeyRef:
@@ -476,38 +482,36 @@ spec:
                   key: license
             - name: KXI_LOG_LEVELS
               value: "default:trace"     
-            - name: KXI_PORT
-              value: "5080"                  
-            - name: KX_TRACE_OBJSTR
-              value: "1"
+            - name: KXI_LOG_FORMAT
+              value: "text"         
             - name: KX_KURL_DEBUG_LOG          
               value: "1"  
             - name: KXI_ASSEMBLY_FILE
               value: /opt/kx/cfg/assembly.yaml
             - name: KXI_RT_LIB
               value: /opt/kx/cfg/rt_tick_client_lib.q
-            - name: KXI_ALLOWED_SBX_APIS
-              value: ".kxi.sql,.kxi.qsql"                 
-            # - name: AWS_REGION
-            #   value: eu-west-1
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aws-access-secret
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aws-access-secret
-                  key: AWS_SECRET_ACCESS_KEY  
-            # - name: KX_OBJSTR_INVENTORY_FILE
-            #   value: "_inventory/all.json.gz"                           
             - name: KXI_CUSTOM_FILE
               value: "/opt/kx/cfg/custom.api.q"    
+            - name: KXI_ALLOWED_SBX_APIS
+              value: ".kxi.sql,.kxi.qsql"    
+            - name: KX_TRACE_OBJSTR
+              value: "1"             
+            # - name: AWS_REGION
+            #   value: eu-west-1
+            # - name: AWS_ACCESS_KEY_ID
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: aws-access-secret
+            #       key: AWS_ACCESS_KEY_ID
+            # - name: AWS_SECRET_ACCESS_KEY
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: aws-access-secret
+            #       key: AWS_SECRET_ACCESS_KEY  
+            # - name: KX_OBJSTR_INVENTORY_FILE
+            #   value: "_inventory/all.json.gz"                           
             # - name: KX_OBJSTR_CACHE_PATH
             #   value: "/data"            
-            - name: KXI_LOG_FORMAT
-              value: "text"                         
           ports:
             - name: kxi-data-access
               containerPort: 5080
@@ -588,7 +592,7 @@ spec:
         - name: sm-single
           securityContext:
             {}
-          image: registry.dl.kx.com/kxi-sm-single:1.3.6         
+          image: registry.dl.kx.com/kxi-sm-single:1.7.3        
           imagePullPolicy: IfNotPresent       
           tty: true   
           stdin: true 
@@ -604,26 +608,26 @@ spec:
                   key: license
             - name: KXI_LOG_LEVELS
               value: "default:trace"     
-            # - name: KXI_PORT
-            #   value: "5080"                  
+            - name: KXI_SM_SMPORT
+              value: "10001"                  
             - name: KXI_ASSEMBLY_FILE
               value: /opt/kx/cfg/assembly.yaml
             - name: KXI_RT_LIB
-              value: /opt/kx/cfg/rt_tick_client_lib.q              
+              value: /opt/kx/cfg/rt_tick_client_lib.q    
+            - name: KXI_LOG_FORMAT
+              value: "text"                
             # - name: AWS_REGION
             #   value: eu-west-1
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: aws-access-secret
-                  key: AWS_ACCESS_KEY_ID
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: aws-access-secret
-                  key: AWS_SECRET_ACCESS_KEY      
-            - name: KXI_LOG_FORMAT
-              value: "text"                  
+            # - name: AWS_ACCESS_KEY_ID
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: aws-access-secret
+            #       key: AWS_ACCESS_KEY_ID
+            # - name: AWS_SECRET_ACCESS_KEY
+            #   valueFrom:
+            #     secretKeyRef:
+            #       name: aws-access-secret
+            #       key: AWS_SECRET_ACCESS_KEY      
           ports:
             - name: sm-single
               containerPort: 10001
@@ -721,7 +725,7 @@ data:
 
     bus:
       stream:
-        protocol: custom
+        protocol: tp
         nodes: kdb-tick.kdb.svc:5010
         topic: dataStream
 
@@ -761,10 +765,11 @@ data:
           - name: idb
             mount: idb
             schedule:
-              freq: 0D00:10:00      # every 10 minutes
-              snap: 0D00:00:00
+              freq: 00:10:00      # every 10 minutes
           - name: hdb
             mount: hdb
+            schedule:
+              snap: 00:00:00      # EOD at midnight   
             retain: 
               time: 30 days
         disableDiscovery: true      # Disables registering with discovery
@@ -776,7 +781,8 @@ metadata:
 data:
   rt_tick_client_lib.q: |-
     // === internal tables without time/sym columns ===
-    .rt.NO_TIME_SYM:`$("_prtnEnd";"_reload")
+    .rt.NO_TIME_SYM:`$("_prtnEnd";"_reload";"_batchIngest";"_batchDelete")
+    .rt.IS_DICT:`$("_batchIngest";"_batchDelete")
 
     // === rt publish and push functions ===
     .rt.push:{'"cannot push unless you have called .rt.pub first"}; // will be overridden
@@ -785,7 +791,7 @@ data:
       if[not 10h=type topic;'"topic must be a string"];
       h:neg hopen hsym`$getenv `KXI_RT_NODES;
       .rt.push:{[nph;payload]
-        if[type x:last payload; x:value flip x];
+        x:$[98h=type x:last payload; value flip x;99h=type x;enlist each value x;x];
         if[(t:first payload)in .rt.NO_TIME_SYM; x:(count[first x]#'(0Nn;`)),x];
         nph(`.u.upd;t;x);}[h;];
         .rt.push }
@@ -808,9 +814,10 @@ data:
 
       // === tick.q will call back to these ===
       upd::{[uf;t;x]
-        if[not type x; x:flip(cols .rt.schema t)!x]; // for log replay 
-        if[t in .rt.NO_TIME_SYM; x:`time`sym _x]; 
-        uf[(t;x);.rt.idx]; 
+        if[not type x; x:flip(cols .rt.schema t)!x]; // for log replay
+        if[t in .rt.NO_TIME_SYM; x:`time`sym _x];
+        if[t in .rt.IS_DICT; x:first x];
+        uf[(t;x);.rt.idx];
         .rt.idx+:1; }[uf];
 
       .u.end:{.rt.idx:.rt.date2startIdx x+1};
@@ -823,7 +830,7 @@ data:
       .rt.schema:(!/)flip res 0; // used to convert arrays to tables during log replay
 
       //if start index is less than current index, then recover
-      if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0]; 
+      if[startIdx<.rt.idx:(.rt.date2startIdx res 2)+res[1;0];
         .rt.recoverMultiDay[res[1];startIdx]]; }
 
     //100 billion records per day
@@ -835,7 +842,7 @@ data:
       //iL - index and Log (as can be fed into -11!)
       i:first iL; L:last iL;
       //get all files in the same folder as the tp log file
-      files:key dir:first pf:` vs last L; 
+      files:key dir:first pf:` vs last L;
       //get the name of the logfile itself
       fileName:last pf;
       //get all the lognameXXXX.XX.XX files (logname is sym by default - so usually the files are of the form sym2021.01.01, sym2021.01.02, sym2021.01.03, etc)
@@ -847,7 +854,7 @@ data:
       //read all of all the log files except the last, where you read up to 'i'
       files:0W,/:files; files[(count files)-1;0]:i;
       //reset .rt.idx for each new day and replay the log file
-      {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files; 
+      {.rt.idx:.rt.date2startIdx "D"$-10#string x 1; -11!x}each files;
       };
 ---
 apiVersion: v1
@@ -859,29 +866,27 @@ data:
     //
     // @desc Define a new API. Counts number of entries by specified columns.
     //
-    // @param table		{symbol}			Table name.
-    // @param byCols	{symbol|symbol[]}	Column(s) to count by.
-    // @param startTS	{timestamp}			Start time (inclusive).
-    // @param endTS		{timestamp}			End time (exclusive).
+    // @param table     {symbol}            Table name.
+    // @param byCols    {symbol|symbol[]}   Column(s) to count by.
+    // @param startTS   {timestamp}         Start time (inclusive).
+    // @param endTS     {timestamp}         End time (exclusive).
     //
-    // @return			{table}				Count by specified columns.
+    // @return          {table}             Count by specified columns.
     //
     .custom.countBy:{[table;startTS;endTS;byCols]
-      bc:$[not[`date in cols table]&`date in byCols;
-        (x,`date)!(x:(byCols,())except`date),enlist($;"d";`time);
-        x!x:byCols,()];
+        ?[table;enlist(within;`time;(startTS;endTS-1));{x!x,:()}byCols;enlist[`cnt]!enlist(count;`i)]
+        }
 
-      ?[table;enlist(within;`timestamp;(startTS;endTS-1));bc;enlist[`cnt]!enlist(count;`i)]
-      }
-
+    // Register with the DA process.
     .da.registerAPI[`.custom.countBy;
-      .sapi.metaDescription["Test custom API - does a count by."],
-      .sapi.metaMisc[enlist[`safe]!enlist 1b],
-      .sapi.metaParam[`name`type`isReq`description!(`table;-11h;1b;"Table name.")],
-      .sapi.metaParam[`name`type`isReq`description!(`byCols;-11 11h;1b;"Column(s) to count by.")],
-      .sapi.metaParam[`name`type`isReq`description!(`startTS;-12h;1b;"Start time (inclusive).")],
-      .sapi.metaParam[`name`type`isReq`description!(`endTS;-12h;1b;"End time (exclusive).")],
-      .sapi.metaReturn`type`description!(98h;"Count by specified columns.")]
+        .sapi.metaDescription["Define a new API. Counts number of entries by specified columns."],
+        .sapi.metaParam[`name`type`isReq`description!(`table;-11h;1b;"Table name.")],
+        .sapi.metaParam[`name`type`isReq`description!(`byCols;-11 11h;1b;"Column(s) to count by.")],
+        .sapi.metaParam[`name`type`isReq`description!(`startTS;-12h;1b;"Start time (inclusive).")],
+        .sapi.metaParam[`name`type`isReq`description!(`endTS;-12h;1b;"End time (exclusive).")],
+        .sapi.metaReturn[`type`description!(98h;"Count by specified columns.")],
+        .sapi.metaMisc[enlist[`safe]!enlist 1b]
+        ]
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -992,8 +997,9 @@ data:
   sym.q: |-
     // internal tables
     // with `time` and `sym` columns added by RT client for compatibility
-    (`$"_prtnEnd")set ([] time:"n"$(); sym:`$(); signal:`$(); endTS:"p"$(); opts:());
+    (`$"_prtnEnd")set ([] time:"n"$(); sym:`$(); signal:`$(); endTS:"p"$(); opts:())
     (`$"_reload")set ([] time:"n"$(); sym:`$(); mount:`$(); params:(); asm:`$())
+    (`$"_heartbeats")set ([] time:"n"$(); sym:`$(); foo:"j"$())
 
 
     // other tables
