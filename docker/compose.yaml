@@ -170,7 +170,7 @@ services:
       - KXI_NAME=sg_rc
       - KXI_PORT=5060
       - KXI_LOG_LEVELS=default:debug # Override
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      # - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_AUTH_DISABLED=1
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
     ports:
@@ -181,7 +181,7 @@ services:
       - .env     
     volumes: 
       - ${HOME}/.qp.licenses:/opt/kx/lic 
-      - ./cfg:/opt/kx/cfg         
+      # - ./cfg:/opt/kx/cfg         
 
   #
   # Aggregator. Note we only have one here, but multiple can be configured.
@@ -192,7 +192,7 @@ services:
     environment:
       - KXI_NAME=sg_agg
       - KXI_PORT=5050
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      # - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_CUSTOM_FILE=/opt/kx/cfg/agg/custom.q
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_AUTH_DISABLED=1
@@ -217,7 +217,7 @@ services:
     image: ${KX_DOCKER_REG}/kxi-sg-gw:${DATABASE_VERSION}
     restart: "always"
     environment:
-      - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
+      # - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - GATEWAY_QIPC_PORT=5040
       - GATEWAY_HTTP_PORT=8080
       - KXI_AUTH_DISABLED=1
@@ -226,10 +226,6 @@ services:
     ports:
       - 5040:5040
       - 8080:8080
-    # Optional: deploy multiple replicas.
-    deploy:
-      mode: replicated
-      replicas: 1
     env_file:
       - .env     
     stdin_open: true
