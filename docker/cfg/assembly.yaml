@@ -162,10 +162,16 @@ elements:
         mount: idb
         schedule:
           freq: 00:10:00      # every 10 minutes
-      - name: hdb
+      - name: hdb1
         mount: hdb
+        store: file:///data/hdb1
         schedule:
           snap: 00:00:00      # EOD at midnight     
         retain: 
-          time: 30 days
+          time: 1 days
+      - name: hdb2
+        mount: hdb
+        store: file:///data/hdb2
+        retain: 
+          time: 1 year
     disableDiscovery: true    # Disables registering with discovery
