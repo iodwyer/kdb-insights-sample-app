@@ -1,38 +1,32 @@
 gw:hopen "J"$last ":" vs first system"docker port docker-sggw-1"
 FileHandle:hopen `:counts.csv
+tabs:`trade`quote
 
+`.last set tabs!count[tabs]#0
 
-
-.last.trade:0
-.last.quote:0
-
-func1:{
-    newCount:count last gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!());
-    diff:newCount - .last.trade;
-    show raze string[.z.p]," Trade count: ",string[newCount],". Trade Difference: ",string[diff];
-    data:csv sv string (.z.p;`trade;newCount;diff);
+writeToCSV:{[time;n;d;t]
+    show raze string[time]," ",string[t]," count: ",string[n],". ",string[t]," difference: ",string[d];
+    data:csv sv string (time;t;n;d);
     FileHandle data,"\n";
-    / show raze string[.z.p]," Trade Difference: ",string[diff];
-    .last.trade:newCount;
     }
 
-func2:{
-    newCount:count last gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!());
-    diff:newCount - .last.quote;
-    show raze string[.z.p]," Quote count: ",string[newCount],". Quote Difference: ",string[diff];
-    data:csv sv string (.z.p;`quote;newCount;diff);
-    FileHandle data,"\n";
-    / show raze string[.z.p]," Quote Difference: ",string[diff];
-    .last.quote:newCount;
+queryAndWrite:{[p;t]
+    newCount:count last gw(`.kxi.getData;(`table`startTS`endTS)!(t;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!());
+    diff:newCount - .last[t];
+    writeToCSV[p;newCount;diff;t];
+    .last[t]:newCount;
     }
 
+readCSV:{[f]
+    flip`time`table`tab_count`diff!("PSJJ";csv) 0: f
+    }
 
-func:{func1[];func2[]}
-.z.ts:func
+.pivot.simple:{[tab; keycol; pivcol; valcol]
+    P:asc distinct ?[tab; (); (); pivcol];
+    / pivcol:`$(string[tabs]),\: "_",string valcol;
+    :?[tab; (); enlist[keycol]!enlist keycol; (#; `P; (!; pivcol; valcol))]
+    };
+
+.z.ts:{queryAndWrite[.z.p;] each tabs}
 
 \t 5000
-
-
-writeToCSV:{
-
-    }
