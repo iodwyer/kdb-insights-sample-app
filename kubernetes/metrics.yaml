@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: da-sidecar-configmap
+data:
+  dap-config.json: |-
+      {
+          "connection": "::5080",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+  rdb-config.json: |-
+      {
+          "connection": "::5081",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+  idb-config.json: |-
+      {
+          "connection": "::5082",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+  hdb-config.json: |-
+      {
+          "connection": "::5083",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+---

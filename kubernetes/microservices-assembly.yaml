@@ -530,6 +530,83 @@ spec:
             - name: rt-tick-client
               mountPath: /opt/kx/cfg/rt_tick_client_lib.q
               subPath: rt_tick_client_lib.q 
+
+        - name: dap-sidecar
+          image: registry.dl.kx.com/kxi-sidecar:1.7.0
+          args: ["-p", "8080" ]
+          ports:
+          - containerPort: 8080
+            name: dap-metrics
+          env:
+          - name: KDB_LICENSE_B64
+            valueFrom:
+              secretKeyRef:
+                name: kdb-license-info
+                key: license            
+          - name: KXI_CONFIG_FILE
+            value: "/opt/kx/sidecarConfig/dap-config.json"    
+          volumeMounts:  
+            - name: da-sidecarconfig
+              mountPath: /opt/kx/sidecarConfig/dap-config.json
+              subPath: dap-config.json
+
+        - name: rdb-sidecar
+          image: registry.dl.kx.com/kxi-sidecar:1.7.0
+          args: ["-p", "8081" ]
+          ports:
+          - containerPort: 8081
+            name: rdb-metrics
+          env:
+          - name: KDB_LICENSE_B64
+            valueFrom:
+              secretKeyRef:
+                name: kdb-license-info
+                key: license            
+          - name: KXI_CONFIG_FILE
+            value: "/opt/kx/sidecarConfig/rdb-config.json"    
+          volumeMounts:  
+            - name: da-sidecarconfig
+              mountPath: /opt/kx/sidecarConfig/rdb-config.json
+              subPath: rdb-config.json
+
+        - name: idb-sidecar
+          image: registry.dl.kx.com/kxi-sidecar:1.7.0
+          args: ["-p", "8082" ]
+          ports:
+          - containerPort: 8082
+            name: idb-metrics
+          env:
+          - name: KDB_LICENSE_B64
+            valueFrom:
+              secretKeyRef:
+                name: kdb-license-info
+                key: license      
+          - name: KXI_CONFIG_FILE
+            value: "/opt/kx/sidecarConfig/idb-config.json"    
+          volumeMounts:  
+            - name: da-sidecarconfig
+              mountPath: /opt/kx/sidecarConfig/idb-config.json
+              subPath: idb-config.json
+
+        - name: hdb-sidecar
+          image: registry.dl.kx.com/kxi-sidecar:1.7.0
+          args: ["-p", "8083" ]
+          ports:
+          - containerPort: 8083
+            name: hdb-metrics
+          env:
+          - name: KDB_LICENSE_B64
+            valueFrom:
+              secretKeyRef:
+                name: kdb-license-info
+                key: license            
+          - name: KXI_CONFIG_FILE
+            value: "/opt/kx/sidecarConfig/hdb-config.json"    
+          volumeMounts:  
+            - name: da-sidecarconfig
+              mountPath: /opt/kx/sidecarConfig/hdb-config.json
+              subPath: hdb-config.json
+
       imagePullSecrets:
         - name: kx-repo-access
       volumes:
@@ -545,6 +622,10 @@ spec:
       - name: rt-tick-client
         configMap:
           name: kxi-rt-tick-client-lib-configmap    
+      - name: da-sidecarconfig
+        configMap:
+          name: da-sidecar-configmap
+
 ---
 apiVersion: v1
 kind: Service
@@ -1030,3 +1111,94 @@ data:
     sub:{if[x~`;:sub[;y]each t];if[not x in t;'x];del[x].z.w;add[x;y]}
 
     end:{(neg union/[w[;;0]])@\:(`.u.end;x)}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: da-sidecar-configmap
+data:
+  dap-config.json: |-
+      {
+          "connection": "::5080",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+  rdb-config.json: |-
+      {
+          "connection": "::5081",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+  idb-config.json: |-
+      {
+          "connection": "::5082",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+  hdb-config.json: |-
+      {
+          "connection": "::5083",
+          "frequencySecs": 5,
+          "metrics": {
+              "enabled": "true",
+              "frequency": 5,
+              "handler": {
+                  "pc": true,
+                  "pg": true,
+                  "ph": true,
+                  "po": true,
+                  "pp": true,
+                  "ps": true,
+                  "ts": true,
+                  "wc": true,
+                  "wo": true,
+                  "ws": true
+              }
+          }
+      }
+---

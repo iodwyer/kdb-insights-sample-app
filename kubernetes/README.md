@@ -43,6 +43,11 @@ $ kubectl apply -f rook-ceph-pvc.yaml -n kdb
 $ kubectl apply -f microservices-assembly.yaml -n kdb
 ```
 
+```bash
+$ helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+```
+
+
 ## Port forward 
 ```bash
 $ kubectl port-forward service/kxi-sg-gw 5040:5040 -n kdb    ## allows you to query localhost:5040
