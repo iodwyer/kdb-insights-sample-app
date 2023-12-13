@@ -16,10 +16,12 @@ version: "3"
 #
 services:
 
-  sp_feed:
+  sp-feed:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     command: -p 5000
     restart: "always"
+    depends_on:
+      - rt-data-0
     # container_name: rt-sp-feed 
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
@@ -99,10 +101,10 @@ services:
       - KXI_NAME=sm
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_SM_SMPORT=10001
       - KXI_SM_EOIPORT=10002
-      - KXI_LOG_LEVELS=default:info  
+      - KXI_LOG_LEVELS=default:trace  
       # - KXI_LATE_DATA=true    
     ports:
       - 127.0.0.1::10001

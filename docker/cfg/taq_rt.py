@@ -102,7 +102,8 @@ print('HELLO 2')
 
 trade_pipeline = (trade_source
     # | sp.map(lambda x: ('trade', x))
-    # | sp.map('{[x] show "parsing trade";show x;x}')
+    | sp.window.timer(period = datetime.timedelta(seconds = 5))
+    | sp.map('{[x] show ("trade: ",string count x); x}')
     # | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
     | sp.write.to_stream(table='trade', stream="data", prefix="rt-"))
 
@@ -124,6 +125,8 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
     | sp.map(transform_quote)
     | sp.map('{[x] enlist x}')
+    | sp.window.timer(period = datetime.timedelta(seconds = 5))
+    | sp.map('{[x] show ("quote: ",string count x); x}')
     # | sp.map(lambda x: ('quote', x))
     # | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
     | sp.write.to_stream(table='quote', stream="data", prefix="rt-"))
