@@ -11,7 +11,7 @@ writeToCSV:{[time;n;d;t]
     }
 
 queryAndWrite:{[p;t]
-    newCount:count last gw(`.kxi.getData;(`table`startTS`endTS)!(t;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!());
+    newCount:count last gw(`.kxi.getData;(`table`startTS`endTS)!(t;"p"$.z.d;"p"$.z.d+1);`;(0#`)!());
     diff:newCount - .last[t];
     writeToCSV[p;newCount;diff;t];
     .last[t]:newCount;
