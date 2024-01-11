@@ -85,8 +85,10 @@ plt.show()
 ```
 ### Curl
 ```bash
+start_time=$(date +"%Y.%m.%dD00:00:00.000") 
+end_time=$(date +"%Y.%m.%dD%T.000")
 curl -X POST --header "Content-Type: application/json" \
     --header "Accepted: application/json" \
-    --data '{ "table":  "trade", "startTS":"2023.07.07D00:00:00.000", "endTS":"2023.07.08D00:00:00.000"}' \
-    localhost:8080/kxi/getData
+    --data "{\"table\": \"trade\", \"startTS\": \"${start_time}\", \"endTS\": \"${end_time}\"}" \
+    http://localhost:8080/kxi/getData
 ```
