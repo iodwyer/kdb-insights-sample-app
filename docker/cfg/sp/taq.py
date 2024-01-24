@@ -27,33 +27,15 @@ def transform_dict_to_table(d):
     return kx.q.enlist(d)   ## transform dictionary to table object
 
 def ohlcv_agg(data):
-    df = data.pd()
-    # create datetime column
-    df['time'] = df['time'].dt.floor('min')
-    # group by sym and datetime, and aggregate
-    agg = {
-        'price': ['first', 'max', 'min', 'last'],
-        'size': 'sum'
-    }
-    ohlcv = df.groupby(['sym', 'time']).agg(agg)
-    # rename columns to match KDB/Q query
-    ohlcv.columns = ['open', 'high', 'low', 'close', 'volume']
-    # reset index to make columns sym and datetime
-    ohlcv = ohlcv.reset_index()[['sym', 'time', 'open', 'high', 'low', 'close', 'volume']]
-    ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
-    # print(ohlcv)
-    return ohlcv
-
-def ohlcv_agg_1(data):
     sql_query = """
         SELECT 
             sym, 
             date_trunc('second', time), 
-            FIRST(price) AS open, 
-            MAX(price)   AS high, 
-            MIN(price)   AS low, 
-            LAST(price)  AS close_e, 
-            SUM(size) AS volume 
+            FIRST(price) AS OPEN, 
+            MAX(price)   AS HIGH, 
+            MIN(price)   AS LOW, 
+            LAST(price)  AS CLOSE_X, 
+            SUM(size)    AS VOL 
         FROM $1 
         GROUP BY sym, date_trunc('second', time)
         """
@@ -88,8 +70,6 @@ trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.map(transform_dict_to_table, name = 'transform trade')
     | sp.transform.rename_columns({'timestamp': 'time'})          ## rename incoming column 'timestamp' to 'time' 
     | sp.transform.schema(trade_schema_types))
-    # | sp.map('{[data] enlist "PS*j"$data }') 
-
 
 trade_pipeline = (trade_source
     | sp.map(lambda x: ('trade', x))
@@ -98,6 +78,7 @@ trade_pipeline = (trade_source
 ohlcv_pipeline = (trade_source
     | sp.window.tumbling(period = datetime.timedelta(seconds = 60), time_column = 'time', sort=True)
     | sp.map(ohlcv_agg, name = 'ohlcv')
+    | sp.transform.rename_columns({'OPEN': 'open', 'HIGH': 'high', 'LOW': 'low', 'CLOSE_X': 'close', 'VOL': 'volume'})  
     | sp.map(lambda x: ('ohlcv', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
@@ -161,3 +142,20 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #     dict['sym']   = dict['sym'].decode("utf-8")
 #     return dict
 
+# def ohlcv_agg_old(data):
+#     df = data.pd()
+#     # create datetime column
+#     df['time'] = df['time'].dt.floor('min')
+#     # group by sym and datetime, and aggregate
+#     agg = {
+#         'price': ['first', 'max', 'min', 'last'],
+#         'size': 'sum'
+#     }
+#     ohlcv = df.groupby(['sym', 'time']).agg(agg)
+#     # rename columns to match KDB/Q query
+#     ohlcv.columns = ['open', 'high', 'low', 'close', 'volume']
+#     # reset index to make columns sym and datetime
+#     ohlcv = ohlcv.reset_index()[['sym', 'time', 'open', 'high', 'low', 'close', 'volume']]
+#     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
+#     # print(ohlcv)
+#     return ohlcv
