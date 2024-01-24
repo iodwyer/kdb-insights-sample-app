@@ -8,6 +8,15 @@ tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
 
+quote_schema_types = {
+    'time':     kx.TimestampAtom,
+    'sym':      kx.SymbolAtom,
+    'bid':      kx.FloatAtom,
+    'ask':      kx.FloatAtom,
+    'bsize':    kx.LongAtom,
+    'asize':    kx.LongAtom
+}
+
 def transform_quote(data):
     dict = data.pd()
     dict['bsize'] = int(dict['bsize'])
@@ -16,6 +25,10 @@ def transform_quote(data):
     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
     dict['sym']   = dict['sym'].decode("utf-8")
     return dict
+
+def transform_quote_1(data):
+    tab = kx.q.enlist(data)   ## transform dictionary to table object
+    return tab
 
 def ohlcv_agg(data):
     df = data.pd()
@@ -84,7 +97,9 @@ vwap_pipeline = (trade_source
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
-    | sp.map(transform_quote, name = 'transform quote')
+    | sp.map(transform_quote_1, name = 'transform quote')
+    | sp.transform.rename_columns({'timestamp': 'time'})
+    | sp.transform.schema(quote_schema_types)
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
@@ -124,16 +139,6 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #     dict['sym']   = dict['sym'].decode("utf-8")
 #     # print(dict)
 #     return dict
-
-
-# quote_schema_types = {
-#     # 'time':       'timestamp',
-#     # 'sym':        'symbol',
-#     'bid':        'float',
-#     'ask':        'float',
-#     'bsize':      'int64',
-#     'asize':      'int64'
-# }
 
 # trade_schema_types = kx.schema.builder({
 #         'timestamp':    kx.TimestampAtom,
