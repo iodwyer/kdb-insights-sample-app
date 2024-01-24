@@ -7,7 +7,6 @@ import datetime
 tp_hostport = ':tp:5010'
 kfk_broker  = '104.198.219.51:9091'
 
-
 quote_schema_types = {
     'time':     kx.TimestampAtom,
     'sym':      kx.SymbolAtom,
@@ -17,18 +16,15 @@ quote_schema_types = {
     'asize':    kx.LongAtom
 }
 
-def transform_quote(data):
-    dict = data.pd()
-    dict['bsize'] = int(dict['bsize'])
-    dict['asize'] = int(dict['asize'])
-    dict['time']  = dict.pop('timestamp')
-    dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
-    dict['sym']   = dict['sym'].decode("utf-8")
-    return dict
+trade_schema_types = {
+    'time':     kx.TimestampAtom,
+    'sym':      kx.SymbolAtom,
+    'price':    kx.FloatAtom,
+    'size':     kx.LongAtom
+}
 
-def transform_quote_1(data):
-    tab = kx.q.enlist(data)   ## transform dictionary to table object
-    return tab
+def transform_dict_to_table(d):
+    return kx.q.enlist(d)   ## transform dictionary to table object
 
 def ohlcv_agg(data):
     df = data.pd()
@@ -47,6 +43,21 @@ def ohlcv_agg(data):
     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
     # print(ohlcv)
     return ohlcv
+
+def ohlcv_agg_1(data):
+    sql_query = """
+        SELECT 
+            sym, 
+            date_trunc('second', time), 
+            FIRST(price) AS open, 
+            MAX(price)   AS high, 
+            MIN(price)   AS low, 
+            LAST(price)  AS close_e, 
+            SUM(size) AS volume 
+        FROM $1 
+        GROUP BY sym, date_trunc('second', time)
+        """
+    return kx.q.sql(sql_query, data)
 
 def vwap_agg(data):
     df = data.pd()
@@ -74,10 +85,11 @@ def vwap_agg(data):
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
-    # | sp.map(transform_trade))
-    # | sp.transform.schema(trade_schema_types)
-    | sp.map('{[data] enlist "PS*j"$data }') 
-    | sp.transform.rename_columns({'timestamp': 'time'}))  ## rename incoming column 'timestamp' to 'time' 
+    | sp.map(transform_dict_to_table, name = 'transform trade')
+    | sp.transform.rename_columns({'timestamp': 'time'})          ## rename incoming column 'timestamp' to 'time' 
+    | sp.transform.schema(trade_schema_types))
+    # | sp.map('{[data] enlist "PS*j"$data }') 
+
 
 trade_pipeline = (trade_source
     | sp.map(lambda x: ('trade', x))
@@ -97,7 +109,7 @@ vwap_pipeline = (trade_source
 
 quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
     | sp.decode.json()
-    | sp.map(transform_quote_1, name = 'transform quote')
+    | sp.map(transform_dict_to_table, name = 'transform quote')
     | sp.transform.rename_columns({'timestamp': 'time'})
     | sp.transform.schema(quote_schema_types)
     | sp.map(lambda x: ('quote', x))
@@ -140,16 +152,12 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #     # print(dict)
 #     return dict
 
-# trade_schema_types = kx.schema.builder({
-#         'timestamp':    kx.TimestampAtom,
-#         'sym':          kx.SymbolAtom,
-#         'price':        kx.FloatAtom,
-#         'size':         kx.LongAtom
-#         })
+# def transform_quote(data):
+#     dict = data.pd()
+#     dict['bsize'] = int(dict['bsize'])
+#     dict['asize'] = int(dict['asize'])
+#     dict['time']  = dict.pop('timestamp')
+#     dict['time']  = pd.to_datetime(dict['time'].decode("utf-8"))
+#     dict['sym']   = dict['sym'].decode("utf-8")
+#     return dict
 
-# trade_schema_types = {
-#     'timestamp':    pykx.TimestampAtom,
-#     'sym':          pykx.SymbolAtom,
-#     'price':        pykx.FloatAtom,
-#     'size':         pykx.LongAtom
-# }

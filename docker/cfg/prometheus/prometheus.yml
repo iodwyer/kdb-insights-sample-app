@@ -39,3 +39,4 @@ scrape_configs:
         - idb-sidecar:8080
         - hdb-sidecar:8080
         - sm-sidecar:8080
+        - sgrc-sidecar:8080

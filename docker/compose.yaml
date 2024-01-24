@@ -183,6 +183,15 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       # - ./cfg:/opt/kx/cfg         
 
+  sgrc-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/rc/rc-config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080   
+
   #
   # Aggregator. Note we only have one here, but multiple can be configured.
   #

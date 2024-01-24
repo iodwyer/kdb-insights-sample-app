@@ -1,0 +1,21 @@
+{
+    "connection": ":sgrc:5060",
+    "frequencySecs": 5,
+    "metrics":
+    {
+        "enabled":"true",
+        "frequency": 5,
+        "handler": {
+            "pc": true,
+            "pg": true,
+            "ph": true,
+            "po": true,
+            "pp": true,
+            "ps": true,
+            "ts": true,
+            "wc": true,
+            "wo": true,
+            "ws": true
+          }
+    }
+}
