@@ -23,14 +23,14 @@ trade_schema_types = {
     'size':     kx.LongAtom
 }
 
-def transform_dict_to_table(d):
-    return kx.q.enlist(d)   ## transform dictionary to table object
+def transform_dict_to_table(d):     ## transform dictionary to table object
+    return kx.q.enlist(d)   
 
 def ohlcv_agg(data):
     sql_query = """
         SELECT 
-            sym, 
             date_trunc('second', time), 
+            sym, 
             FIRST(price) AS OPEN, 
             MAX(price)   AS HIGH, 
             MIN(price)   AS LOW, 
@@ -42,28 +42,17 @@ def ohlcv_agg(data):
     return kx.q.sql(sql_query, data)
 
 def vwap_agg(data):
-    df = data.pd()
+    sql_query = """
+        SELECT 
+            date_trunc('second', time), 
+            sym, 
+            SUM(price * size) / SUM(size)   AS vwap,
+            SUM(size)                       AS accVol
+        FROM $1 
+        GROUP BY sym, date_trunc('second', time)
+        """
+    return kx.q.sql(sql_query, data)
 
-    if df.empty:
-        # print('Empty Dataframe')
-        vwap = df
-    else:
-        # create datetime column
-        df['time'] = df['time'].dt.floor('min')
-
-        # group by sym and datetime, and calculate VWAP and accumulated volume
-        agg = {
-            'price': 'mean',
-            'size' : 'sum'
-        }
-        vwap = df.groupby(['sym', 'time']).apply(lambda x: pd.Series({
-            'vwap': (x['price'] * x['size']).sum() / x['size'].sum(),
-            'accVol': x['size'].sum()
-        }))
-        vwap = vwap.reset_index()[['sym', 'time', 'vwap', 'accVol']]
-        vwap = vwap.astype({'vwap':'float', 'accVol':'int64'})
-        # print(vwap)
-    return vwap
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
     | sp.decode.json()
@@ -159,3 +148,25 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #     ohlcv = ohlcv.astype({'open':'float', 'high':'float','low':'float','close':'float','volume':'int64'})
 #     # print(ohlcv)
 #     return ohlcv
+
+
+# def vwap_agg_old(data):
+#     print(kx.q.meta(data))
+#     df = data.pd()
+
+#     if df.empty:
+#         # print('Empty Dataframe')
+#         vwap = df
+#     else:
+#         # create datetime column
+#         df['time'] = df['time'].dt.floor('min')
+
+#         # group by sym and datetime, and calculate VWAP and accumulated volume
+#         vwap = df.groupby(['sym', 'time']).apply(lambda x: pd.Series({
+#             'vwap': (x['price'] * x['size']).sum() / x['size'].sum(),
+#             'accVol': x['size'].sum()
+#         }))
+#         vwap = vwap.reset_index()[['sym', 'time', 'vwap', 'accVol']]
+#         vwap = vwap.astype({'vwap':'float', 'accVol':'int64'})
+#         print(vwap)
+#     return vwap
