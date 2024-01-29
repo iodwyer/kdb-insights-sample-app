@@ -13,6 +13,7 @@ services:
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
       - KXI_SP_SPEC=/opt/kx/cfg/sp/taq.py
+      - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
@@ -29,6 +30,7 @@ services:
   #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
   #   environment:
   #     - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
+  #     - KXI_LOG_LEVELS=default:trace # Override
   #   volumes:
   #     - ${HOME}/.qp.licenses:/opt/kx/lic  
   #     - ./cfg:/opt/kx/cfg     
