@@ -4,7 +4,7 @@ version: "3"
 #
 services:
 
-  sp_feed:
+  sp-worker:
     image: ${KX_DOCKER_REG}/kxi-sp-python:${SP_PY_VERSION}
     command: -p 5000
     restart: "always"
@@ -24,6 +24,15 @@ services:
       - .env 
     stdin_open: true
     tty: true     
+
+  # sp-sidecar:
+  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+  #   environment:
+  #     - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
+  #   volumes:
+  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
+  #     - ./cfg:/opt/kx/cfg     
+  #   command: -p 8080   
 
   tp:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
@@ -218,6 +227,15 @@ services:
     volumes: 
       - ${HOME}/.qp.licenses:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg                
+
+  agg-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/opt/kx/cfg/agg/agg-config.json
+    volumes:
+      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./cfg:/opt/kx/cfg     
+    command: -p 8080   
 
   #
   # Gateway.
