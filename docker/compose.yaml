@@ -136,8 +136,7 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
-    ports:
-      - 8084:8080
+
   rdb-sidecar:
     image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
     environment:
@@ -146,8 +145,7 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
-    ports:
-      - 8081:8080
+
   idb-sidecar:
     image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
     environment:
@@ -156,8 +154,7 @@ services:
       - ${HOME}/.qp.licenses:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080  
-    ports:
-      - 8082:8080 
+
   hdb-sidecar:
     image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
     environment:
@@ -168,9 +165,7 @@ services:
     command: -p 8080   
     stdin_open: true
     tty: true 
-    ports:
-      - 8083:8080
-  
+
   #
   # Resource Coordinator -- 1 per assembly.
   #
