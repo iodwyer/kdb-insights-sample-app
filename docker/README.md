@@ -18,7 +18,7 @@ $ cp k[4,c,x].lic $HOME/.qp.licenses
 
 ## Docker start
 ```bash
-$ docker login registry.dl.kx.com          ## enter obtained credentials
+$ docker login portal.dl.kx.com          ## enter obtained credentials
 $ docker compose up -d
 $ docker compose logs -f 
 ```
