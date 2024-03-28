@@ -23,7 +23,6 @@ $ docker compose up -d
 $ docker compose logs -f 
 ```
 
-
 ## Query Data
 ### q
 ```q
@@ -92,3 +91,17 @@ curl -X POST --header "Content-Type: application/json" \
     --data "{\"table\": \"trade\", \"startTS\": \"${start_time}\", \"endTS\": \"${end_time}\"}" \
     http://localhost:8080/kxi/getData
 ```
+
+
+## Custom APIs
+
+When creating custom analytics that access data there is a helper function `.kxi.selectTable` which understands the data model within each DAP and can help select from the tables necessary to return the appropriate records. It's interface is as follows:
+
+| name | type | description |
+|------|-----|----------------|
+| tn   | symbol | Name of table to retrieve data from |
+| ts   | timestamp[2] | Time period of interest |
+| wc   | list[] | Where clause of what to select | 
+| bc   | dict/boolean | By clause for select |
+| cn   | symbol | Names of columns to select for. Include any columns needed in aggregations |
+| agg  | dict | Select clause/aggregations to apply to table |
