@@ -1,6 +1,6 @@
 // === internal tables without time/sym columns ===
-.rt.NO_TIME_SYM:`$("_prtnEnd";"_reload";"_batchIngest";"_batchDelete")
-.rt.IS_DICT:`$("_batchIngest";"_batchDelete")
+.rt.NO_TIME_SYM:`$("_prtnEnd";"_reload";"_batchIngest";"_batchDelete";"_schemaChange")
+.rt.IS_DICT:`$("_batchIngest";"_batchDelete";"_schemaChange")
 
 // === rt publish and push functions ===
 .rt.push:{'"cannot push unless you have called .rt.pub first"}; // will be overridden
@@ -37,6 +37,7 @@ if[not type key`.rt.upd; .rt.upd:{[payload;idx] '"need to implement .rt.upd"}];
     if[t in .rt.IS_DICT; x:first x];
     uf[(t;x);.rt.idx];
     .rt.idx+:1; }[uf];
+  .com_kx_secure.addAPI`upd;
 
   .u.end:{.rt.idx:.rt.date2startIdx x+1};
 
