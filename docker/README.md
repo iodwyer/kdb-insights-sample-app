@@ -45,11 +45,13 @@ q)gw(`.kxi.getMeta;args;`;(0#`)!())
 
 ### Python
 <!-- ![](../img/python_example.png) -->
-<!-- <img src="../img/python_example.png" width="1200"> -->
-<!-- <img src="../img/python_example.png" style="width:90%;">   -->
 <div style="text-align: center;">
-    <img src="../img/python_example.png" width="1000" height="600">
+    <img src="../img/python_example.png">
 </div>
+
+<!-- <div style="text-align: center;">
+    <img src="../img/python_example.png" width="1000" height="600">
+</div> -->
 
 ```python
 import pykx as kx
