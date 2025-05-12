@@ -44,8 +44,11 @@ q)gw(`.kxi.getMeta;args;`;(0#`)!())
 ```
 
 ### Python
+
+![](../img/python_example.png)
+
 ```python
-iimport pykx as kx
+import pykx as kx
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
