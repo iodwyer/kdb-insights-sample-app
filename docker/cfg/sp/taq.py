@@ -5,7 +5,13 @@ import pandas as pd
 import datetime
 
 tp_hostport = ':tp:5010'
-kfk_broker  = '104.198.219.51:9091'
+
+kfk_broker  = 'kafka.trykdb.kx.com:443'
+kfk_broker_options = {
+    'sasl.username': 'demo',
+    'sasl.password': 'demo',
+    'sasl.mechanism': 'SCRAM-SHA-512',
+    'security.protocol': 'SASL_SSL'}
 
 quote_schema_types = {
     'time':     kx.TimestampAtom,
@@ -53,8 +59,7 @@ def vwap_agg(data):
         """
     return kx.q.sql(sql_query, data)
 
-
-trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker)
+trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker, options=kfk_broker_options)
     | sp.decode.json()
     | sp.map(transform_dict_to_table, name = 'transform trade')
     | sp.transform.rename_columns({'timestamp': 'time'})          ## rename incoming column 'timestamp' to 'time' 
@@ -77,7 +82,7 @@ vwap_pipeline = (trade_source
     | sp.map(lambda x: ('vwap', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
-quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker)
+quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker, options=kfk_broker_options)
     | sp.decode.json()
     | sp.map(transform_dict_to_table, name = 'transform quote')
     | sp.transform.rename_columns({'timestamp': 'time'})
@@ -103,7 +108,7 @@ sp.run(trade_pipeline, ohlcv_pipeline, vwap_pipeline, quote_pipeline)
 #     # | sp.write.to_console())
 
 # def ohlcv_format(data):
-#     print("$$$$$$$$$$$$$$$$$   type of incoming data: " + str(pykx.q.type(data)) + "  $$$$$$$$$$$$$$$$")
+#     print("$$$$$$$$$$$$$$$$$   type of incoming data: " + str(kx.q.type(data)) + "  $$$$$$$$$$$$$$$$")
 #     df = data.pd()
 #     print(df[:2])
 #     if df.empty:

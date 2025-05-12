@@ -18,7 +18,7 @@ services:
     ports:
       - 127.0.0.1::5000
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./lic:/opt/kx/lic 
       - ./data/sp:/sp   
       - ./cfg:/opt/kx/cfg 
     env_file:
@@ -32,7 +32,7 @@ services:
   #     - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
   #     - KXI_LOG_LEVELS=default:trace # Override
   #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic  
+  #     - ./lic:/opt/kx/lic  
   #     - ./cfg:/opt/kx/cfg     
   #   command: -p 8080   
 
@@ -46,7 +46,7 @@ services:
     command: tick.q sym /logs -p 5010
     working_dir: /opt/kx/tick
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./lic:/opt/kx/lic    
       - ./tplog:/logs
       - ./kdb-tick:/opt/kx/tick
     env_file:
@@ -75,7 +75,7 @@ services:
     ports:
       - 127.0.0.1::10001
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./lic:/opt/kx/lic    
       - ./data:/data
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg 
@@ -88,7 +88,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/sm/sm-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
   
@@ -117,7 +117,7 @@ services:
       - 127.0.0.1::5082
       - 127.0.0.1::5083
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic    
+      - ./lic:/opt/kx/lic    
       - ./data:/data
       - ./tplog:/logs
       - ./cfg:/opt/kx/cfg     
@@ -133,7 +133,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/da/dap-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
 
@@ -142,7 +142,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/da/rdb-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
 
@@ -151,7 +151,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/da/idb-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080  
 
@@ -160,7 +160,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/da/hdb-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
     stdin_open: true
@@ -186,7 +186,7 @@ services:
     env_file:
       - .env     
     volumes: 
-      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./lic:/opt/kx/lic 
       # - ./cfg:/opt/kx/cfg         
 
   sgrc-sidecar:
@@ -194,7 +194,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/rc/rc-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
 
@@ -222,7 +222,7 @@ services:
     stdin_open: true
     tty: true 
     volumes: 
-      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./lic:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg                
 
   agg-sidecar:
@@ -230,7 +230,7 @@ services:
     environment:
       - KXI_CONFIG_FILE=/opt/kx/cfg/agg/agg-config.json
     volumes:
-      - ${HOME}/.qp.licenses:/opt/kx/lic  
+      - ./lic:/opt/kx/lic  
       - ./cfg:/opt/kx/cfg     
     command: -p 8080   
 
@@ -255,7 +255,7 @@ services:
     stdin_open: true
     tty: true  
     volumes: 
-      - ${HOME}/.qp.licenses:/opt/kx/lic 
+      - ./lic:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg         
 #
 # Metrics
@@ -308,7 +308,7 @@ volumes:
   #   ports:
   #     - 127.0.0.1::5090
   #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./lic:/opt/kx/lic    
   #     - ./data:/data
   #     - ./cfg:/opt/kx/cfg   
   #     - ./tplog:/logs    
@@ -339,7 +339,7 @@ volumes:
   #   ports:
   #     - 127.0.0.1::5090
   #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./lic:/opt/kx/lic    
   #     - ./data:/data
   #     - ./cfg:/opt/kx/cfg       
   #   deploy:
@@ -372,7 +372,7 @@ volumes:
   #   ports:
   #     - 127.0.0.1::5100
   #   volumes: 
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic 
+  #     - ./lic:/opt/kx/lic 
   #     - ./cfg:/opt/kx/cfg 
   #     - ./data:/data
   #     # - ./cache:/opt/kx/cache        
@@ -396,7 +396,7 @@ volumes:
   #     - 127.0.0.1::5009
   #   command: /opt/kx/cfg/proc/feed.q -p 5009 
   #   volumes:
-  #     - ${HOME}/.qp.licenses:/opt/kx/lic    
+  #     - ./lic:/opt/kx/lic    
   #     - ./cfg:/opt/kx/cfg 
   #   env_file:
   #     - .env 

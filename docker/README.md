@@ -5,20 +5,21 @@
 * [Run docker commands without `sudo`](https://docs.docker.com/engine/install/linux-postinstall/)
 ## Create data folders 
 ```bash
-$ mkdir -p data/sp/checkpoints tplog
+$ mkdir -p data/sp/checkpoints tplog lic
 $ sudo chmod 777 -R data tplog
 ```
 
 ## KX License
-Copy obtained KX License into the `.qp.licenses` folder in your `$HOME` directory. Further info here: https://code.kx.com/insights/core/qpacker/qpacker.html#licenses
+Copy obtained KX License into the `lic` folder. Further info here: https://code.kx.com/insights/core/qpacker/qpacker.html#licenses
+<!-- install -D file.txt /path/to/non/existing/dir/file.txt  -->
 ```bash
-$ mkdir $HOME/.qp.licenses
-$ cp k[4,c,x].lic $HOME/.qp.licenses
+$ cp /path/to/k[4,c,x].lic lic/
 ```
 
 ## Docker start
+Log in to the [KX download portal](https://portal.dl.kx.com) and obtain a bearer token. 
 ```bash
-$ docker login portal.dl.kx.com          ## enter obtained credentials
+$ docker login -u iodwyer@kx.com -p $BEARER portal.dl.kx.com         ## enter obtained credentials
 $ docker compose up -d
 $ docker compose logs -f 
 ```
