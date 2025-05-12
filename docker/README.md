@@ -44,12 +44,40 @@ q)gw(`.kxi.getMeta;args;`;(0#`)!())
 ```
 
 ### Python
+<!-- ![](../img/python_example.png) -->
+<!-- <div style="text-align: center;">
+    <img src="../img/python_example.png" width="900">
+</div> -->
+
+<div style="text-align: center;">
+    <img src="../img/python_example.png" width="1000" height="600">
+</div>
+
 ```python
 import pykx as kx
 import pandas as pd
 import matplotlib.pyplot as plt
 import datetime
 import pytz
+import random
+import requests
+from bs4 import BeautifulSoup
+
+def get_company_name(ticker):
+    print('Querying for ticker info: ' + ticker)
+    url = f'https://finance.yahoo.com/quote/{ticker}'
+    headers = {'User-Agent': 'Mozilla/5.0'}  # Avoid blocking
+    response = requests.get(url, headers=headers)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # The title tag contains company name and ticker
+    title = soup.title.string
+    
+    if ticker in title:
+        ticker = '(' + ticker + ')'
+        name = title.split(ticker)[0]
+        return(name + ticker)
+    return 'Name not found'
 
 gw = kx.QConnection(host='localhost', port=5040, no_ctx = True)                        ## SG Gateway port
 
@@ -76,11 +104,21 @@ get_data_query_params = {
 }
 
 tab = gw(kx.SymbolAtom('.kxi.getData'), get_data_query_params, '', empty_dict)
-data = tab[1].pd()
+df = tab[1].pd()
 
-print(data)
+unique_syms = list(set(df['sym']))
+selected_sym = random.choice(unique_syms)
+company_name = get_company_name(selected_sym)
 
-plt.plot(data.size)
+filtered_df = df[df['sym'] == selected_sym]
+
+plt.xlabel('Time')
+plt.ylabel('Price')
+plt.title('Trade Data - ' + company_name)
+plt.xticks(rotation=45)
+plt.tight_layout()
+
+plt.plot(filtered_df['time'], filtered_df['price'], label='Price')
 plt.show()
 ```
 ### Curl
