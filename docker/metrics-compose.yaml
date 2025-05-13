@@ -1,0 +1,114 @@
+services:
+  #
+  # Sidecars
+  #
+  sgrc-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/rc-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg     
+
+    command: -p 8080   
+
+  sm-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/sm-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg     
+    command: -p 8080   
+  
+  agg-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/agg-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg     
+    command: -p 8080   
+
+  dap-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/dap-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg     
+    command: -p 8080 
+    stdin_open: true
+    tty: true   
+
+  rdb-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/rdb-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg       
+    command: -p 8080   
+
+  idb-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/idb-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg    
+    command: -p 8080  
+
+  hdb-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/hdb-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg     
+    command: -p 8080   
+    stdin_open: true
+    tty: true 
+
+  # sp-sidecar:
+  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+  #   environment:
+  #     - KXI_CONFIG_FILE=/metrics-cfg/sp/sp-config.json
+  #     - KXI_LOG_LEVELS=default:trace # Override
+  #   volumes:
+  #     - ./lic:/opt/kx/lic  
+  #     - ./cfg/metrics/sidecar:/metrics-cfg       
+  #   command: -p 8080   
+
+  #
+  # Metrics
+  #
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    ports:
+      - 9090:9090
+    restart: unless-stopped
+    volumes:
+      - ./cfg/metrics/prometheus:/etc/prometheus
+      - prom_data:/prometheus
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000                     ## CHANGE
+    restart: unless-stopped
+    environment:
+      # - GF_SECURITY_ADMIN_USER=admin
+      # - GF_SECURITY_ADMIN_PASSWORD=grafana
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/kdb-sample-metrics.json
+    volumes:
+      - ./cfg/metrics/grafana/provisioning:/etc/grafana/provisioning
+      - ./cfg/metrics/grafana/dashboards:/var/lib/grafana/dashboards
+
+
+volumes:
+  prom_data:

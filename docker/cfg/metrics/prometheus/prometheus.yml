@@ -41,4 +41,7 @@ scrape_configs:
         - sm-sidecar:8080
         - sgrc-sidecar:8080
         - agg-sidecar:8080
+        - kxi-da:8080
+        - kxi-gw:81
         # - sp-sidecar:8080
+        # - rt-sidecar:8080
