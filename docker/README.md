@@ -25,16 +25,12 @@ $ docker compose logs -f
 ```
 
 ### Metrics
-
-To enable metrics, bring up the following docker compose file after bringing up compose.yaml
+To enable metrics, bring up the following docker compose file after bringing up compose.yaml. There is a sample dashboard included. 
 
 _Enable metrics_
 ```bash
-docker compose -f config/compose-metrics.yaml up
+docker compose -f metrics-compose.yaml up -d 
 ```
-
-There will be a Prometheus server with the hostname "promstats" added, which you can connect to a grafana dashboard. Port 9090 is mapped to the Prometheus server, and port 3000 is mapped to grafana.
-
 
 ## Query Data
 ### q

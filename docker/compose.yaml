@@ -1,4 +1,3 @@
-version: "3"
 #
 # Services.
 #
@@ -13,7 +12,7 @@ services:
     environment:
       - KXI_LOG_LEVELS=default:debug # Override
       - KXI_SP_SPEC=/opt/kx/cfg/sp/taq.py
-      - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
+      # - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
       # - KXI_SP_BETA_FEATURES=true
     ports:
       - 127.0.0.1::5000
@@ -25,16 +24,6 @@ services:
       - .env 
     stdin_open: true
     tty: true     
-
-  # sp-sidecar:
-  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-  #   environment:
-  #     - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
-  #     - KXI_LOG_LEVELS=default:trace # Override
-  #   volumes:
-  #     - ./lic:/opt/kx/lic  
-  #     - ./cfg:/opt/kx/cfg     
-  #   command: -p 8080   
 
   tp:
     image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
@@ -67,10 +56,10 @@ services:
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
-      - KXI_SM_SMPORT=10001
-      - KXI_SM_EOIPORT=10002
+      - KXI_SM_SMPORT=10001      ## Remove??
+      - KXI_SM_EOIPORT=10002     ## Remove??
       - KXI_LOG_LEVELS=default:info  
-      - KXI_CONFIG_FILE=/opt/kx/cfg/sm/sm-config.json
+      - KXI_CONFIG_FILE=/opt/kx/cfg/metrics/sidecar/sm-config.json
       # - KXI_LATE_DATA=true    
     ports:
       - 127.0.0.1::10001
@@ -83,15 +72,10 @@ services:
       - .env 
     stdin_open: true
     tty: true      
-  sm-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/sm/sm-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080   
-  
+
+  #
+  # Data Access
+  #  
   da-single:
     image: ${KX_DOCKER_REG}/kxi-da-single:${DATABASE_VERSION}
     restart: "always"
@@ -110,7 +94,7 @@ services:
       - KXI_CUSTOM_FILE=/opt/kx/cfg/da/custom.api.q
       - KXI_SG_RC_ADDR=sgrc:5060
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
-      - KXI_CONFIG_FILE=/opt/kx/cfg/da/dap-config.json
+      - KXI_CONFIG_FILE=/opt/kx/cfg/metrics/sidecar/dap-config.json
     ports:
       - 127.0.0.1::5080
       - 127.0.0.1::5081
@@ -120,49 +104,12 @@ services:
       - ./lic:/opt/kx/lic    
       - ./data:/data
       - ./tplog:/logs
-      - ./cfg:/opt/kx/cfg     
+      - ./cfg:/opt/kx/cfg    
     deploy:
       mode: replicated
       replicas: 1
     env_file:
       - .env    
-    stdin_open: true
-    tty: true 
-  dap-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/da/dap-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080   
-
-  rdb-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/da/rdb-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080   
-
-  idb-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/da/idb-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080  
-
-  hdb-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/da/hdb-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080   
     stdin_open: true
     tty: true 
 
@@ -187,16 +134,7 @@ services:
       - .env     
     volumes: 
       - ./lic:/opt/kx/lic 
-      # - ./cfg:/opt/kx/cfg         
-
-  sgrc-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/rc/rc-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080   
+      # - ./cfg:/opt/kx/cfg   
 
   #
   # Aggregator. Note we only have one here, but multiple can be configured.
@@ -223,16 +161,7 @@ services:
     tty: true 
     volumes: 
       - ./lic:/opt/kx/lic 
-      - ./cfg:/opt/kx/cfg                
-
-  agg-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/opt/kx/cfg/agg/agg-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg:/opt/kx/cfg     
-    command: -p 8080   
+      - ./cfg:/opt/kx/cfg          
 
   #
   # Gateway.
@@ -256,38 +185,7 @@ services:
     tty: true  
     volumes: 
       - ./lic:/opt/kx/lic 
-      - ./cfg:/opt/kx/cfg         
-#
-# Metrics
-#
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    ports:
-      - 9090:9090
-    restart: unless-stopped
-    volumes:
-      - ./cfg/prometheus:/etc/prometheus
-      - prom_data:/prometheus
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - 3000:3000
-    restart: unless-stopped
-    environment:
-      # - GF_SECURITY_ADMIN_USER=admin
-      # - GF_SECURITY_ADMIN_PASSWORD=grafana
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH=/var/lib/grafana/dashboards/kdb-sample-metrics.json
-    volumes:
-      - ./cfg/grafana/provisioning:/etc/grafana/provisioning
-      - ./cfg/grafana/dashboards:/var/lib/grafana/dashboards
-
-volumes:
-  prom_data:
+      - ./cfg:/opt/kx/cfg        
 
 
   # rdb:
