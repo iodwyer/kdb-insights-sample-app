@@ -2,9 +2,19 @@ name: "trade-assembly"
 description: "Sample assembly file"
 
 labels:
-  region: "nyc" 
+  region: nyc 
+  assetClass: equities
 
 tables:
+  _heartbeats:
+    type: splayed_mem
+    columns:
+      - name: time
+        type: timespan
+      - name: sym
+        type: symbol
+      - name: foo
+        type: float
   trade:
     description: Trade data
     type: partitioned
@@ -145,12 +155,12 @@ elements:
     instances:
       dap:
         mountList: [rdb, idb, hdb]
-      RDB:
-        mountName: rdb
-      IDB:
-        mountName: idb
-      HDB:
-        mountName: hdb
+      # RDB:
+      #   mountName: rdb
+      # IDB:
+      #   mountName: idb
+      # HDB:
+      #   mountName: hdb
 
   sm:
     description: Storage manager
@@ -161,7 +171,7 @@ elements:
       - name: idb
         mount: idb
         schedule:
-          freq: 00:10:00      # every 10 minutes
+          freq: 0D00:10:00      # every 10 minutes
       - name: hdb1
         mount: hdb
         store: file:///data/hdb1
