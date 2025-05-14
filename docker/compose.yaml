@@ -95,7 +95,9 @@ services:
       - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql,.kxi.sql2
       # Optional for gathering metrics
       - KXI_CONFIG_FILE=/opt/kx/cfg/metrics/sidecar/dap-config.json
-      # - KXI_DA_START_SIDECARS=false
+      # - KXI_DA_START_SIDECARS=true
+      # - KXI_DA_SIDECAR_BASEPORT=8081
+      # - KX_KURL_DISABLE_AUTO_REGISTER=1
     ports:
       - 127.0.0.1::5080
       - 127.0.0.1::5081
