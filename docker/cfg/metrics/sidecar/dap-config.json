@@ -1,6 +1,4 @@
 {
-    "connection": ":da-single:5080",
-    "frequencySecs": 5,
     "metrics": {
         "enabled": "true",
         "frequency": 5,
