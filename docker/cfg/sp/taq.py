@@ -60,12 +60,13 @@ def vwap_agg(data):
     return kx.q.sql(sql_query, data)
 
 trade_source = (sp.read.from_kafka(topic='trade', brokers=kfk_broker, options=kfk_broker_options)
-    | sp.decode.json()
+    | sp.decode.json()    
     | sp.map(transform_dict_to_table, name = 'transform trade')
-    | sp.transform.rename_columns({'timestamp': 'time'})          ## rename incoming column 'timestamp' to 'time' 
+    | sp.transform.rename_columns({'timestamp': 'time'})            ## rename incoming column 'timestamp' to 'time' 
     | sp.transform.schema(trade_schema_types))
 
 trade_pipeline = (trade_source
+    | sp.window.timer(datetime.timedelta(milliseconds=1000))         ## Batch every 1000ms
     | sp.map(lambda x: ('trade', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 
@@ -87,6 +88,7 @@ quote_pipeline = (sp.read.from_kafka(topic='quote', brokers=kfk_broker, options=
     | sp.map(transform_dict_to_table, name = 'transform quote')
     | sp.transform.rename_columns({'timestamp': 'time'})
     | sp.transform.schema(quote_schema_types)
+    | sp.window.timer(datetime.timedelta(milliseconds=500))         ## Batch every 500ms
     | sp.map(lambda x: ('quote', x))
     | sp.write.to_process(handle=tp_hostport, mode='function', target='.u.upd', spread=True))
 

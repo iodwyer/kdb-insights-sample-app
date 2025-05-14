@@ -10,7 +10,7 @@ services:
     depends_on:
       - tp    
     environment:
-      - KXI_LOG_LEVELS=default:debug # Override
+      - KXI_LOG_LEVELS=default:info       
       - KXI_SP_SPEC=/opt/kx/cfg/sp/taq.py
       # - KXI_CONFIG_FILE=/opt/kx/cfg/sp/sp-config.json
       # - KXI_SP_BETA_FEATURES=true
@@ -85,16 +85,17 @@ services:
       - KXI_NAME=dap
       - KXI_SC=dap
       - KXI_PORT=5080
-      - KXI_LOG_LEVELS=default:info # Override
+      - KXI_LOG_LEVELS=default:info 
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_DA_RDB_THREADS=0
       - KXI_DA_IDB_THREADS=4
       - KXI_DA_HDB_THREADS=8
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
       - KXI_CUSTOM_FILE=/opt/kx/cfg/da/custom.api.q
       - KXI_SG_RC_ADDR=sgrc:5060
-      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql,.kxi.sql2
+      # Optional for gathering metrics
       - KXI_CONFIG_FILE=/opt/kx/cfg/metrics/sidecar/dap-config.json
+      # - KXI_DA_START_SIDECARS=false
     ports:
       - 127.0.0.1::5080
       - 127.0.0.1::5081
@@ -125,7 +126,7 @@ services:
       - KXI_LOG_LEVELS=default:debug # Override
       # - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - KXI_AUTH_DISABLED=1
-      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql
+      - KXI_ALLOWED_SBX_APIS=.kxi.sql,.kxi.qsql,.kxi.sql2
     ports:
       - 127.0.0.1::5060
     stdin_open: true
@@ -176,9 +177,13 @@ services:
       - KXI_AUTH_DISABLED=1
       - KXI_LOG_LEVELS=default:trace # Override  
       - KXI_SG_RC_ADDR=sgrc:5060   
+      - KXI_SG_METRICS_ENABLED=true
+      - KXI_SG_METRICS_ENDPOINT=/metrics
+      - KXI_SG_METRICS_PORT=8081
     ports:
       - 5040:5040
       - 8080:8080
+      - 8081:8081          # metrics
     env_file:
       - .env     
     stdin_open: true
