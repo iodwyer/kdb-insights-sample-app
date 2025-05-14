@@ -1,30 +1,3 @@
-# global:
-#   scrape_interval: 15s
-#   scrape_timeout: 10s
-#   evaluation_interval: 15s
-# # alerting:
-# #   alertmanagers:
-# #   - static_configs:
-# #     - targets: []
-# #     scheme: http
-# #     timeout: 10s
-# #     api_version: v1
-# scrape_configs:
-# - job_name: monitoring
-#   honor_timestamps: true
-#   scrape_interval: 15s
-#   scrape_timeout: 10s
-#   metrics_path: /metrics
-#   scheme: http
-#   static_configs:
-#   - targets:
-#     - dap-sidecar:8080
-#     - rdb-sidecar:8080
-#     - idb-sidecar:8080
-#     - hdb-sidecar:8080
-#     - sm-sidecar:8080
-
-
 global:
   scrape_interval:     15s # By default, scrape targets every 15 seconds.
   evaluation_interval: 15s # Evaluate rules every 15 seconds.
@@ -34,14 +7,13 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
       - targets:
-        - dap-sidecar:8080
+        # - dap-sidecar:8080
         - rdb-sidecar:8080
         - idb-sidecar:8080
         - hdb-sidecar:8080
         - sm-sidecar:8080
         - sgrc-sidecar:8080
         - agg-sidecar:8080
-        - kxi-da:8080
-        - kxi-gw:81
+        - sggw:8081
+        # - kxi-da:8080
         # - sp-sidecar:8080
-        # - rt-sidecar:8080

@@ -11,15 +11,6 @@ services:
       - ./cfg/metrics/sidecar:/metrics-cfg     
 
     command: -p 8080   
-
-  sm-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/metrics-cfg/sm-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg/metrics/sidecar:/metrics-cfg     
-    command: -p 8080   
   
   agg-sidecar:
     image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
@@ -30,16 +21,16 @@ services:
       - ./cfg/metrics/sidecar:/metrics-cfg     
     command: -p 8080   
 
-  dap-sidecar:
-    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
-    environment:
-      - KXI_CONFIG_FILE=/metrics-cfg/dap-config.json
-    volumes:
-      - ./lic:/opt/kx/lic  
-      - ./cfg/metrics/sidecar:/metrics-cfg     
-    command: -p 8080 
-    stdin_open: true
-    tty: true   
+  # dap-sidecar:
+  #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+  #   environment:
+  #     - KXI_CONFIG_FILE=/metrics-cfg/dap-config.json
+  #   volumes:
+  #     - ./lic:/opt/kx/lic  
+  #     - ./cfg/metrics/sidecar:/metrics-cfg     
+  #   command: -p 8080 
+  #   stdin_open: true
+  #   tty: true   
 
   rdb-sidecar:
     image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
@@ -69,6 +60,16 @@ services:
     command: -p 8080   
     stdin_open: true
     tty: true 
+  
+  sm-sidecar:
+    image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
+    environment:
+      - KXI_CONFIG_FILE=/metrics-cfg/sm-config.json
+    volumes:
+      - ./lic:/opt/kx/lic  
+      - ./cfg/metrics/sidecar:/metrics-cfg     
+    command: -p 8080   
+
 
   # sp-sidecar:
   #   image: ${KX_DOCKER_REG}/kxi-sidecar:${SIDECAR_VERSION}
@@ -98,7 +99,7 @@ services:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - 3000:3000                     ## CHANGE
+      - 3000:3000                     
     restart: unless-stopped
     environment:
       # - GF_SECURITY_ADMIN_USER=admin
