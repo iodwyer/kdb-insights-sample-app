@@ -55,7 +55,7 @@ services:
       - KXI_NAME=sm
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q
+      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q   ## Remove??
       - KXI_SM_SMPORT=10001      ## Remove??
       - KXI_SM_EOIPORT=10002     ## Remove??
       - KXI_LOG_LEVELS=default:info  
