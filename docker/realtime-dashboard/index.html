@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Live Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <canvas id="myChart" width="600" height="300"></canvas>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log("⚙️ Initializing WebSocket connection...");
+
+      const socketUrl = 'ws://localhost:8090/ws/v1/subscribe/websockets-example';
+      console.log("🔌 Connecting to:", socketUrl);
+      const socket = new WebSocket(socketUrl);
+
+      const ctx = document.getElementById('myChart').getContext('2d');
+      const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Live Prices',
+            data: [],
+            borderColor: 'blue',
+            borderWidth: 2,
+            fill: false,
+            pointRadius: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          animation: false,
+          scales: {
+            x: { title: { display: true, text: 'Time' }},
+            y: { title: { display: true, text: 'Price' }}
+          }
+        }
+      });
+
+      socket.addEventListener('open', () => {
+        console.log('✅ WebSocket connected.');
+        const subscribeMessage = {
+          type: "subscribe",
+          id: 2222,
+          payload: { topic: "data" }
+        };
+        socket.send(JSON.stringify(subscribeMessage));
+      });
+
+      socket.addEventListener('message', (event) => {
+        console.log("📩 Received message:", event.data);
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === 'update' && msg.payload?.data) {
+            const data = msg.payload.data;
+
+            for (let i = 0; i < data.price.length; i++) {
+              const time = data.time[i];
+              const price = data.price[i];
+
+              chart.data.labels.push(time);
+              chart.data.datasets[0].data.push(price);
+
+              if (chart.data.labels.length > 50) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+              }
+            }
+
+            chart.update();
+          }
+        } catch (e) {
+          console.error("❌ Failed to parse message:", event.data, e);
+        }
+      });
+
+      socket.addEventListener('close', (event) => {
+        console.warn('🔌 WebSocket closed:', event);
+      });
+
+      socket.addEventListener('error', (error) => {
+        console.error('🚨 WebSocket error:', error);
+      });
+    });
+  </script>
+</body>
+</html>
