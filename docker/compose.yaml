@@ -34,8 +34,6 @@ services:
     environment:
       - KXI_LOG_LEVELS=default:info       
       - KXI_SP_SPEC=/opt/kx/cfg/sp/streaming.py
-    ports:
-      - 7000:7000
     volumes:
       - ./lic:/opt/kx/lic 
       - ./data/sp:/sp   
@@ -204,10 +202,10 @@ services:
       - KXI_SG_METRICS_ENABLED=true
       - KXI_SG_METRICS_ENDPOINT=/metrics
       - KXI_SG_METRICS_PORT=8081
-      - SP_STREAM_HOST_LIST=websockets-example:sp-stream-subscriber:7000
+      - SP_STREAM_HOST_LIST=websockets-example:sp-stream-subscriber:7000     ## used for websocket streaming
     ports:
       - 5040:5040
-      - 8090:8080
+      - 8080:8080
       - 8081:8081          # metrics
     env_file:
       - .env     
