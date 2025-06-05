@@ -138,9 +138,9 @@ curl -X POST --header "Content-Type: application/json" \
 ```
 
 ### Python - `kxi.Query`
-Install `kxi` library:
+_Install `kxi` library:_
 ```bash 
-$ pip --no-input --quiet install --extra-index-url=https://portal.dl.kx.com/assets/pypi/ kxi
+$ pip --no-input install --extra-index-url=https://portal.dl.kx.com/assets/pypi/ kxi
 ```
 
 Docs: https://code.kx.com/insights/1.13/api/kxi-python/query.html
