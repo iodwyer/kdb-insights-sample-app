@@ -21,7 +21,7 @@
         data: {
           labels: [],
           datasets: [{
-            label: 'Live Prices',
+            label: 'AAPL Live Prices',
             data: [],
             borderColor: 'blue',
             borderWidth: 2,
@@ -57,15 +57,17 @@
             const data = msg.payload.data;
 
             for (let i = 0; i < data.price.length; i++) {
-              const time = data.time[i];
-              const price = data.price[i];
+              if (data.sym[i] === 'AAPL') {   // <-- Filter for AAPL only
+                const time = data.time[i];
+                const price = data.price[i];
 
-              chart.data.labels.push(time);
-              chart.data.datasets[0].data.push(price);
+                chart.data.labels.push(time);
+                chart.data.datasets[0].data.push(price);
 
-              if (chart.data.labels.length > 50) {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
+                if (chart.data.labels.length > 50) {
+                  chart.data.labels.shift();
+                  chart.data.datasets[0].data.shift();
+                }
               }
             }
 
