@@ -11,7 +11,8 @@ kfk_broker_options = {
     'sasl.username': 'demo',
     'sasl.password': 'demo',
     'sasl.mechanism': 'SCRAM-SHA-512',
-    'security.protocol': 'SASL_SSL'}
+    'security.protocol': 'SASL_SSL'
+    }
 
 quote_schema_types = {
     'time':     kx.TimestampAtom,
@@ -20,14 +21,14 @@ quote_schema_types = {
     'ask':      kx.FloatAtom,
     'bsize':    kx.LongAtom,
     'asize':    kx.LongAtom
-}
+    }
 
 trade_schema_types = {
     'time':     kx.TimestampAtom,
     'sym':      kx.SymbolAtom,
     'price':    kx.FloatAtom,
     'size':     kx.LongAtom
-}
+    }
 
 def transform_dict_to_table(d):     ## transform dictionary to table object
     return kx.q.enlist(d)   
