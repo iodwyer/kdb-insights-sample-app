@@ -35,8 +35,10 @@ docker compose -f metrics-compose.yaml up -d
 ## Query Data
 ### q
 ```q
-// getData API
+// open connection
 q)gw:hopen `:localhost:5040
+
+// getData API
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`quote;"p"$.z.d-1;"p"$.z.d+1);`;(0#`)!())
 q)gw(`.kxi.getData;(`table`startTS`endTS)!(`trade;"p"$.z.d;.z.p);`;(0#`)!())
 
@@ -51,11 +53,7 @@ q)args:`region`startTS`endTS!(`nyc;-0Wp;0Wp)
 q)gw(`.kxi.getMeta;args;`;(0#`)!())
 ```
 
-### Python
-<!-- ![](../img/python_example.png) -->
-<!-- <div style="text-align: center;">
-    <img src="../img/python_example.png" width="900">
-</div> -->
+### Python - `PyKX`
 
 <div style="text-align: center;">
     <img src="../img/python_example.png" width="1000" height="600">
@@ -137,6 +135,26 @@ curl -X POST --header "Content-Type: application/json" \
     --header "Accepted: application/json" \
     --data "{\"table\": \"trade\", \"startTS\": \"${start_time}\", \"endTS\": \"${end_time}\"}" \
     http://localhost:8080/kxi/getData
+```
+
+### Python - `kxi.Query`
+Install `kxi` library:
+```bash 
+$ pip --no-input --quiet install --extra-index-url=https://portal.dl.kx.com/assets/pypi/ kxi
+```
+
+Docs: https://code.kx.com/insights/1.13/api/kxi-python/query.html
+```python
+import kxi.query
+import datetime
+import pytz 
+
+conn = kxi.query.Query('http://localhost:8090', usage='MICROSERVICES')
+
+START_TIME = END_TIME - datetime.timedelta(minutes = 60)   
+END_TIME = datetime.datetime.now(tz=pytz.utc)               ## Now                                  
+
+conn.get_data(table = 'trade', start_time = START_TIME, end_time = END_TIME)
 ```
 
 
