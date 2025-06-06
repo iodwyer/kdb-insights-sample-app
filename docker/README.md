@@ -25,7 +25,7 @@ $ docker compose logs -f
 ```
 
 ### Metrics
-To enable metrics, bring up the following docker compose file after bringing up compose.yaml. There is a sample dashboard included. 
+To enable metrics, bring up the following docker compose file after bringing up `compose.yaml`. There is a sample dashboard included. Then you can access the Grafana metrics dashboard.
 
 _Enable metrics_
 ```bash

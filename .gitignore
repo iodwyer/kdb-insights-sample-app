@@ -1,1 +1,7 @@
-.ipynb_checkpoints
+docker/data/
+docker/tplog/
+docker/lic/
+cfg/__pycache__/
+.kx/
+.vscode/
+.ipynb_checkpoints/
