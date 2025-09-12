@@ -1,6 +1,7 @@
 ## Realtime Dashboard using websockets
 The following code subscribes to the websocket publisher and filters by `AAPL` stocks.
 ```bash
+$ cd kdb-insights-sample-app/docker/realtime-dashboard
 $ python -m http.server 8888 --bind localhost 
 ```
 
