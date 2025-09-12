@@ -73,9 +73,8 @@ services:
       - KXI_NAME=sm
       - KXI_SC=SM
       - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
-      # - KXI_RT_LIB=/opt/kx/cfg/rt_tick_client_lib.q   ## Remove??
-      - KXI_SM_SMPORT=10001      ## Remove??
-      - KXI_SM_EOIPORT=10002     ## Remove??
+      # - KXI_SM_SMPORT=10001      ## Remove??
+      # - KXI_SM_EOIPORT=10002     ## Remove??
       - KXI_LOG_LEVELS=default:info  
       - KXI_CONFIG_FILE=/opt/kx/cfg/metrics/sidecar/sm-config.json
       # - KXI_LATE_DATA=true    
@@ -196,17 +195,28 @@ services:
       # - KXI_ASSEMBLY_FILE=/opt/kx/cfg/${ASSEMBLY_FILE_YAML}
       - GATEWAY_QIPC_PORT=5040
       - GATEWAY_HTTP_PORT=8080
-      - KXI_AUTH_DISABLED=1
       - KXI_LOG_LEVELS=default:trace # Override  
       - KXI_SG_RC_ADDR=sgrc:5060   
       - KXI_SG_METRICS_ENABLED=true
       - KXI_SG_METRICS_ENDPOINT=/metrics
       - KXI_SG_METRICS_PORT=8081
       - SP_STREAM_HOST_LIST=websockets-example:sp-stream-subscriber:7000     ## used for websocket streaming
+      - KXI_SG_CORS_ENABLED=true
+      - KXI_SG_CORS_ORIGINS=http://localhost:9090
+      - USE_SP_WATCHER=1
+      # - KXI_SG_AUTH_IPC_HOST=kxi-auth
+      # - KXI_SG_AUTH_IPC_PORT=5000
+      # - KXI_SG_AUTH_IPC_AUTH_API=authorize
+      # - KXI_SG_USE_SSL=0
+      # - GATEWAY_EXT_QIPC_PORT=5051
+      # - KXI_SG_KEYSTORE=/keystore/keystore.p12
+      # - KXI_SG_KEYSTORE_PASS_FILE=/keystore/keystore.pkcs12
+      # - KXI_SG_KEYSTORE_PASS=changeit
     ports:
-      - 5040:5040
-      - 8080:8080
+      - 5000:5040
+      - 8090:8080
       - 8081:8081          # metrics
+      # - 5051:5051          # qipc auth port   
     env_file:
       - .env     
     stdin_open: true
@@ -214,6 +224,47 @@ services:
     volumes: 
       - ./lic:/opt/kx/lic 
       - ./cfg:/opt/kx/cfg        
+      # - ./keystore:/keystore 
+
+  # kxi-auth:
+  #   image: ${KX_DOCKER_REG}/qce:${QCE_VERSION}
+  #   restart: "always"
+  #   command: auth.q -p 5000
+  #   working_dir: /opt/kx/auth
+  #   volumes:
+  #     - ./lic:/opt/kx/lic    
+  #     - ./auth:/opt/kx/auth 
+
+# volume save gateway state in the docker volumes
+# volumes:
+#   gw-data:
+
+  # dash-web:
+  #   image: ${KX_DOCKER_REG}/dash-web:2.12.0
+  #   ports: 
+  #     - 9090:8080
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - gui-gateway
+
+  # gui-gateway:   
+  #   image: ${KX_DOCKER_REG}/kxi-gui-gateway:1.15.1
+  #   ports:
+  #     - 10001:10001
+  #   restart: unless-stopped
+  #   volumes:
+  #     - gw-data:/opt/kx/app/data
+  #     - ./lic:/opt/kx/lic 
+
+  # gui-data:
+  #   image: ${KX_DOCKER_REG}/kxi-gui-data:1.15.1
+  #   ports:
+  #     - 6812:6812
+  #   restart: unless-stopped
+  #   volumes:
+  #     - .:/opt/kx/app/sample/hdb/date
+  #     - ./lic:/opt/kx/lic 
+
 
 
   # rdb:

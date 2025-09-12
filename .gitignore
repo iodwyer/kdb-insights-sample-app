@@ -1,6 +1,7 @@
 docker/data/
 docker/tplog/
 docker/lic/
+docker/keystore/
 cfg/__pycache__/
 .kx/
 .vscode/
