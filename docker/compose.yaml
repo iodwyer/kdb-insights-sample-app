@@ -235,36 +235,36 @@ services:
   #     - ./lic:/opt/kx/lic    
   #     - ./auth:/opt/kx/auth 
 
+
+  dash-web:
+    image: ${KX_DOCKER_REG}/dash-web:2.12.0
+    ports: 
+      - 9090:8080
+    restart: unless-stopped
+    depends_on:
+      - gui-gateway
+
+  gui-gateway:   
+    image: ${KX_DOCKER_REG}/kxi-gui-gateway:1.15.1
+    ports:
+      - 10001:10001
+    restart: unless-stopped
+    volumes:
+      - gw-data:/opt/kx/app/data
+      - ./lic:/opt/kx/lic 
+
+  gui-data:
+    image: ${KX_DOCKER_REG}/kxi-gui-data:1.15.1
+    ports:
+      - 6812:6812
+    restart: unless-stopped
+    volumes:
+      - .:/opt/kx/app/sample/hdb/date
+      - ./lic:/opt/kx/lic 
+
 # volume save gateway state in the docker volumes
-# volumes:
-#   gw-data:
-
-  # dash-web:
-  #   image: ${KX_DOCKER_REG}/dash-web:2.12.0
-  #   ports: 
-  #     - 9090:8080
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - gui-gateway
-
-  # gui-gateway:   
-  #   image: ${KX_DOCKER_REG}/kxi-gui-gateway:1.15.1
-  #   ports:
-  #     - 10001:10001
-  #   restart: unless-stopped
-  #   volumes:
-  #     - gw-data:/opt/kx/app/data
-  #     - ./lic:/opt/kx/lic 
-
-  # gui-data:
-  #   image: ${KX_DOCKER_REG}/kxi-gui-data:1.15.1
-  #   ports:
-  #     - 6812:6812
-  #   restart: unless-stopped
-  #   volumes:
-  #     - .:/opt/kx/app/sample/hdb/date
-  #     - ./lic:/opt/kx/lic 
-
+volumes:
+  gw-data:
 
 
   # rdb:
